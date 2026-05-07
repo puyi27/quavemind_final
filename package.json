@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@tanstack/react-query": "^5.100.6",
+    "axios": "^1.15.2",
+    "cookie-parser": "^1.4.7",
+    "dompurify": "^3.4.1",
+    "react-error-boundary": "^6.1.1",
+    "redis": "^5.12.1"
+  }
+}

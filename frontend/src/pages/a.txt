@@ -1,0 +1,33 @@
+Copia y pégame este Prompt (1):
+
+"Actuando como mi Copiloto Senior de Quavemind: Diséñame la página PerfilAlbum.jsx. Quiero que mantenga el diseño neobrutalista. Debe mostrar la portada del disco, los datos del álbum, el tracklist completo (con botones para reproducir la preview de Deezer en cada canción) y un botón para guardar el álbum entero en 'Mi Bóveda' (usando el LocalStorage por ahora)."
+
+Copia y pégame este Prompt (2):
+
+"Ahora vamos a crear la vista Valoraciones.jsx. Quiero un dashboard neobrutalista donde el usuario pueda ver un historial de todas las canciones a las que les ha dado estrellas (del 1 al 5) en el Laboratorio (PerfilCancion.jsx). Debe verse como un registro de auditorías técnicas."
+
+
+🔐 BLOQUE 2: El Salto a la Fase 2 (Backend Real y Usuarios)
+Aquí es donde tu TFG pasa de ser una web bonita a una aplicación real (SaaS). Vamos a cambiar el LocalStorage por tu base de datos PostgreSQL.
+
+Copia y pégame este Prompt (3):
+
+"Vamos a empezar la Fase 2 de Quavemind: El sistema de usuarios. Redáctame el schema.prisma completo. Necesito los modelos para: Usuario, Favoritos (canciones, artistas, álbumes), Valoraciones (estrellas) y Anotaciones. Después, dame el código para backend/routes/auth.js que gestione el Registro y Login usando contraseñas encriptadas (Bcrypt) y tokens JWT."
+
+Copia y pégame este Prompt (4):
+
+"Ya tenemos el backend de autenticación. Ahora diséñame las páginas Login.jsx y Register.jsx en el frontend. Tienen que ser increíblemente neobrutalistas, parecer terminales de acceso a un servidor confidencial. Además, actualiza nuestro App.jsx para proteger las rutas privadas (como La Bóveda) para que solo entren usuarios logueados."
+
+✍️ BLOQUE 3: La Magia Colaborativa (El "Genius" hispano)
+El core de tu TFG según tu documento: que la comunidad aporte significado a las letras.
+
+Copia y pégame este Prompt (5):
+
+"Quiero implementar el sistema de Anotaciones Colaborativas en el PerfilCancion.jsx. Modifica el frontend y dame la ruta del backend necesaria para que, si un usuario está logueado, pueda seleccionar una frase de la letra, escribir una explicación de esa jerga, y que se guarde en la base de datos (Prisma). Si otro usuario hace clic en esa frase, debe abrirse un recuadro lateral con la anotación estilo Genius."
+
+🎛️ BLOQUE 4: El Algoritmo Avanzado
+Tu documento menciona un "Playlist generator basado en audio features". Esto te da el sobresaliente directo.
+
+Copia y pégame este Prompt (6):
+
+"Vamos a crear el 'Playlist Generator' de Quavemind. Crea una nueva página llamada Generador.jsx. Quiero una interfaz donde el usuario elija parámetros técnicos con sliders (Ej: Energía alta, BPMs entre 90 y 110, vibe oscuro). El frontend debe enviar esto a una nueva ruta de backend que llamará a Spotify para buscar canciones que encajen matemáticamente con esos datos y devolverle una playlist perfecta."

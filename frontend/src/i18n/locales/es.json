@@ -1,0 +1,117 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "search": "Buscar",
+    "dictionary": "Diccionario",
+    "games": "Juegos",
+    "vault": "Mi Bóveda",
+    "login": "Iniciar Sesión",
+    "register": "Registrarse",
+    "profile": "Perfil",
+    "settings": "Configuración",
+    "logout": "Cerrar Sesión"
+  },
+  "home": {
+    "title": "El Radar",
+    "subtitle": "Descubrimientos Diarios",
+    "artistOfDay": "Artista del Día",
+    "underDiscovery": "Descubrimiento Under",
+    "songOfDay": "Canción del Día",
+    "albumOfDay": "Álbum del Día",
+    "trending": "Trending Esta Semana",
+    "explore": "Explorar"
+  },
+  "search": {
+    "placeholder": "Buscar artistas, canciones, álbumes...",
+    "results": "Resultados",
+    "songs": "Canciones",
+    "artists": "Artistas",
+    "albums": "Álbumes"
+  },
+  "games": {
+    "title": "Laboratorio de Juegos",
+    "quavedle": "Quavedle",
+    "versoOculto": "Verso Oculto",
+    "daily": "Modo Diario",
+    "infinite": "Modo Infinito",
+    "archive": "Archivo"
+  },
+  "artist": {
+    "followers": "Seguidores",
+    "songs": "Canciones",
+    "albums": "Álbumes",
+    "bio": "Biografía",
+    "topTracks": "Hits en el Laboratorio",
+    "discography": "Archivo / Discografía",
+    "collaborations": "Colaboraciones",
+    "similar": "Artistas Similares",
+    "follow": "Seguir Artista",
+    "following": "Siguiendo"
+  },
+  "song": {
+    "lyrics": "Letra",
+    "annotations": "Anotaciones",
+    "bpm": "BPM",
+    "energy": "Energía",
+    "danceability": "Bailabilidad",
+    "duration": "Duración",
+    "key": "Tonalidad",
+    "explicit": "Explícito",
+    "addAnnotation": "Añadir Anotación"
+  },
+  "auth": {
+    "loginTitle": "Acceso Confidencial",
+    "registerTitle": "Nuevo Agente",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "username": "Nombre de Usuario",
+    "confirmPassword": "Confirmar Contraseña",
+    "loginButton": "Ingresar",
+    "registerButton": "Crear Cuenta",
+    "noAccount": "¿No tienes cuenta?",
+    "hasAccount": "¿Ya tienes cuenta?",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "loginError": "Credenciales incorrectas",
+    "registerError": "Error al crear cuenta"
+  },
+  "profile": {
+    "title": "Perfil de Agente",
+    "stats": "Estadísticas",
+    "favorites": "Favoritos",
+    "annotations": "Mis Anotaciones",
+    "achievements": "Logros",
+    "gamesPlayed": "Partidas Jugadas",
+    "accuracy": "Precisión",
+    "streak": "Racha Actual",
+    "editProfile": "Editar Perfil",
+    "changeAvatar": "Cambiar Avatar"
+  },
+  "settings": {
+    "title": "Configuración",
+    "theme": "Tema",
+    "dark": "Oscuro",
+    "light": "Claro",
+    "system": "Sistema",
+    "language": "Idioma",
+    "spanish": "Español",
+    "english": "Inglés",
+    "portuguese": "Portugués",
+    "notifications": "Notificaciones",
+    "sound": "Sonido",
+    "save": "Guardar Cambios"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "save": "Guardar",
+    "close": "Cerrar",
+    "more": "Más",
+    "less": "Menos",
+    "viewAll": "Ver Todo"
+  }
+}

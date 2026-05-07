@@ -1,0 +1,213 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // Aquí va tu connection string de Neon
+}
+
+// ==========================================
+// FASE 2: USUARIOS Y SOCIAL
+// ==========================================
+
+model Usuario {
+  id           String       @id @default(uuid())
+  email        String       @unique
+  username     String       @unique
+  passwordHash String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  
+  // Perfil y Características
+  bio          String?      @db.Text
+  avatar       String?      // URL de la imagen
+  ubicacion    String?
+  quavePoints  Int          @default(0)
+  rol          String       @default("USER")
+
+  // Relaciones Sociales
+  favoritos    Favorito[]
+  valoraciones Valoracion[]
+  anotaciones  Anotacion[]
+
+  // Relaciones de Gamificación
+  historialPuntos HistorialPuntos[]
+  resultadosJuegos ResultadoJuego[]
+}
+
+model HistorialPuntos {
+  id        String   @id @default(uuid())
+  usuarioId String
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  puntos    Int
+  motivo    String   // 'quavedle_win', 'valoracion_post', 'comentario_track'
+  createdAt DateTime @default(now())
+}
+
+model ResultadoJuego {
+  id         String   @id @default(uuid())
+  usuarioId  String
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  juego      String   // 'quavedle', 'otra_cosa'
+  puntuacion Int
+  metadatos  Json?    // Para guardar stats específicas (intentos, tiempo, etc.)
+  createdAt  DateTime @default(now())
+}
+
+model Favorito {
+  id         String   @id @default(uuid())
+  usuarioId  String
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  tipo       String   // 'cancion', 'artista', 'album'
+  itemId     String   // ID de Spotify
+  snapshot   Json     // Caché visual (nombre, imagen, artista) para no saturar la API
+  createdAt  DateTime @default(now())
+
+  @@unique([usuarioId, tipo, itemId])
+}
+
+model Valoracion {
+  id         String   @id @default(uuid())
+  usuarioId  String
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  tipo       String   // 'cancion', 'album', 'artista'
+  itemId     String   // ID de Spotify
+  rating     Float    // Valor del 1 al 5 (soporta medias estrellas)
+  comentario String?  @db.Text
+  snapshot   Json     // Caché visual
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([usuarioId, tipo, itemId])
+}
+
+model Anotacion {
+  id             String   @id @default(uuid())
+  usuarioId      String
+  autor          Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  cancionId      String
+  cancion        Cancion  @relation(fields: [cancionId], references: [id], onDelete: Cascade)
+  
+  // Posicionamiento en la letra
+  inicio         Int
+  fin            Int
+  textoSeleccionado String  @db.Text
+  
+  // Contenido
+  titulo         String?
+  contenido      String   @db.Text
+  
+  // Metadatos y Social
+  votosPositivos Int      @default(0)
+  votosNegativos Int      @default(0)
+  estado         String   @default("PENDIENTE") // PENDIENTE, APROBADA, RECHAZADA, DESTACADA
+  
+  // Relaciones opcionales
+  artistaMencionadoId String?
+  artistaMencionado   Artista? @relation(fields: [artistaMencionadoId], references: [id])
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Cancion {
+  id          String   @id // ID de Spotify
+  nombre      String
+  duracionMs  Int?
+  previewUrl  String?
+  imagen      String?
+  popularidad Int      @default(0)
+  
+  // Relaciones
+  letra       Letra?
+  anotaciones Anotacion[]
+  artistas    CancionesOnArtistas[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Letra {
+  id        String   @id @default(uuid())
+  cancionId String   @unique
+  cancion   Cancion  @relation(fields: [cancionId], references: [id], onDelete: Cascade)
+  texto     String   @db.Text
+  fuente    String?
+  urlFuente String?
+  estado    String   @default("PENDIENTE") // PENDIENTE, VERIFICADA, INCOMPLETA
+
+  updatedAt DateTime @updatedAt
+}
+
+model Artista {
+  id          String   @id // ID de Spotify
+  nombre      String
+  imagen      String?
+  generos     String[]
+  popularidad Int      @default(0)
+  biografia   String?  @db.Text
+  
+  // Relaciones
+  canciones   CancionesOnArtistas[]
+  mencionadoEn Anotacion[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model CancionesOnArtistas {
+  cancionId String
+  cancion   Cancion @relation(fields: [cancionId], references: [id], onDelete: Cascade)
+  artistaId String
+  artista   Artista @relation(fields: [artistaId], references: [id], onDelete: Cascade)
+
+  @@id([cancionId, artistaId])
+}
+
+// ==========================================
+// FASE 1: DICCIONARIO Y QUAVEDLE (Existentes)
+// ==========================================
+
+model Creador {
+  id           String  @id @default(uuid())
+  alias        String
+  rolPrincipal String
+  barrioOrigen String?
+  biografia    String? @db.Text
+}
+
+model Jerga {
+  id          String  @id @default(uuid())
+  termino     String
+  significado String  @db.Text
+  contexto    String? @db.Text
+  origen      String?
+}
+
+model PistaQuavedle {
+  id                  String   @id @default(uuid())
+  tipo                String
+  respuesta           String
+  artista             String?
+  dificultad          Int      @default(1)
+  vecesJugada         Int      @default(0)
+  aciertos            Int      @default(0)
+  fallos              Int      @default(0)
+  respuestasAceptadas String[]
+  pistaAnio           String?
+  pistaGenero         String?
+  pistaAlbum          String?
+  pistaAdjetivos      String[]
+  pistaCanciones      String[]
+  pistaColaboradores  String[]
+  usadaEnDiario       DateTime?
+  PartidaDiaria       PartidaDiaria[]
+}
+
+model PartidaDiaria {
+  id      String   @id @default(uuid())
+  fecha   DateTime @unique
+  pistaId String
+  pista   PistaQuavedle @relation(fields: [pistaId], references: [id])
+}
