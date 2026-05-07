@@ -116,7 +116,13 @@ const PerfilCancion = () => {
 
         const queryGenius = `${cancion.nombre} ${cancion.artistaPrincipal}`;
         const [resGenius, resRecom] = await Promise.allSettled([
-          api.get('/music/lyrics', { params: { q: queryGenius } }),
+          api.get('/music/lyrics', { 
+            params: { 
+              q: queryGenius,
+              title: cancion.nombre,
+              artist: cancion.artistaPrincipal
+            } 
+          }),
           api.get(`/recomendaciones/cancion/${id}`),
         ]);
 

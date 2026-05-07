@@ -22,27 +22,28 @@ export default function RecomendacionesDiarias() {
     setLoading(true);
     const hoy = getHoy();
     
+    // Intentar cargar de caché pero solo si es de hoy y tiene datos reales
     const guardado = localStorage.getItem(STORAGE_KEY);
     if (guardado) {
       const datos = JSON.parse(guardado);
-      if (datos.fecha === hoy && datos.selecciones) {
+      if (datos.fecha === hoy && datos.selecciones && datos.selecciones.cancionDelDia) {
         setSelecciones(datos.selecciones);
         setLoading(false);
         return;
       }
     }
     
-    // Usamos el optimizador para evitar que el 404 rompa la UI
+    // Si no hay caché válida, pedimos al servidor
     const data = await fetchOptimizer.get('/recomendaciones/diarias');
     
-    if (data && data.status === 'ok') {
+    // Aceptamos tanto 'ok' como 'partial' para no dejar la UI vacía
+    if (data && (data.status === 'ok' || data.status === 'partial') && data.selecciones) {
       setSelecciones(data.selecciones);
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
         fecha: hoy,
         selecciones: data.selecciones
       }));
     } else {
-      // Si no hay recomendaciones (404), no lanzamos error, simplemente mostramos el fallback de la UI
       setSelecciones(null);
     }
     

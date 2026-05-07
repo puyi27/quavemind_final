@@ -36,30 +36,54 @@ const getGeniusBio = async (nombre) => {
   }
 };
 
-// Ruta: Letras
+// Ruta: Letras (Optimizada con limpieza de metadatos)
 router.get('/lyrics', async (req, res) => {
-  const { q: query } = req.query;
-  if (!query) return res.status(400).json({ status: 'error', mensaje: 'Falta query' });
+  const { q: query, title, artist } = req.query;
+  
+  // Construir una búsqueda limpia
+  let searchQuery = query;
+  if (title && artist) {
+    searchQuery = cleanLyricsQuery(title, artist);
+  }
 
-  const cacheKey = `lyrics:${query.toLowerCase().trim()}`;
+  if (!searchQuery) return res.status(400).json({ status: 'error', mensaje: 'Falta query' });
+
+  const cacheKey = `lyrics:${searchQuery.toLowerCase().trim()}`;
   const cached = await getCachedData(cacheKey);
   if (cached) return res.json({ status: 'ok', letra: cached });
 
-  if (!geniusClient) return res.json({ status: 'ok', letra: 'Letras no disponibles.' });
+  if (!geniusClient) return res.json({ status: 'ok', letra: 'Servicio de letras no configurado.' });
 
   try {
-    const searches = await geniusClient.songs.search(query);
-    if (!searches || searches.length === 0) {
-      return res.json({ status: 'ok', letra: 'Letra no encontrada.' });
+    // 1. Intento con búsqueda limpia
+    let searches = await geniusClient.songs.search(searchQuery);
+    
+    // 2. Si falla, intento con la query original (por si acaso)
+    if ((!searches || searches.length === 0) && query && query !== searchQuery) {
+      searches = await geniusClient.songs.search(query);
     }
+
+    if (!searches || searches.length === 0) {
+      return res.json({ status: 'ok', letra: 'No hemos podido encontrar la letra exacta para este archivo.' });
+    }
+
     const song = searches[0];
     const lyrics = await song.lyrics(true);
-    const cleanedLyrics = lyrics ? lyrics.replace(/^\d+ Contributors.*/i, '').trim() : 'Letra no disponible.';
+    
+    // Limpieza de "Basura" de Genius (Contributors, etc)
+    const cleanedLyrics = lyrics 
+      ? lyrics
+          .replace(/^\d+ Contributors.*/i, '')
+          .replace(/[0-9]+[ ]?Embed/gi, '')
+          .replace(/You might also like/gi, '')
+          .trim() 
+      : 'Letra no disponible.';
     
     await cacheData(cacheKey, cleanedLyrics, 86400);
     return res.json({ status: 'ok', letra: cleanedLyrics });
   } catch (error) {
-    return res.json({ status: 'ok', letra: 'Error obteniendo letras.' });
+    console.error('[LYRICS ERROR]:', error.message);
+    return res.json({ status: 'ok', letra: 'Error de conexión con el satélite de letras.' });
   }
 });
 

@@ -14,6 +14,15 @@ const Register = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     setError('');
+
+    // Validación de robustez de contraseña
+    // Mínimo 6 caracteres, un número y un carácter especial
+    const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>]).{6,}$/;
+    if (!passwordRegex.test(formData.password)) {
+      setError('LA CLAVE NO ES SEGURA: Debe tener al menos 6 caracteres, un número y un símbolo especial.');
+      return;
+    }
+
     setCargando(true);
 
     try {

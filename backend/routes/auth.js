@@ -18,6 +18,15 @@ router.post('/register', async (req, res) => {
       });
     }
 
+    // Validación de robustez de contraseña (Backend Defense)
+    const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>]).{6,}$/;
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        status: 'error',
+        mensaje: 'LA CLAVE NO ES SEGURA: Debe tener al menos 6 caracteres, un número y un símbolo especial.'
+      });
+    }
+
     const usuarioExistente = await prisma.usuario.findFirst({
       where: {
         OR: [{ email }, { username }]
@@ -169,7 +178,14 @@ const handleUpdateProfile = async (req, res) => {
       ubicacion: ubicacion !== undefined ? ubicacion : undefined,
     };
 
-    if (newPassword && newPassword.length >= 6) {
+    if (newPassword) {
+      const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>]).{6,}$/;
+      if (!passwordRegex.test(newPassword)) {
+        return res.status(400).json({
+          status: 'error',
+          mensaje: 'LA NUEVA CLAVE NO ES SEGURA: Debe tener al menos 6 caracteres, un número y un símbolo especial.'
+        });
+      }
       const salt = await bcrypt.genSalt(10);
       dataToUpdate.passwordHash = await bcrypt.hash(newPassword, salt);
     }

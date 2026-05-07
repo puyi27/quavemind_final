@@ -18,8 +18,8 @@ export const ESCENAS_DATA = {
         'Ptazeta', 'Lia Kali', 'Gloosito', 'Hoke', 'Hens', 'Ill Pekeño', 'Ergo Pro'
       ],
       mujeres: [
-        'Bad Gyal', 'Lola Indigo', 'Aitana', 'La Zowi', 'Bb trickz',
-        'Judeline', 'Ptazeta', 'Lia Kali', 'Bea Pelea', 'Soto Asa' // Soto Asa is male, remove him. Let's add 'Marlena' or 'Alba Reche'. Wait, just 8 is fine.
+        'Rosalia', 'Bad Gyal', 'Lola Indigo', 'Aitana', 'La Zowi', 'Bb trickz',
+        'Judeline', 'Ptazeta', 'Lia Kali', 'Bea Pelea'
       ]
     },
     productores: ['Alizzz', 'Campi', 'Kabasaki', 'Ovy on the drums'],

@@ -69,11 +69,7 @@ export default function Escena() {
       // Validar si un artista cargado coincide con una lista de nombres de forma flexible
       const belongsToList = (lista, artista) => {
          const n2 = normalize(artista.nombre);
-         return lista.some(n1 => {
-            const normalN1 = normalize(n1);
-            return normalN1.includes(n2) || n2.includes(normalN1) || 
-                   (normalN1.split(' ')[0] && normalN1.split(' ')[0] === n2.split(' ')[0]);
-         });
+         return lista.some(n1 => normalize(n1) === n2);
       };
 
       const establecidos = artistasCargados

@@ -93,6 +93,16 @@ export default function PerfilUsuario() {
 
   const handleUpdate = async (e) => {
     if (e) e.preventDefault();
+
+    // Si intenta cambiar la contraseña, validar robustez
+    if (editData.newPassword) {
+      const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>]).{6,}$/;
+      if (!passwordRegex.test(editData.newPassword)) {
+        alert('LA NUEVA CLAVE NO ES SEGURA: Debe tener al menos 6 caracteres, un número y un símbolo especial.');
+        return;
+      }
+    }
+
     try {
       const data = await fetchOptimizer.post('/auth/update-profile', editData);
       if (data && data.usuario) {
