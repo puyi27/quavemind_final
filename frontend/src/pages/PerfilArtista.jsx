@@ -148,7 +148,7 @@ export default function PerfilArtista() {
   return (
     <div className="min-h-screen bg-black pb-32">
       {/* Header Visual Original Feel */}
-      <section className="relative h-[650px] w-full overflow-hidden bg-[#050505] border-b border-white/5">
+      <section className="relative min-h-[650px] lg:h-[650px] w-full overflow-hidden bg-[#050505] border-b border-white/5">
         <div className="absolute inset-0">
           <img 
             src={artista.imagen || '/default.png'} 
