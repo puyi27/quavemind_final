@@ -152,24 +152,26 @@ export default function MiniPlayer() {
                   )}
                 </Link>
 
-                <div className="text-center space-y-1">
-                  <h4 className="text-xs font-black text-white uppercase truncate">{currentTrack.nombre}</h4>
-                  <p className="text-[9px] font-bold text-[#ff6b00] uppercase truncate">{currentTrack.artista}</p>
+                {/* Info Artista/Canción */}
+                <div className="text-center space-y-1 mb-4">
+                  <h4 className="text-sm font-black text-white uppercase truncate tracking-tight">{currentTrack.nombre}</h4>
+                  <p className="text-[10px] font-bold text-[#ff6b00] uppercase truncate tracking-widest">{currentTrack.artista}</p>
                 </div>
 
-                {/* BARRA REUBICADA (EXPANDIDA) - ESPACIO SEÑALADO */}
-                <div className="px-4 py-2">
-                  <div ref={progressRef} onClick={handleProgressClick} className="h-1.5 w-full bg-white/10 cursor-pointer relative rounded-full overflow-hidden shadow-inner">
-                    <div className="h-full bg-[#ff6b00] transition-all shadow-[0_0_10px_rgba(255,107,0,0.5)]" style={{ width: `${progPct}%` }} />
+                {/* LA BARRA: EN EL SITIO EXACTO SEÑALADO */}
+                <div className="px-2 mb-6">
+                  <div ref={progressRef} onClick={handleProgressClick} className="h-1.5 w-full bg-white/10 cursor-pointer relative rounded-full overflow-hidden border border-white/5">
+                    <div className="h-full bg-[#ff6b00] transition-all shadow-[0_0_15px_rgba(255,107,0,0.6)]" style={{ width: `${progPct}%` }} />
                   </div>
                 </div>
 
+                {/* Botones de control */}
                 <div className="flex items-center justify-between px-2">
-                  <button onClick={() => !isChangingTrack && previous()} className={`p-2 transition-all ${isChangingTrack ? 'opacity-20' : 'text-gray-500 hover:text-white'}`} disabled={isChangingTrack}><MdSkipPrevious size={24} /></button>
-                  <button onClick={handlePlayPause} className="w-12 h-12 bg-white text-black rounded-2xl flex items-center justify-center shadow-lg hover:bg-[#ff6b00] transition-all active:scale-95">
-                    {isPlaying ? <MdPause size={28} /> : <MdPlayArrow size={28} className="ml-0.5" />}
+                  <button onClick={() => !isChangingTrack && previous()} className={`p-2 transition-all ${isChangingTrack ? 'opacity-20' : 'text-gray-500 hover:text-white'}`} disabled={isChangingTrack}><MdSkipPrevious size={28} /></button>
+                  <button onClick={handlePlayPause} className="w-14 h-14 bg-white text-black rounded-2xl flex items-center justify-center shadow-xl hover:bg-[#ff6b00] transition-all active:scale-95">
+                    {isPlaying ? <MdPause size={32} /> : <MdPlayArrow size={32} className="ml-1" />}
                   </button>
-                  <button onClick={() => !isChangingTrack && next()} className={`p-2 transition-all ${isChangingTrack ? 'opacity-20' : 'text-gray-500 hover:text-white'}`} disabled={isChangingTrack}><MdSkipNext size={24} /></button>
+                  <button onClick={() => !isChangingTrack && next()} className={`p-2 transition-all ${isChangingTrack ? 'opacity-20' : 'text-gray-500 hover:text-white'}`} disabled={isChangingTrack}><MdSkipNext size={28} /></button>
                 </div>
               </div>
             ) : (
