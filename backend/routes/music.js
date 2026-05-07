@@ -36,15 +36,15 @@ const getGeniusBio = async (nombre) => {
   }
 };
 
-// Ruta: Letras (Optimizada con limpieza de metadatos)
+// Ruta: Letras (Optimizada con triple intento)
 router.get('/lyrics', async (req, res) => {
   const { q: query, title, artist } = req.query;
   
-  // Construir una búsqueda limpia
-  let searchQuery = query;
-  if (title && artist) {
-    searchQuery = cleanLyricsQuery(title, artist);
-  }
+  // Limpiar artista: usar solo el primero si hay varios (ej: "Quevedo, Myke Towers" -> "Quevedo")
+  const cleanArtist = artist ? artist.split(',')[0].trim() : '';
+  const cleanTitle = title ? title.replace(/\s*-\s*.*Remix.*$/i, '').replace(/\(.*\)/g, '').trim() : '';
+  
+  const searchQuery = cleanArtist && cleanTitle ? `${cleanArtist} ${cleanTitle}` : query;
 
   if (!searchQuery) return res.status(400).json({ status: 'error', mensaje: 'Falta query' });
 
@@ -55,35 +55,44 @@ router.get('/lyrics', async (req, res) => {
   if (!geniusClient) return res.json({ status: 'ok', letra: 'Servicio de letras no configurado.' });
 
   try {
-    // 1. Intento con búsqueda limpia
-    let searches = await geniusClient.songs.search(searchQuery);
+    let searches = [];
     
-    // 2. Si falla, intento con la query original (por si acaso)
-    if ((!searches || searches.length === 0) && query && query !== searchQuery) {
+    // Intento 1: Artista limpio + Título limpio
+    searches = await geniusClient.songs.search(searchQuery);
+    
+    // Intento 2: Solo Título (si el 1 falla)
+    if ((!searches || searches.length === 0) && cleanTitle) {
+      searches = await geniusClient.songs.search(cleanTitle);
+    }
+
+    // Intento 3: Query original de Spotify
+    if ((!searches || searches.length === 0) && query) {
       searches = await geniusClient.songs.search(query);
     }
 
     if (!searches || searches.length === 0) {
-      return res.json({ status: 'ok', letra: 'No hemos podido encontrar la letra exacta para este archivo.' });
+      return res.json({ status: 'ok', letra: 'No hemos podido encontrar la letra exacta para este archivo en la base de datos de Genius.' });
     }
 
+    // Buscamos el mejor match que contenga al artista o al menos la canción
     const song = searches[0];
     const lyrics = await song.lyrics(true);
     
-    // Limpieza de "Basura" de Genius (Contributors, etc)
+    // Limpieza profunda de metadatos de Genius
     const cleanedLyrics = lyrics 
       ? lyrics
           .replace(/^\d+ Contributors.*/i, '')
-          .replace(/[0-9]+[ ]?Embed/gi, '')
+          .replace(/[0-9]*[ ]?Embed$/gi, '')
           .replace(/You might also like/gi, '')
+          .replace(/\[.*?\]/g, '') // Quitar [Chorus], [Verse], etc si prefieres una lectura limpia
           .trim() 
       : 'Letra no disponible.';
     
     await cacheData(cacheKey, cleanedLyrics, 86400);
     return res.json({ status: 'ok', letra: cleanedLyrics });
   } catch (error) {
-    console.error('[LYRICS ERROR]:', error.message);
-    return res.json({ status: 'ok', letra: 'Error de conexión con el satélite de letras.' });
+    console.error('[LYRICS CRITICAL ERROR]:', error.message);
+    return res.json({ status: 'ok', letra: 'Error de sincronización con el servidor de letras. Inténtalo de nuevo en unos segundos.' });
   }
 });
 
