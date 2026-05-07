@@ -172,6 +172,7 @@ export default function MiniPlayer() {
                   <button onClick={() => !isChangingTrack && next()} className={`p-2 transition-all ${isChangingTrack ? 'opacity-20' : 'text-gray-500 hover:text-white'}`} disabled={isChangingTrack}><MdSkipNext size={24} /></button>
                 </div>
               </div>
+            ) : (
               <div className="p-3 flex items-center gap-3">
                 <div onClick={() => setIsExpanded(true)} className="relative w-12 h-12 shrink-0 rounded-xl overflow-hidden border border-white/5 cursor-pointer group">
                   <img src={currentTrack.imagen || '/default.png'} className={`w-full h-full object-cover transition-all ${isChangingTrack ? 'opacity-50' : ''}`} alt="" />
