@@ -158,7 +158,6 @@ const PerfilAlbum = () => {
       
       {/* HEADER & HERO SECTION */}
       <section className="relative pt-12 pb-24 overflow-hidden border-b border-white/5 bg-[#050505]">
-        {/* Background Immersivo con la portada difuminada */}
         <div className="absolute inset-0 w-full h-full pointer-events-none -z-10 overflow-hidden">
           <img 
             src={album.imagen || '/default.png'} 
@@ -298,8 +297,6 @@ const PerfilAlbum = () => {
               </div>
             ))}
           </div>
-
-          </div>
         </section>
 
         <aside className="lg:col-span-4 space-y-10">
@@ -337,12 +334,9 @@ const PerfilAlbum = () => {
                   />
                 </div>
               </div>
-                </div>
-              </div>
             </div>
           </div>
 
-          {/* SPOTIFY BRIDGE REUBICADO Y REFINADO */}
           <div className="mt-8 group">
             <div className="bg-[#0a0a0a] rounded-[2.5rem] p-4 border-2 border-white/5 group-hover:border-[#ff6b00]/30 transition-all shadow-2xl relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#ff6b00]/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -365,8 +359,6 @@ const PerfilAlbum = () => {
       {/* SECCIÓN SOCIAL / AUDITORÍA */}
       <section className="max-w-7xl mx-auto px-6 mt-32">
         <div className="grid lg:grid-cols-12 gap-16">
-
-          {/* Opiniones de la Comunidad (Principal) */}
           <div className="lg:col-span-12">
             <div className="flex items-center gap-5 mb-10 border-l-8 border-[#ff6b00] pl-8">
                <div>
