@@ -3,10 +3,17 @@
   "version": "1.0.0",
   "type": "module",
   "main": "index.js",
+  "prisma": {
+    "schema": "prisma/schema.prisma"
+  },
   "scripts": {
     "start": "node index.js",
     "build": "prisma generate",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "seed:jerga": "node scripts/seedJerga.js",
+    "db:migrate": "prisma migrate dev",
+    "db:generate": "prisma generate",
+    "db:studio": "prisma studio"
   },
   "dependencies": {
     "@prisma/client": "^5.21.0",
@@ -16,10 +23,13 @@
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
+    "genius-lyrics": "^4.4.7",
     "jsonwebtoken": "^9.0.3",
-    "pg": "^8.20.0"
+    "pg": "^8.20.0",
+    "redis": "^5.12.1"
   },
   "devDependencies": {
+    "@types/node": "^25.5.0",
     "prisma": "^5.21.0"
   }
 }
