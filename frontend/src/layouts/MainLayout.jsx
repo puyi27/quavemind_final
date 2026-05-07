@@ -162,9 +162,6 @@ export default function MainLayout() {
                 </AnimatePresence>
               </div>
             ))}
-
-            <div className="w-px h-4 bg-white/10 mx-2 hidden lg:block" />
-
             {/* Comunidad & Juegos */}
             {navItems.slice(2).map((item) => (
               <Link
