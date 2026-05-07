@@ -24,6 +24,7 @@ const PerfilUsuario = lazy(() => import('./pages/PerfilUsuario'));
 const Comunidad = lazy(() => import('./pages/Comunidad'));
 const AdminPanel = lazy(() => import('./pages/AdminPanel'));
 const ProtectedRoute = lazy(() => import('./components/ProtectedRoute'));
+const AdminRoute = lazy(() => import('./components/AdminRoute'));
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -79,10 +80,14 @@ const AppContent = () => {
             <Route path="/perfil/:id" element={<PerfilUsuario />} />
             <Route path="/comunidad" element={<Comunidad />} />
 
-            {/* RUTAS PROTEGIDAS */}
+            {/* RUTAS PROTEGIDAS (USUARIO) */}
             <Route element={<ProtectedRoute />}>
               <Route path="/boveda/*" element={<Boveda />} />
               <Route path="/valoraciones" element={<Valoraciones />} />
+            </Route>
+
+            {/* RUTA PROTEGIDA (ADMIN) */}
+            <Route element={<AdminRoute />}>
               <Route path="/admin" element={<AdminPanel />} />
             </Route>
           </Route>
