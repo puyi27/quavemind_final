@@ -157,10 +157,10 @@ export default function MiniPlayer() {
                   <p className="text-[9px] font-bold text-[#ff6b00] uppercase truncate">{currentTrack.artista}</p>
                 </div>
 
-                {/* BARRA REUBICADA (EXPANDIDA) - ENTRE ARTISTA Y BOTONES */}
-                <div className="px-2">
-                  <div ref={progressRef} onClick={handleProgressClick} className="h-1.5 w-full bg-white/5 cursor-pointer relative rounded-full overflow-hidden">
-                    <div className="h-full bg-[#ff6b00] transition-all" style={{ width: `${progPct}%` }} />
+                {/* BARRA REUBICADA (EXPANDIDA) - ESPACIO SEÑALADO */}
+                <div className="px-4 py-2">
+                  <div ref={progressRef} onClick={handleProgressClick} className="h-1.5 w-full bg-white/10 cursor-pointer relative rounded-full overflow-hidden shadow-inner">
+                    <div className="h-full bg-[#ff6b00] transition-all shadow-[0_0_10px_rgba(255,107,0,0.5)]" style={{ width: `${progPct}%` }} />
                   </div>
                 </div>
 

@@ -94,11 +94,28 @@ export const useSpotifyEmbedStore = create((set, get) => ({
     }
   },
 
-  updatePlayback: (data) => set({
-    isPlaying: !data.isPaused,
-    position: data.position || 0,
-    duration: data.duration || 0,
-  }),
+  updatePlayback: (data) => {
+    const { isPaused, position, duration } = data;
+    const currentState = get();
+    
+    set({
+      isPlaying: !isPaused,
+      position: position || 0,
+      duration: duration || 0,
+    });
+
+    // Lógica de reproducción automática: si la canción termina (o falta muy poco y se pausa)
+    if (duration > 0 && position > 0 && position >= duration - 800 && isPaused) {
+      // Pequeño delay para evitar saltos bruscos
+      setTimeout(() => {
+        const freshState = get();
+        // Solo saltar si sigue pausado y al final
+        if (freshState.position >= freshState.duration - 1000) {
+          freshState.next();
+        }
+      }, 500);
+    }
+  },
 
   reset: () => set({ 
     isPlaying: false, 
