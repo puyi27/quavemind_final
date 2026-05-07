@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-route
 import RouteLoading from './components/ui/RouteLoading';
 import { useThemeStore } from './store/themeStore';
 import { useAuthStore } from './store/authStore';
+import { SpeedInsights } from "@vercel/speed-insights/react"
 
 const MainLayout = lazy(() => import('./layouts/MainLayout'));
 const Home = lazy(() => import('./pages/Home'));
@@ -96,6 +97,7 @@ const App = () => {
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <div className="min-h-screen bg-black text-white font-sans selection:bg-[var(--color-quave-orange)] selection:text-black">
         <AppContent />
+        <SpeedInsights />
       </div>
     </Router>
   );

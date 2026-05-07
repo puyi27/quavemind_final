@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@tanstack/react-query": "^5.100.6",
+    "@vercel/speed-insights": "^2.0.0",
     "axios": "^1.15.2",
     "cookie-parser": "^1.4.7",
     "dompurify": "^3.4.1",
