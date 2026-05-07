@@ -243,7 +243,7 @@ export default function MiniPlayer() {
                 </div>
 
                 <div className="flex-1 min-w-0" onClick={() => setIsExpanded(true)}>
-                  <div className="max-w-[100px]">
+                  <div className="flex flex-col">
                     <h4 className="text-[10px] font-black text-white uppercase truncate tracking-tight leading-none mb-1">{currentTrack.nombre}</h4>
                     <p className="text-[8px] font-bold text-[#ff6b00] uppercase truncate tracking-widest opacity-80">{currentTrack.artista}</p>
                   </div>
