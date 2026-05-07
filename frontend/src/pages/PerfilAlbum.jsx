@@ -342,18 +342,21 @@ const PerfilAlbum = () => {
             </div>
           </div>
 
-          {/* SPOTIFY BRIDGE REUBICADO */}
-          <div className="group">
-            <p className="text-[9px] font-black text-gray-600 uppercase tracking-[0.4em] mb-4 text-center group-hover:text-[#ff6b00] transition-colors">Spotify Bridge: Digital Link</p>
-            <div className="rounded-[2.5rem] overflow-hidden border-4 border-black shadow-[15px_15px_0px_0px_rgba(0,0,0,0.5)] bg-black/40 backdrop-blur-xl">
-              <iframe
-                src={`https://open.spotify.com/embed/album/${album.id}?utm_source=generator&theme=0`}
-                width="100%"
-                height="380"
-                className="border-0"
-                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                loading="lazy"
-              />
+          {/* SPOTIFY BRIDGE REUBICADO Y REFINADO */}
+          <div className="mt-8 group">
+            <div className="bg-[#0a0a0a] rounded-[2.5rem] p-4 border-2 border-white/5 group-hover:border-[#ff6b00]/30 transition-all shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#ff6b00]/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.4em] mb-4 text-center mt-2">Spotify Link: Digital Interface</p>
+              <div className="rounded-3xl overflow-hidden border-2 border-black shadow-lg">
+                <iframe
+                  src={`https://open.spotify.com/embed/album/${album.id}?utm_source=generator&theme=0`}
+                  width="100%"
+                  height="380"
+                  className="border-0"
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                  loading="lazy"
+                />
+              </div>
             </div>
           </div>
         </aside>
