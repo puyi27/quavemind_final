@@ -227,14 +227,18 @@ export const getRealArtistStats = async (id) => {
     monthlyListeners = await scrapeFallback(id);
   }
 
-  // 4. ALGORITMO DE ESTIMACIÓN PRO (Si todo lo anterior falla)
-  // No mostramos seguidores como oyentes, ya que son datos muy distintos.
-  // Un artista con 1M seguidores suele tener 3.5M - 5M oyentes.
-  if (!monthlyListeners || monthlyListeners <= 0) {
-    const multiplier = popularity > 80 ? 4.8 : popularity > 50 ? 3.5 : 2.2;
-    monthlyListeners = Math.floor(followers * multiplier) + (popularity * 1000);
-    // Aseguramos un mínimo lógico si tiene popularidad
-    if (monthlyListeners < popularity * 500) monthlyListeners = popularity * 750;
+  // 4. ALGORITMO DE ESTIMACIÓN REALISTA (Si todo lo anterior falla)
+  // Basado en correlación popularidad/seguidores observada en Spotify
+  const hasRealStats = monthlyListeners !== null && monthlyListeners > 0;
+
+  if (!hasRealStats) {
+    // Multiplicadores más conservadores para evitar números "locos"
+    const baseMultiplier = popularity > 80 ? 3.2 : popularity > 50 ? 2.5 : 1.8;
+    monthlyListeners = Math.floor(followers * baseMultiplier) + (popularity * 500);
+    
+    // Mínimo lógico basado en popularidad (0-100)
+    const minListeners = popularity * popularity * 10; 
+    if (monthlyListeners < minListeners) monthlyListeners = minListeners;
   }
 
   const value = {
@@ -242,12 +246,12 @@ export const getRealArtistStats = async (id) => {
     bio,
     followers,
     popularity,
-    verificado: monthlyListeners > followers // Si es mayor que seguidores, es muy probable que sea el dato real o estimado correctamente
+    isEstimated: !hasRealStats
   };
 
   try {
-    // 12h si tenemos dato real, 20min si solo tenemos fallback de seguidores
-    await cacheData(cacheKey, value, hasRealStats ? 43200 : 1200);
+    // 12h si tenemos dato real (43200s), 1h si es estimado (3600s)
+    await cacheData(cacheKey, value, hasRealStats ? 43200 : 3600);
   } catch {}
 
   return value;
