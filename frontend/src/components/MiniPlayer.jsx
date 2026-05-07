@@ -3,9 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
   MdPlayArrow, MdPause, MdSkipNext, MdSkipPrevious,
-  MdOpenInNew, MdExpandMore, MdExpandLess, MdGraphicEq, MdClose, MdUnfoldMore
+  MdOpenInNew, MdExpandMore, MdExpandLess, MdGraphicEq, MdClose, MdUnfoldMore,
+  MdFavorite, MdFavoriteBorder
 } from 'react-icons/md';
 import { useSpotifyEmbedStore } from '../store/spotifyEmbedStore';
+import { useAuthStore } from '../store/authStore';
+import api from '../services/api';
 
 const loadSpotifyApi = () => {
   if (window.SpotifyIframeApiLoaded) return;
@@ -100,12 +103,55 @@ export default function MiniPlayer() {
     ctrl.seek(Math.floor((pct / 100) * duration));
   }, [duration]);
 
+  const [esFavorito, setEsFavorito] = useState(false);
+  const { isAuthenticated, updatePoints } = useAuthStore();
+ 
+  // 0. Comprobar si el tema es favorito al cambiar de canción
+  useEffect(() => {
+    if (!isAuthenticated || !currentTrack) return;
+    const checkFavorite = async () => {
+      try {
+        const res = await api.get('/vault/favoritos');
+        const favs = res.data.favoritos || [];
+        setEsFavorito(favs.some(f => f.itemId === currentTrack.id));
+      } catch (err) {
+        console.warn('[MiniPlayer] Error checking favorites');
+      }
+    };
+    checkFavorite();
+  }, [currentTrack, isAuthenticated]);
+
   const handleClose = (e) => {
     e.stopPropagation();
     if (controllerRef.current) controllerRef.current.pause();
     controllerRef.current = null;
     lastLoadedUri.current = null;
     reset();
+  };
+
+  const toggleFavorito = async (e) => {
+    e.stopPropagation();
+    if (!isAuthenticated || !currentTrack) return;
+    
+    const previous = esFavorito;
+    setEsFavorito(!esFavorito);
+
+    try {
+      const res = await api.post('/vault/favoritos/toggle', {
+        itemId: currentTrack.id,
+        tipo: 'cancion',
+        snapshot: {
+          nombre: currentTrack.nombre,
+          artista: currentTrack.artista,
+          imagen: currentTrack.imagen,
+        }
+      });
+      if (res.data.totalPuntos !== undefined) {
+        updatePoints(res.data.totalPuntos);
+      }
+    } catch (err) {
+      setEsFavorito(previous);
+    }
   };
 
   if (!currentTrack) {
@@ -152,10 +198,17 @@ export default function MiniPlayer() {
                   )}
                 </Link>
 
-                {/* Info Artista/Canción */}
-                <div className="text-center space-y-1 mb-4">
-                  <h4 className="text-sm font-black text-white uppercase truncate tracking-tight">{currentTrack.nombre}</h4>
-                  <p className="text-[10px] font-bold text-[#ff6b00] uppercase truncate tracking-widest">{currentTrack.artista}</p>
+                <div className="flex flex-col items-center gap-2 mb-4">
+                  <div className="text-center space-y-1 flex-1">
+                    <h4 className="text-sm font-black text-white uppercase truncate tracking-tight">{currentTrack.nombre}</h4>
+                    <p className="text-[10px] font-bold text-[#ff6b00] uppercase truncate tracking-widest">{currentTrack.artista}</p>
+                  </div>
+                  <button 
+                    onClick={toggleFavorito}
+                    className={`p-2 rounded-xl transition-all ${esFavorito ? 'text-[#ff6b00] bg-[#ff6b00]/10' : 'text-white/40 hover:text-white bg-white/5'}`}
+                  >
+                    {esFavorito ? <MdFavorite size={20} /> : <MdFavoriteBorder size={20} />}
+                  </button>
                 </div>
 
                 {/* LA BARRA: EN EL SITIO EXACTO SEÑALADO */}
@@ -201,6 +254,12 @@ export default function MiniPlayer() {
                 </div>
 
                 <div className="flex items-center gap-1.5 shrink-0">
+                  <button 
+                    onClick={toggleFavorito}
+                    className={`p-2 transition-all ${esFavorito ? 'text-[#ff6b00]' : 'text-gray-700 hover:text-white'}`}
+                  >
+                    {esFavorito ? <MdFavorite size={20} /> : <MdFavoriteBorder size={20} />}
+                  </button>
                   <button onClick={handlePlayPause} className="w-10 h-10 bg-[#ff6b00] text-black rounded-xl flex items-center justify-center hover:scale-105 transition-all shadow-lg active:scale-90">
                     {isPlaying ? <MdPause size={20} /> : <MdPlayArrow size={20} className="ml-0.5" />}
                   </button>

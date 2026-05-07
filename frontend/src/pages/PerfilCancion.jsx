@@ -455,7 +455,7 @@ const PerfilCancion = () => {
         <div className="mt-24 border-t-8 border-dashed border-white/5 pt-24">
            <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-16">
               <div className="border-l-[12px] border-[#ff6b00] pl-6">
-                 <h2 className="text-5xl md:text-6xl font-black uppercase tracking-tighter italic">INTELIGENCIA COLECTIVA</h2>
+                 <h2 className="text-5xl md:text-6xl font-black uppercase tracking-tighter italic">REPORTE DE LA COMUNIDAD</h2>
                  <p className="text-gray-500 font-mono text-xs uppercase tracking-widest mt-2">Opiniones de la comunidad</p>
               </div>
               <div className="px-8 py-4 bg-white/5 rounded-3xl border border-white/10 flex items-center gap-4">

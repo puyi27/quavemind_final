@@ -394,7 +394,7 @@ export default function PerfilUsuario() {
           <section>
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
               <div>
-                <h2 className="text-4xl font-black uppercase italic leading-none mb-2">AUDITORÍAS</h2>
+                <h2 className="text-4xl font-black uppercase italic leading-none mb-2">VALORACIONES</h2>
                 <div className="w-12 h-1 bg-white" />
               </div>
               <div className="flex p-1.5 bg-white/5 rounded-2xl border border-white/10 gap-1">
@@ -434,7 +434,7 @@ export default function PerfilUsuario() {
                       </div>
                       <div className="relative p-4 bg-white/2 rounded-xl border border-white/5 italic text-[11px] text-gray-400 leading-relaxed">
                         <MdFormatQuote className="absolute -top-2 -left-1 text-2xl text-[#ff6b00] opacity-30" />
-                        "{val.comentario || 'Sin reporte detallado.'}"
+                        "{val.comentario || 'Sin comentario.'}"
                       </div>
                     </div>
                   </div>
@@ -471,7 +471,7 @@ export default function PerfilUsuario() {
                 <div>
                   <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2">
                     <span>Actividad Analítica</span>
-                    <span className="text-white">{userProfile.valoraciones?.length || 0} AUDITS</span>
+                    <span className="text-white">{userProfile.valoraciones?.length || 0} REVIEWS</span>
                   </div>
                   <div className="h-2 bg-white/5 rounded-full overflow-hidden">
                     <div className="h-full bg-white transition-all duration-1000" style={{ width: `${Math.min(100, (userProfile.valoraciones?.length || 0) * 10)}%` }} />

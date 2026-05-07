@@ -35,7 +35,7 @@ const OpinionesGlobales = ({ tipo, itemId }) => {
   if (opiniones.length === 0) return (
     <div className="py-8 text-center border-2 border-dashed border-white/5 rounded-2xl">
       <p className="text-[10px] font-mono text-gray-600 uppercase tracking-widest">
-        Ningún agente ha dejado su reporte aún.
+        Todavía no hay valoraciones para este tema.
       </p>
     </div>
   );
@@ -65,7 +65,7 @@ const OpinionesGlobales = ({ tipo, itemId }) => {
           <div className="relative pl-6">
             <MdFormatQuote className="absolute top-0 left-0 text-[#ff6b00] opacity-30 text-xl" />
             <p className="text-[11px] text-gray-400 font-sans italic leading-relaxed">
-              {op.comentario || 'Reporte silencioso.'}
+              {op.comentario || 'Sin comentario.'}
             </p>
           </div>
           

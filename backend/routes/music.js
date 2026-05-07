@@ -93,9 +93,10 @@ router.get('/lyrics', async (req, res) => {
 
   } catch (error) {
     console.error('[LYRICS ERROR]:', error.message);
+    // Error silencioso: si todo falla, simplemente decimos que no hay letras
     return res.json({ 
-      status: 'error', 
-      letra: `Fallo en el enlace: ${error.message}. Genius está bloqueando la conexión.` 
+      status: 'ok', 
+      letra: 'No hemos podido localizar la frecuencia de esta letra en nuestros archivos. Prueba con otro tema.' 
     });
   }
 });
