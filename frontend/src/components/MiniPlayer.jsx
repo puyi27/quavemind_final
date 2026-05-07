@@ -131,9 +131,7 @@ export default function MiniPlayer() {
         >
           <div className={`bg-[#0a0a0a]/95 backdrop-blur-2xl border-2 border-white/10 rounded-[2rem] shadow-2xl overflow-hidden transition-all duration-500 ${isExpanded ? 'w-64' : 'w-[220px]'}`}>
             
-            <div ref={progressRef} onClick={handleProgressClick} className="h-1 w-full bg-white/5 cursor-pointer relative">
-              <div className="h-full bg-[#ff6b00] transition-all" style={{ width: `${progPct}%` }} />
-            </div>
+            {/* La barra se ha movido dentro de los bloques condicionales */}
 
             {isExpanded ? (
               <div className="p-4 flex flex-col gap-4 relative">
@@ -159,6 +157,11 @@ export default function MiniPlayer() {
                   <p className="text-[9px] font-bold text-[#ff6b00] uppercase truncate mt-1">{currentTrack.artista}</p>
                 </div>
 
+                {/* BARRA REUBICADA (EXPANDIDA) */}
+                <div ref={progressRef} onClick={handleProgressClick} className="h-1.5 w-full bg-white/5 cursor-pointer relative rounded-full overflow-hidden">
+                  <div className="h-full bg-[#ff6b00] transition-all" style={{ width: `${progPct}%` }} />
+                </div>
+
                 <div className="flex items-center justify-between px-2">
                   <button onClick={() => !isChangingTrack && previous()} className={`p-2 transition-all ${isChangingTrack ? 'opacity-20' : 'text-gray-500 hover:text-white'}`} disabled={isChangingTrack}><MdSkipPrevious size={24} /></button>
                   <button onClick={handlePlayPause} className="w-12 h-12 bg-white text-black rounded-2xl flex items-center justify-center shadow-lg hover:bg-[#ff6b00] transition-all active:scale-95">
@@ -168,7 +171,13 @@ export default function MiniPlayer() {
                 </div>
               </div>
             ) : (
-              <div className="p-2 flex items-center gap-2">
+              <div className="p-2 flex flex-col gap-2">
+                {/* BARRA REUBICADA (COMPACTA) */}
+                <div ref={progressRef} onClick={handleProgressClick} className="h-1 w-full bg-white/5 cursor-pointer relative rounded-full overflow-hidden">
+                  <div className="h-full bg-[#ff6b00] transition-all" style={{ width: `${progPct}%` }} />
+                </div>
+
+                <div className="flex items-center gap-2">
                 <div onClick={() => setIsExpanded(true)} className="relative w-10 h-10 shrink-0 rounded-xl overflow-hidden border border-white/5 cursor-pointer group">
                   <img src={currentTrack.imagen || '/default.png'} className={`w-full h-full object-cover transition-all ${isChangingTrack ? 'opacity-50' : ''}`} alt="" />
                   <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
