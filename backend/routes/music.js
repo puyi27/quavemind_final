@@ -52,47 +52,54 @@ router.get('/lyrics', async (req, res) => {
   const cached = await getCachedData(cacheKey);
   if (cached) return res.json({ status: 'ok', letra: cached });
 
-  if (!geniusClient) return res.json({ status: 'ok', letra: 'Servicio de letras no configurado.' });
+  if (!geniusClient) {
+    console.error('[LYRICS] Genius client not initialized. Check GENIUS_ACCESS_TOKEN env var.');
+    return res.json({ status: 'ok', letra: 'Servicio de letras no configurado en el servidor.' });
+  }
 
   try {
     let searches = [];
     
-    // Intento 1: Artista limpio + Título limpio
-    searches = await geniusClient.songs.search(searchQuery);
+    // Timeout manual para evitar que la petición se quede colgada
+    const searchPromise = geniusClient.songs.search(searchQuery);
+    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 8000));
     
-    // Intento 2: Solo Título (si el 1 falla)
-    if ((!searches || searches.length === 0) && cleanTitle) {
-      searches = await geniusClient.songs.search(cleanTitle);
-    }
-
-    // Intento 3: Query original de Spotify
-    if ((!searches || searches.length === 0) && query) {
-      searches = await geniusClient.songs.search(query);
+    searches = await Promise.race([searchPromise, timeoutPromise]);
+    
+    // ... rest of the logic ... (Same as before but inside safety)
+    if (!searches || searches.length === 0) {
+      // Re-intentar con título si existe
+      if (cleanTitle && searchQuery !== cleanTitle) {
+         searches = await geniusClient.songs.search(cleanTitle);
+      }
     }
 
     if (!searches || searches.length === 0) {
       return res.json({ status: 'ok', letra: 'No hemos podido encontrar la letra exacta para este archivo en la base de datos de Genius.' });
     }
 
-    // Buscamos el mejor match que contenga al artista o al menos la canción
     const song = searches[0];
     const lyrics = await song.lyrics(true);
     
-    // Limpieza profunda de metadatos de Genius
     const cleanedLyrics = lyrics 
       ? lyrics
           .replace(/^\d+ Contributors.*/i, '')
           .replace(/[0-9]*[ ]?Embed$/gi, '')
           .replace(/You might also like/gi, '')
-          .replace(/\[.*?\]/g, '') // Quitar [Chorus], [Verse], etc si prefieres una lectura limpia
+          .replace(/\[.*?\]/g, '')
           .trim() 
       : 'Letra no disponible.';
     
     await cacheData(cacheKey, cleanedLyrics, 86400);
     return res.json({ status: 'ok', letra: cleanedLyrics });
   } catch (error) {
-    console.error('[LYRICS CRITICAL ERROR]:', error.message);
-    return res.json({ status: 'ok', letra: 'Error de sincronización con el servidor de letras. Inténtalo de nuevo en unos segundos.' });
+    console.error('[LYRICS ERROR]:', error.message);
+    return res.json({ 
+      status: 'ok', 
+      letra: error.message === 'Timeout' 
+        ? 'El servidor de letras está tardando demasiado en responder. Inténtalo de nuevo.' 
+        : 'Error de sincronización con el servidor de letras.' 
+    });
   }
 });
 
