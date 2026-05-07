@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-route
 import RouteLoading from './components/ui/RouteLoading';
 import { useThemeStore } from './store/themeStore';
 import { useAuthStore } from './store/authStore';
-import { SpeedInsights } from "@vercel/speed-insights/react"
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 const MainLayout = lazy(() => import('./layouts/MainLayout'));
 const Home = lazy(() => import('./pages/Home'));

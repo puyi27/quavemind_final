@@ -18,7 +18,9 @@ router.get('/users', async (req, res) => {
         rol: true,
         quavePoints: true,
         createdAt: true,
-        avatar: true
+        avatar: true,
+        bio: true,
+        ubicacion: true
       },
       orderBy: { createdAt: 'desc' }
     });
@@ -28,27 +30,50 @@ router.get('/users', async (req, res) => {
   }
 });
 
-// 2. Cambiar rol de un usuario
-router.patch('/users/:id/role', async (req, res) => {
-  const { id } = req.params;
-  const { nuevoRol } = req.body;
-
-  if (!['USER', 'ADMIN'].includes(nuevoRol)) {
-    return res.status(400).json({ status: 'error', mensaje: 'Rol no válido' });
-  }
-
+// 2. Crear un nuevo usuario manualmente
+router.post('/users', async (req, res) => {
+  const { username, email, password, rol, quavePoints } = req.body;
   try {
-    const usuario = await prisma.usuario.update({
-      where: { id },
-      data: { rol: nuevoRol }
+    const passwordHash = await import('bcrypt').then(b => b.default.hash(password, 10));
+    const usuario = await prisma.usuario.create({
+      data: {
+        username,
+        email,
+        passwordHash,
+        rol: rol || 'USER',
+        quavePoints: parseInt(quavePoints) || 0
+      }
     });
     res.json({ status: 'ok', usuario });
   } catch (error) {
-    res.status(500).json({ status: 'error', mensaje: 'Error al actualizar el rol' });
+    res.status(500).json({ status: 'error', mensaje: 'Error al crear usuario. El nombre o email ya podrían existir.' });
   }
 });
 
-// 3. Eliminar usuario (Banear)
+// 3. Actualización completa de un usuario
+router.put('/users/:id', async (req, res) => {
+  const { id } = req.params;
+  const { username, email, rol, quavePoints, bio, ubicacion, password } = req.body;
+
+  try {
+    const data = { username, email, rol, quavePoints: parseInt(quavePoints), bio, ubicacion };
+    
+    // Si se envía contraseña, la hasheamos
+    if (password && password.trim() !== '') {
+      data.passwordHash = await import('bcrypt').then(b => b.default.hash(password, 10));
+    }
+
+    const usuario = await prisma.usuario.update({
+      where: { id },
+      data
+    });
+    res.json({ status: 'ok', usuario });
+  } catch (error) {
+    res.status(500).json({ status: 'error', mensaje: 'Error al actualizar el usuario' });
+  }
+});
+
+// 4. Eliminar usuario (Banear)
 router.delete('/users/:id', async (req, res) => {
   const { id } = req.params;
   
