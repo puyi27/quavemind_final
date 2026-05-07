@@ -186,6 +186,7 @@ export default function MiniPlayer() {
                   <button onClick={handleClose} className="p-1.5 bg-black/60 rounded-lg text-red-500/50 hover:text-red-500 transition-all"><MdClose size={18} /></button>
                 </div>
 
+
                 <Link to={iPath} className="relative aspect-square w-full rounded-2xl overflow-hidden border border-white/5 group">
                   <img src={currentTrack.imagen || '/default.png'} className={`w-full h-full object-cover transition-all ${isChangingTrack ? 'opacity-50' : 'group-hover:scale-110'}`} alt="" />
                   {isPlaying && !isChangingTrack && (
@@ -241,11 +242,10 @@ export default function MiniPlayer() {
                   )}
                 </div>
 
-                <div className="flex-1 min-w-0 space-y-1.5" onClick={() => setIsExpanded(true)}>
-                  <div className="truncate">
-                    <h4 className="text-[10px] font-black text-white uppercase leading-tight truncate">{currentTrack.nombre}</h4>
-                    <p className="text-[8px] font-bold text-[#ff6b00] uppercase truncate tracking-widest">{currentTrack.artista}</p>
-                  </div>
+                <div className="flex-1 min-w-0" onClick={() => setIsExpanded(true)}>
+                  <h4 className="text-[11px] font-black text-white uppercase truncate tracking-tight leading-tight">{currentTrack.nombre}</h4>
+                  <p className="text-[9px] font-bold text-[#ff6b00] uppercase truncate tracking-widest">{currentTrack.artista}</p>
+                </div>
                   
                   {/* BARRA REUBICADA (COMPACTA) - ENCIMA DE BOTONES / BAJO ARTISTA */}
                   <div ref={progressRef} onClick={(e) => { e.stopPropagation(); handleProgressClick(e); }} className="h-1 w-full bg-white/5 cursor-pointer relative rounded-full overflow-hidden">

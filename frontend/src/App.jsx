@@ -40,6 +40,17 @@ const AppContent = () => {
   useEffect(() => {
     initTheme();
     checkAuth();
+
+    // AUTO-RECUPERACIÓN: Detectar errores de carga de chunks (Vite/Vercel)
+    const handleChunkError = (e) => {
+      if (e.message.includes('Failed to fetch dynamically imported module') || e.message.includes('type "text/html"')) {
+        console.warn('[Quavemind] Error de sincronización detectado. Recargando núcleo...');
+        window.location.reload();
+      }
+    };
+
+    window.addEventListener('error', handleChunkError);
+    return () => window.removeEventListener('error', handleChunkError);
   }, [initTheme, checkAuth]);
 
   return (
