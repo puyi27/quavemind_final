@@ -25,11 +25,7 @@ const app = express();
 const genius = process.env.GENIUS_ACCESS_TOKEN ? new Client(process.env.GENIUS_ACCESS_TOKEN) : null;
 
 app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'http://localhost:5174',
-    process.env.FRONTEND_URL
-  ].filter(Boolean),
+  origin: '*',
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
