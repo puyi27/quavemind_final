@@ -60,25 +60,34 @@ router.get('/lyrics', async (req, res) => {
   try {
     let searches = [];
     
-    // Timeout manual para evitar que la petición se quede colgada
-    const searchPromise = geniusClient.songs.search(searchQuery);
-    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 8000));
+    // Limpieza Maestra: Solo el nombre artístico real (ej: "Bad Gyal, Quevedo" -> "Bad Gyal")
+    const searchTerms = searchQuery.split(',')[0].split(' ft.')[0].split(' feat.')[0].trim();
+
+    console.log(`[LYRICS DEBUG] Buscando en Genius: "${searchTerms}"`);
+
+    const searchPromise = geniusClient.songs.search(searchTerms);
+    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 10000));
     
     searches = await Promise.race([searchPromise, timeoutPromise]);
     
-    // ... rest of the logic ... (Same as before but inside safety)
     if (!searches || searches.length === 0) {
-      // Re-intentar con título si existe
-      if (cleanTitle && searchQuery !== cleanTitle) {
-         searches = await geniusClient.songs.search(cleanTitle);
+      // Re-intento 2: Solo título limpio
+      if (cleanTitle) {
+        console.log(`[LYRICS DEBUG] Re-intentando solo título: "${cleanTitle}"`);
+        searches = await geniusClient.songs.search(cleanTitle);
       }
     }
 
     if (!searches || searches.length === 0) {
-      return res.json({ status: 'ok', letra: 'No hemos podido encontrar la letra exacta para este archivo en la base de datos de Genius.' });
+      return res.json({ 
+        status: 'ok', 
+        letra: 'No hemos podido localizar la letra. Esto suele ocurrir si la canción es muy reciente o está mal etiquetada en Genius.' 
+      });
     }
 
     const song = searches[0];
+    console.log(`[LYRICS DEBUG] Canción encontrada: ${song.fullTitle}`);
+    
     const lyrics = await song.lyrics(true);
     
     const cleanedLyrics = lyrics 
@@ -88,17 +97,15 @@ router.get('/lyrics', async (req, res) => {
           .replace(/You might also like/gi, '')
           .replace(/\[.*?\]/g, '')
           .trim() 
-      : 'Letra no disponible.';
+      : 'Letra no disponible en este momento.';
     
     await cacheData(cacheKey, cleanedLyrics, 86400);
     return res.json({ status: 'ok', letra: cleanedLyrics });
   } catch (error) {
-    console.error('[LYRICS ERROR]:', error.message);
+    console.error('[LYRICS CRITICAL ERROR]:', error.message);
     return res.json({ 
-      status: 'ok', 
-      letra: error.message === 'Timeout' 
-        ? 'El servidor de letras está tardando demasiado en responder. Inténtalo de nuevo.' 
-        : 'Error de sincronización con el servidor de letras.' 
+      status: 'error', 
+      letra: `Error: ${error.message}. Verifica que GENIUS_ACCESS_TOKEN esté en Render.` 
     });
   }
 });
