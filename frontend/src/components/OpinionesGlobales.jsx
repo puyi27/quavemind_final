@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MdAccountCircle, MdFormatQuote, MdStar } from 'react-icons/md';
-import api from '../lib/api';
+import api from '../services/api';
 
 const OpinionesGlobales = ({ tipo, itemId }) => {
   const [opiniones, setOpiniones] = useState([]);
