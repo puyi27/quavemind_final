@@ -202,12 +202,12 @@ export default function PerfilArtista() {
                     {artista.oyentesMensuales ? 'Oyentes Mensuales' : 'Seguidores'}
                   </p>
                 </div>
-                <div className="flex gap-4">
-                  <button onClick={handleToggleFavorito} className={`flex items-center gap-3 px-8 py-4 font-black rounded-2xl transition-all ${esFavorito ? 'bg-[#ff6b00] text-black shadow-[0_0_30px_rgba(255,107,0,0.3)]' : 'bg-white/5 text-white border border-white/10 hover:bg-white/10'}`}>
+                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mt-6 lg:mt-0">
+                  <button onClick={handleToggleFavorito} className={`flex items-center justify-center gap-3 px-8 py-4 font-black rounded-2xl transition-all ${esFavorito ? 'bg-[#ff6b00] text-black shadow-[0_0_30px_rgba(255,107,0,0.3)]' : 'bg-white/5 text-white border border-white/10 hover:bg-white/10'}`}>
                     {esFavorito ? <MdFavorite /> : <MdFavoriteBorder />}
                     <span className="text-xs tracking-widest uppercase">{esFavorito ? 'SIGUIENDO' : 'SEGUIR'}</span>
                   </button>
-                  <a href={artista.spotifyUrl || `https://open.spotify.com/artist/${artista.id}`} target="_blank" rel="noreferrer" className="flex items-center gap-3 px-8 py-4 bg-[#1DB954] text-black font-black rounded-2xl hover:bg-[#1ed760] transition-all shadow-xl">
+                  <a href={artista.spotifyUrl || `https://open.spotify.com/artist/${artista.id}`} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-3 px-8 py-4 bg-[#1DB954] text-black font-black rounded-2xl hover:bg-[#1ed760] transition-all shadow-xl">
                     <MdOpenInNew /> <span className="text-xs tracking-widest uppercase">SPOTIFY</span>
                   </a>
                 </div>
@@ -218,7 +218,7 @@ export default function PerfilArtista() {
       </section>
 
       {/* Main Content Grid */}
-      <section className="mx-auto max-w-7xl px-4 -mt-10 relative z-10">
+      <section className="mx-auto max-w-7xl px-4 mt-10 lg:-mt-10 relative z-10">
         <div className="grid lg:grid-cols-3 gap-16">
 
           {/* Top Tracks */}
@@ -228,7 +228,7 @@ export default function PerfilArtista() {
                 <MdTrendingUp className="text-3xl text-[#ff6b00]" />
               </div>
               <div>
-                <h2 className="text-4xl font-black uppercase tracking-tighter text-white">Temas Populares</h2>
+                <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-white">Temas Populares</h2>
                 <p className="text-gray-500 text-[10px] font-black uppercase tracking-widest mt-1">Los temas más escuchados del momento</p>
               </div>
             </div>

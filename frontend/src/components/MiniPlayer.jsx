@@ -152,14 +152,16 @@ export default function MiniPlayer() {
                   )}
                 </Link>
 
-                <div className="text-center">
+                <div className="text-center space-y-1">
                   <h4 className="text-xs font-black text-white uppercase truncate">{currentTrack.nombre}</h4>
-                  <p className="text-[9px] font-bold text-[#ff6b00] uppercase truncate mt-1">{currentTrack.artista}</p>
+                  <p className="text-[9px] font-bold text-[#ff6b00] uppercase truncate">{currentTrack.artista}</p>
                 </div>
 
-                {/* BARRA REUBICADA (EXPANDIDA) */}
-                <div ref={progressRef} onClick={handleProgressClick} className="h-1.5 w-full bg-white/5 cursor-pointer relative rounded-full overflow-hidden">
-                  <div className="h-full bg-[#ff6b00] transition-all" style={{ width: `${progPct}%` }} />
+                {/* BARRA REUBICADA (EXPANDIDA) - ENTRE ARTISTA Y BOTONES */}
+                <div className="px-2">
+                  <div ref={progressRef} onClick={handleProgressClick} className="h-1.5 w-full bg-white/5 cursor-pointer relative rounded-full overflow-hidden">
+                    <div className="h-full bg-[#ff6b00] transition-all" style={{ width: `${progPct}%` }} />
+                  </div>
                 </div>
 
                 <div className="flex items-center justify-between px-2">
@@ -170,34 +172,34 @@ export default function MiniPlayer() {
                   <button onClick={() => !isChangingTrack && next()} className={`p-2 transition-all ${isChangingTrack ? 'opacity-20' : 'text-gray-500 hover:text-white'}`} disabled={isChangingTrack}><MdSkipNext size={24} /></button>
                 </div>
               </div>
-            ) : (
-              <div className="p-2 flex flex-col gap-2">
-                {/* BARRA REUBICADA (COMPACTA) */}
-                <div ref={progressRef} onClick={handleProgressClick} className="h-1 w-full bg-white/5 cursor-pointer relative rounded-full overflow-hidden">
-                  <div className="h-full bg-[#ff6b00] transition-all" style={{ width: `${progPct}%` }} />
-                </div>
-
-                <div className="flex items-center gap-2">
-                <div onClick={() => setIsExpanded(true)} className="relative w-10 h-10 shrink-0 rounded-xl overflow-hidden border border-white/5 cursor-pointer group">
+              <div className="p-3 flex items-center gap-3">
+                <div onClick={() => setIsExpanded(true)} className="relative w-12 h-12 shrink-0 rounded-xl overflow-hidden border border-white/5 cursor-pointer group">
                   <img src={currentTrack.imagen || '/default.png'} className={`w-full h-full object-cover transition-all ${isChangingTrack ? 'opacity-50' : ''}`} alt="" />
                   <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                     <MdUnfoldMore className="text-white" />
                   </div>
                   {isChangingTrack && (
                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                       <div className="w-3 h-3 border-2 border-[#ff6b00] border-t-transparent animate-spin rounded-full" />
+                       <div className="w-4 h-4 border-2 border-[#ff6b00] border-t-transparent animate-spin rounded-full" />
                     </div>
                   )}
                 </div>
 
-                <div className="flex-1 min-w-0" onClick={() => setIsExpanded(true)}>
-                  <h4 className="text-[9px] font-black text-white uppercase truncate leading-tight">{currentTrack.nombre}</h4>
-                  <p className="text-[7px] font-bold text-[#ff6b00] uppercase truncate tracking-widest mt-0.5">{currentTrack.artista}</p>
+                <div className="flex-1 min-w-0 space-y-1.5" onClick={() => setIsExpanded(true)}>
+                  <div className="truncate">
+                    <h4 className="text-[10px] font-black text-white uppercase leading-tight truncate">{currentTrack.nombre}</h4>
+                    <p className="text-[8px] font-bold text-[#ff6b00] uppercase truncate tracking-widest">{currentTrack.artista}</p>
+                  </div>
+                  
+                  {/* BARRA REUBICADA (COMPACTA) - ENCIMA DE BOTONES / BAJO ARTISTA */}
+                  <div ref={progressRef} onClick={(e) => { e.stopPropagation(); handleProgressClick(e); }} className="h-1 w-full bg-white/5 cursor-pointer relative rounded-full overflow-hidden">
+                    <div className="h-full bg-[#ff6b00] transition-all" style={{ width: `${progPct}%` }} />
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-0.5 shrink-0">
-                  <button onClick={handlePlayPause} className="w-8 h-8 bg-[#ff6b00] text-black rounded-lg flex items-center justify-center hover:scale-105 transition-all shadow-lg active:scale-90">
-                    {isPlaying ? <MdPause size={18} /> : <MdPlayArrow size={18} className="ml-0.5" />}
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button onClick={handlePlayPause} className="w-10 h-10 bg-[#ff6b00] text-black rounded-xl flex items-center justify-center hover:scale-105 transition-all shadow-lg active:scale-90">
+                    {isPlaying ? <MdPause size={20} /> : <MdPlayArrow size={20} className="ml-0.5" />}
                   </button>
                   <button onClick={handleClose} className="p-1 text-gray-700 hover:text-red-500 transition-colors">
                     <MdClose size={18} />
