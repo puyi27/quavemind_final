@@ -99,7 +99,7 @@ const PerfilAlbum = () => {
         comentario: comentario,
         snapshot: {
           nombre: datos.album.nombre,
-          artista: datos.album.artista,
+          artista: datos.album.artista || 'Artista Desconocido',
           imagen: datos.album.imagen
         }
       });
@@ -122,7 +122,7 @@ const PerfilAlbum = () => {
         comentario: nuevoComentario,
         snapshot: {
           nombre: datos.album.nombre,
-          artista: datos.album.artista,
+          artista: datos.album.artista || 'Artista Desconocido',
           imagen: datos.album.imagen
         }
       });

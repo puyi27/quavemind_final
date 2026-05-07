@@ -211,7 +211,7 @@ const PerfilCancion = () => {
         comentario: comentario,
         snapshot: {
           nombre: datosCancion.nombre,
-          artista: datosCancion.artista,
+          artista: datosCancion.artistaPrincipal || datosCancion.artistas?.[0]?.nombre || datosCancion.artista || 'Artista Desconocido',
           imagen: datosCancion.imagen
         }
       });
@@ -248,7 +248,7 @@ const PerfilCancion = () => {
         comentario: nuevoComentario,
         snapshot: {
           nombre: datosCancion.nombre,
-          artista: datosCancion.artista,
+          artista: datosCancion.artistaPrincipal || datosCancion.artistas?.[0]?.nombre || datosCancion.artista || 'Artista Desconocido',
           imagen: datosCancion.imagen
         }
       });
