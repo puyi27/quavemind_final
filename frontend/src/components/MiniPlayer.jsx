@@ -199,9 +199,9 @@ export default function MiniPlayer() {
                   )}
                 </Link>
 
-                <div className="flex flex-col items-center gap-2 mb-4">
-                  <div className="text-center space-y-1 flex-1">
-                    <h4 className="text-sm font-black text-white uppercase truncate tracking-tight">{currentTrack.nombre}</h4>
+                <div className="flex flex-col items-center gap-2">
+                  <div className="text-center space-y-1">
+                    <h4 className="text-sm font-black text-white uppercase truncate tracking-tight max-w-[200px]">{currentTrack.nombre}</h4>
                     <p className="text-[10px] font-bold text-[#ff6b00] uppercase truncate tracking-widest">{currentTrack.artista}</p>
                   </div>
                   <button 
@@ -243,8 +243,10 @@ export default function MiniPlayer() {
                 </div>
 
                 <div className="flex-1 min-w-0" onClick={() => setIsExpanded(true)}>
-                  <h4 className="text-[11px] font-black text-white uppercase truncate tracking-tight leading-tight">{currentTrack.nombre}</h4>
-                  <p className="text-[9px] font-bold text-[#ff6b00] uppercase truncate tracking-widest">{currentTrack.artista}</p>
+                  <div className="max-w-[100px]">
+                    <h4 className="text-[10px] font-black text-white uppercase truncate tracking-tight leading-none mb-1">{currentTrack.nombre}</h4>
+                    <p className="text-[8px] font-bold text-[#ff6b00] uppercase truncate tracking-widest opacity-80">{currentTrack.artista}</p>
+                  </div>
                 </div>
                   
                   {/* BARRA REUBICADA (COMPACTA) - ENCIMA DE BOTONES / BAJO ARTISTA */}

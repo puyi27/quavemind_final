@@ -322,10 +322,12 @@ const PerfilAlbum = () => {
             </h3>
             
             <div className="space-y-6">
-              <div className="p-6 bg-black border-2 border-white/5 rounded-3xl flex flex-col gap-2">
-                <span className="text-[10px] font-black text-gray-600 uppercase tracking-[0.2em]">Sello Discográfico</span>
-                <span className="text-xl font-black uppercase text-[#ff6b00] truncate">{album.label || 'INDEPENDIENTE'}</span>
-              </div>
+              {album.label && (
+                <div className="p-6 bg-black border-2 border-white/5 rounded-3xl flex flex-col gap-2">
+                  <span className="text-[10px] font-black text-gray-600 uppercase tracking-[0.2em]">Sello Discográfico</span>
+                  <span className="text-xl font-black uppercase text-[#ff6b00] truncate">{album.label}</span>
+                </div>
+              )}
               <div className="p-6 bg-black border-2 border-white/5 rounded-3xl flex flex-col gap-2">
                 <span className="text-[10px] font-black text-gray-600 uppercase tracking-[0.2em]">Fecha de Salida</span>
                 <span className="text-xl font-black uppercase text-white tracking-widest">{album.fecha}</span>
