@@ -36,14 +36,12 @@ const getGeniusBio = async (nombre) => {
   }
 };
 
-// Ruta: Letras (Optimizada con triple intento)
+// Ruta: Letras (Híbrida: LRCLIB + Genius)
 router.get('/lyrics', async (req, res) => {
   const { q: query, title, artist } = req.query;
   
-  // Limpiar artista: usar solo el primero si hay varios (ej: "Quevedo, Myke Towers" -> "Quevedo")
   const cleanArtist = artist ? artist.split(',')[0].trim() : '';
   const cleanTitle = title ? title.replace(/\s*-\s*.*Remix.*$/i, '').replace(/\(.*\)/g, '').trim() : '';
-  
   const searchQuery = cleanArtist && cleanTitle ? `${cleanArtist} ${cleanTitle}` : query;
 
   if (!searchQuery) return res.status(400).json({ status: 'error', mensaje: 'Falta query' });
@@ -52,68 +50,52 @@ router.get('/lyrics', async (req, res) => {
   const cached = await getCachedData(cacheKey);
   if (cached) return res.json({ status: 'ok', letra: cached });
 
-  if (!geniusClient) {
-    console.error('[LYRICS] Genius client not initialized. Check GENIUS_ACCESS_TOKEN env var.');
-    return res.json({ status: 'ok', letra: 'Servicio de letras no configurado en el servidor.' });
-  }
-
   try {
-    let searches = [];
-    
-    // Limpieza Maestra
-    const searchTerms = searchQuery.split(',')[0].split(' ft.')[0].split(' feat.')[0].trim();
-    console.log(`[LYRICS] Nodo de búsqueda: ${searchTerms}`);
+    // 1. INTENTO CON LRCLIB (Mucho más estable para servidores)
+    console.log(`[LYRICS] Probando LRCLIB para: ${cleanTitle} - ${cleanArtist}`);
+    try {
+      const lrclibUrl = `https://lrclib.net/api/get?artist_name=${encodeURIComponent(cleanArtist)}&track_name=${encodeURIComponent(cleanTitle)}`;
+      const response = await fetch(lrclibUrl, {
+        headers: { 'User-Agent': 'Quavemind (https://github.com/puyi27/quavemind_final)' }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data && (data.plainLyrics || data.syncedLyrics)) {
+          const letra = data.plainLyrics || data.syncedLyrics.replace(/\[\d+:\d+\.\d+\]/g, ''); // Limpiar tiempos si es synced
+          console.log('[LYRICS] Encontrada en LRCLIB');
+          await cacheData(cacheKey, letra, 86400);
+          return res.json({ status: 'ok', letra });
+        }
+      }
+    } catch (e) {
+      console.warn('[LYRICS] LRCLIB falló, pasando a Genius...');
+    }
 
-    // Intentamos identificarnos como un navegador real para evitar el 403
-    // Nota: genius-lyrics usa fetch internamente, intentamos forzar headers si es posible
-    // o al menos capturar el error para informar al usuario.
-    
-    const searchPromise = geniusClient.songs.search(searchTerms);
-    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 12000));
-    
-    searches = await Promise.race([searchPromise, timeoutPromise]);
-    
-    if (!searches || searches.length === 0) {
-      if (cleanTitle) {
-        searches = await geniusClient.songs.search(cleanTitle);
+    // 2. INTENTO CON GENIUS (Como respaldo)
+    if (geniusClient) {
+      const searchTerms = cleanArtist && cleanTitle ? `${cleanArtist} ${cleanTitle}` : searchQuery;
+      const searches = await geniusClient.songs.search(searchTerms);
+
+      if (searches && searches.length > 0) {
+        const song = searches[0];
+        const lyrics = await song.lyrics(true);
+        const cleanedLyrics = lyrics ? lyrics.replace(/^\d+ Contributors.*/i, '').replace(/[0-9]*[ ]?Embed$/gi, '').replace(/You might also like/gi, '').replace(/\[.*?\]/g, '').trim() : null;
+        
+        if (cleanedLyrics) {
+          await cacheData(cacheKey, cleanedLyrics, 86400);
+          return res.json({ status: 'ok', letra: cleanedLyrics });
+        }
       }
     }
 
-    if (!searches || searches.length === 0) {
-      return res.json({ 
-        status: 'ok', 
-        letra: 'No se han encontrado registros en el satélite Genius para esta frecuencia.' 
-      });
-    }
+    return res.json({ status: 'ok', letra: 'Letra no encontrada en los archivos Quave. Prueba con otra canción.' });
 
-    const song = searches[0];
-    // Intentamos obtener las letras
-    const lyrics = await song.lyrics(true);
-    
-    const cleanedLyrics = lyrics 
-      ? lyrics
-          .replace(/^\d+ Contributors.*/i, '')
-          .replace(/[0-9]*[ ]?Embed$/gi, '')
-          .replace(/You might also like/gi, '')
-          .replace(/\[.*?\]/g, '')
-          .trim() 
-      : 'Frecuencia de letra vacía.';
-    
-    await cacheData(cacheKey, cleanedLyrics, 86400);
-    return res.json({ status: 'ok', letra: cleanedLyrics });
   } catch (error) {
     console.error('[LYRICS ERROR]:', error.message);
-    
-    if (error.message.includes('403')) {
-      return res.json({ 
-        status: 'error', 
-        letra: 'ERROR 403: Genius está bloqueando el acceso. Por favor, genera un NUEVO Access Token en genius.com y actualízalo en Render.' 
-      });
-    }
-
     return res.json({ 
       status: 'error', 
-      letra: `Fallo en el enlace: ${error.message}` 
+      letra: `Fallo en el enlace: ${error.message}. Genius está bloqueando la conexión.` 
     });
   }
 });
