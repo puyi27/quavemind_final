@@ -26,105 +26,69 @@ router.get('/diarias', async (req, res) => {
     const hoy = getHoy();
     const seed = getSeed();
     
-    if (cacheDiaria.fecha === hoy && cacheDiaria.selecciones && cacheDiaria.selecciones.artistaDestacado) {
+    if (cacheDiaria.fecha === hoy && cacheDiaria.selecciones) {
       return res.json({ status: 'ok', fecha: hoy, desdeCache: true, selecciones: cacheDiaria.selecciones });
     }
     
     const token = await getSpotifyToken();
     const headers = { Authorization: `Bearer ${token}` };
     
-    // Consultas más robustas y variadas
-    const queries = [
-      'genre:trap latino', 
-      'genre:reggaeton',
-      'urbano en español',
-      'genre:corridos tumbados',
-      'pop urbano español',
-      'hip hop español',
-      'top urbano españa',
-      'musica urbana latina 2024'
-    ];
+    const queries = ['trap latino', 'reggaeton', 'urbano español', 'pop latino'];
     const query = queries[seed % queries.length];
     
-    // 1. Obtener pool de canciones
-    const searchTracksUrl = `${SPOTIFY_API_BASE}/search?q=${encodeURIComponent(query)}&type=track&limit=50&market=ES`;
-    const dataTracks = await fetchJsonWithRetry(searchTracksUrl, { headers });
-    const trackItems = dataTracks.tracks?.items || [];
+    // Ejecutamos en paralelo para mayor velocidad
+    const [dataTracks, dataAlbums] = await Promise.all([
+      fetchJsonWithRetry(`${SPOTIFY_API_BASE}/search?q=${encodeURIComponent(query)}&type=track&limit=50&market=ES`, { headers }),
+      fetchJsonWithRetry(`${SPOTIFY_API_BASE}/search?q=${encodeURIComponent(query)}&type=album&limit=50&market=ES`, { headers })
+    ]);
 
-    // 2. Obtener pool de álbumes
-    const searchAlbumsUrl = `${SPOTIFY_API_BASE}/search?q=${encodeURIComponent(query)}&type=album&limit=50&market=ES`;
-    const dataAlbums = await fetchJsonWithRetry(searchAlbumsUrl, { headers });
-    const albumItems = (dataAlbums.albums?.items || []).filter(a => a.album_type === 'album' && a.total_tracks > 3);
+    const trackItems = dataTracks?.tracks?.items || [];
+    const albumItems = (dataAlbums?.albums?.items || []).filter(a => a.album_type === 'album');
 
-    // Selección de canción del día
-    const cancionPool = trackItems.map(item => ({
+    const cancionDelDia = selectWithSeed(trackItems.map(item => ({
       id: item.id,
       nombre: item.name,
       imagen: item.album?.images?.[0]?.url,
       artista: item.artists?.[0]?.name,
       preview: item.preview_url
-    }));
-    const cancionDelDia = selectWithSeed(cancionPool, seed, 2);
+    })), seed, 2);
 
-    // Selección de álbum del día
-    const albumPool = albumItems.map(a => ({
+    const albumDelDia = selectWithSeed(albumItems.map(a => ({
       id: a.id,
       nombre: a.name,
       imagen: a.images?.[0]?.url,
-      artista: a.artists?.[0]?.name,
-      fecha: a.release_date?.substring(0, 4)
-    }));
-    const albumDelDia = selectWithSeed(albumPool, seed, 3);
+      artista: a.artists?.[0]?.name
+    })), seed, 3);
 
-    // Selección de artista destacado
     const artistIds = Array.from(new Set(trackItems.map(t => t.artists[0]?.id).filter(Boolean))).slice(0, 20);
-    
     let artistaDestacado = null;
+
     if (artistIds.length > 0) {
       const artistsFullRes = await fetchJsonWithRetry(`${SPOTIFY_API_BASE}/artists?ids=${artistIds.join(',')}`, { headers });
-      const artistPool = (artistsFullRes.artists || []).filter(a => a && a.images?.length > 0);
-      
-      // Intentamos buscar uno con popularidad decente pero no necesariamente el top 1
-      const selectedArtistRaw = selectWithSeed(artistPool, seed, 1);
-      
-      if (selectedArtistRaw) {
+      const artistPool = (artistsFullRes?.artists || []).filter(a => a && a.images?.length > 0);
+      const selected = selectWithSeed(artistPool, seed, 1);
+      if (selected) {
         artistaDestacado = {
-          id: selectedArtistRaw.id,
-          nombre: selectedArtistRaw.name,
-          imagen: selectedArtistRaw.images?.[0]?.url,
-          seguidores: selectedArtistRaw.followers?.total || 0,
-          popularidad: selectedArtistRaw.popularity || 0
+          id: selected.id,
+          nombre: selected.name,
+          imagen: selected.images?.[0]?.url,
+          seguidores: selected.followers?.total || 0,
+          popularidad: selected.popularity || 0
         };
       }
     }
 
-    const selecciones = {
-      artistaDestacado,
-      cancionDelDia,
-      albumDelDia
-    };
+    const selecciones = { artistaDestacado, cancionDelDia, albumDelDia };
     
-    // Solo cacheamos si tenemos al menos un artista
-    if (artistaDestacado) {
-      cacheDiaria.fecha = hoy; 
-      cacheDiaria.seed = seed; 
-      cacheDiaria.selecciones = selecciones;
-    }
+    cacheDiaria.fecha = hoy; 
+    cacheDiaria.selecciones = selecciones;
     
     res.json({ status: 'ok', fecha: hoy, desdeCache: false, selecciones });
     
   } catch (error) {
-    console.error("Error en recomendaciones:", error);
-    res.status(500).json({ status: 'error', message: error.message });
+    console.error("Error en recomendaciones:", error.message);
+    res.status(200).json({ status: 'partial', message: 'Spotify temporalmente fuera de servicio', selecciones: { artistaDestacado: null, cancionDelDia: null, albumDelDia: null } });
   }
 });
 
-router.get('/limpiar', (req, res) => {
-  cacheDiaria.fecha = null; 
-  cacheDiaria.seed = null; 
-  cacheDiaria.selecciones = null;
-  res.json({ status: 'ok', mensaje: 'Caché purgada.' });
-});
-
 export default router;
-
