@@ -68,3 +68,17 @@ export const authenticate = async (req, res, next) => {
     });
   }
 };
+
+/**
+ * Middleware para restringir acceso solo a Administradores.
+ * Debe usarse DESPUÉS de authenticate.
+ */
+export const authorizeAdmin = (req, res, next) => {
+  if (!req.usuario || req.usuario.rol !== 'ADMIN') {
+    return res.status(403).json({
+      status: 'error',
+      mensaje: 'ACCESO DENEGADO: No tienes permisos de Superadmin para realizar esta acción.'
+    });
+  }
+  next();
+};

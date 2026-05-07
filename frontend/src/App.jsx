@@ -22,6 +22,7 @@ const Register = lazy(() => import('./pages/Register'));
 const Generador = lazy(() => import('./pages/Generador'));
 const PerfilUsuario = lazy(() => import('./pages/PerfilUsuario'));
 const Comunidad = lazy(() => import('./pages/Comunidad'));
+const AdminPanel = lazy(() => import('./pages/AdminPanel'));
 const ProtectedRoute = lazy(() => import('./components/ProtectedRoute'));
 
 const ScrollToTop = () => {
@@ -82,6 +83,7 @@ const AppContent = () => {
             <Route element={<ProtectedRoute />}>
               <Route path="/boveda/*" element={<Boveda />} />
               <Route path="/valoraciones" element={<Valoraciones />} />
+              <Route path="/admin" element={<AdminPanel />} />
             </Route>
           </Route>
 

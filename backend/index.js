@@ -18,6 +18,7 @@ import authRoutes from './routes/auth.js';
 import generadorRoutes from './routes/generador.js';
 import vaultRoutes from './routes/vault.js';
 import artistasRoutes from './routes/artistas.js';
+import adminRoutes from './routes/admin.js';
 import { getRealArtistStats } from './lib/stats.js';
 import { normalizeArtistList } from './lib/artistValidator.js';
 
@@ -59,6 +60,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/generador', generadorRoutes);
 app.use('/api/vault', vaultRoutes);
 app.use('/api/artistas', artistasRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api/music/artistas', artistasRoutes);
 
 const SPOTIFY_OPEN_BASE = 'https://open.spotify.com';

@@ -3,7 +3,7 @@ import {
   MdHome, MdExplore, MdSearch, 
   MdSportsEsports, MdFolder, MdMap, MdAlbum,
   MdPerson, MdArrowDropDown, MdMenu, MdClose,
-  MdGroups
+  MdGroups, MdSecurity
 } from 'react-icons/md';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -38,6 +38,7 @@ export default function MainLayout() {
     { to: '/', label: 'Inicio', icon: MdHome },
     { to: '/buscar', label: 'Buscar', icon: MdSearch },
     { to: '/comunidad', label: 'Comunidad', icon: MdGroups },
+    ...(user?.rol === 'ADMIN' ? [{ to: '/admin', label: 'Admin', icon: MdSecurity }] : []),
   ];
 
   const dropdownItems = [
