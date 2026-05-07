@@ -253,8 +253,7 @@ export default function MiniPlayer() {
                   <div ref={progressRef} onClick={(e) => { e.stopPropagation(); handleProgressClick(e); }} className="h-1 w-full bg-white/5 cursor-pointer relative rounded-full overflow-hidden">
                     <div className="h-full bg-[#ff6b00] transition-all" style={{ width: `${progPct}%` }} />
                   </div>
-                </div>
-
+                
                 <div className="flex items-center gap-1.5 shrink-0">
                   <button 
                     onClick={toggleFavorito}
