@@ -434,6 +434,21 @@ const PerfilCancion = () => {
                 <ReviewSection initialComment={comentario} onSave={handleSaveReview} />
               </div>
             </div>
+
+            {/* SPOTIFY BRIDGE */}
+            <div className="mt-8 group">
+              <p className="text-[9px] font-black text-gray-600 uppercase tracking-[0.4em] mb-4 text-center group-hover:text-[#ff6b00] transition-colors">Spotify Bridge: Digital Link</p>
+              <div className="rounded-[2.5rem] overflow-hidden border-4 border-black shadow-[15px_15px_0px_0px_rgba(0,0,0,0.5)] bg-black/40 backdrop-blur-xl">
+                <iframe
+                  src={`https://open.spotify.com/embed/track/${id}?utm_source=generator&theme=0`}
+                  width="100%"
+                  height="152"
+                  className="border-0"
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                  loading="lazy"
+                />
+              </div>
+            </div>
           </div>
 
           <div className="lg:col-span-2">
