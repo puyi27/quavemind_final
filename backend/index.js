@@ -24,23 +24,28 @@ import { normalizeArtistList } from './lib/artistValidator.js';
 const app = express();
 const genius = process.env.GENIUS_ACCESS_TOKEN ? new Client(process.env.GENIUS_ACCESS_TOKEN) : null;
 
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:5174',
-  'https://quavemind-final.vercel.app',
-  process.env.FRONTEND_URL,
-].filter(Boolean);
+const vercelPreviewPattern = /^https:\/\/quavemind-final.*\.vercel\.app$/;
+
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+  if (origin === 'http://localhost:5173') return true;
+  if (origin === 'http://localhost:5174') return true;
+  if (vercelPreviewPattern.test(origin)) return true;
+  if (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL) return true;
+  return false;
+};
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (isAllowedOrigin(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('CORS no permitido'));
+      callback(new Error('CORS no permitido: ' + origin));
     }
   },
   credentials: true
 }));
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(cookieParser());
