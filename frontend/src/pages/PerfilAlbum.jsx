@@ -338,7 +338,7 @@ const PerfilAlbum = () => {
               <div className="bg-black/40 p-6 rounded-3xl border-2 border-dashed border-white/10">
                 <RatingSystem 
                   initialRating={rating}
-                  label="VALORACIÓN DEL ARTISTA" 
+                  label="VALORACIÓN DEL ÁLBUM" 
                   onRate={handleRate} 
                 />
                 <div className="mt-6">
@@ -357,21 +357,9 @@ const PerfilAlbum = () => {
       {/* SECCIÓN SOCIAL / AUDITORÍA */}
       <section className="max-w-7xl mx-auto px-6 mt-32">
         <div className="grid lg:grid-cols-12 gap-16">
-          {/* Tu Valoración (Lateral) */}
-          <div className="lg:col-span-4">
-             <div className="bg-[#0a0a0a] rounded-[2.5rem] p-10 border border-white/5 shadow-2xl relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-10 opacity-[0.02] pointer-events-none">
-                  <MdRateReview size={200} />
-                </div>
-                <div className="relative z-10">
-                  <RatingSystem initialRating={rating} label="AUDITAR ÁLBUM" onRate={handleRate} />
-                  <ReviewSection initialComment={comentario} onSave={handleSaveReview} />
-                </div>
-             </div>
-          </div>
 
           {/* Opiniones de la Comunidad (Principal) */}
-          <div className="lg:col-span-8">
+          <div className="lg:col-span-12">
             <div className="flex items-center gap-5 mb-10 border-l-8 border-[#ff6b00] pl-8">
                <div>
                   <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter italic leading-none">REPORTE DE <br/> <span className="text-[#ff6b00]">COMUNIDAD</span></h2>
