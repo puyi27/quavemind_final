@@ -193,6 +193,20 @@ export default function MainLayout() {
 
           {/* LADO DERECHO: ACCIONES Y PERFIL - Centrado vertical forzado */}
           <div className="flex-1 flex items-center justify-end gap-3 pointer-events-auto h-12">
+            {user?.role === 'ADMIN' && (
+              <Link 
+                to="/admin"
+                className={`hidden md:flex items-center gap-2 px-5 py-2.5 rounded-full text-[11px] font-bold uppercase tracking-[0.1em] transition-all duration-500 h-10 border border-white/20 ${
+                  isActive('/admin')
+                    ? 'bg-white text-black'
+                    : 'bg-black text-white hover:bg-white hover:text-black shadow-[0_0_15px_rgba(255,255,255,0.1)]'
+                }`}
+              >
+                <MdPerson className="text-base" />
+                <span>Admin</span>
+              </Link>
+            )}
+
             <Link 
               to="/boveda"
               className={`hidden md:flex items-center gap-2 px-5 py-2.5 rounded-full text-[11px] font-bold uppercase tracking-[0.1em] transition-all duration-500 h-10 ${
