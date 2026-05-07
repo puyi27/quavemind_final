@@ -60,20 +60,21 @@ router.get('/lyrics', async (req, res) => {
   try {
     let searches = [];
     
-    // Limpieza Maestra: Solo el nombre artístico real (ej: "Bad Gyal, Quevedo" -> "Bad Gyal")
+    // Limpieza Maestra
     const searchTerms = searchQuery.split(',')[0].split(' ft.')[0].split(' feat.')[0].trim();
+    console.log(`[LYRICS] Nodo de búsqueda: ${searchTerms}`);
 
-    console.log(`[LYRICS DEBUG] Buscando en Genius: "${searchTerms}"`);
-
+    // Intentamos identificarnos como un navegador real para evitar el 403
+    // Nota: genius-lyrics usa fetch internamente, intentamos forzar headers si es posible
+    // o al menos capturar el error para informar al usuario.
+    
     const searchPromise = geniusClient.songs.search(searchTerms);
-    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 10000));
+    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 12000));
     
     searches = await Promise.race([searchPromise, timeoutPromise]);
     
     if (!searches || searches.length === 0) {
-      // Re-intento 2: Solo título limpio
       if (cleanTitle) {
-        console.log(`[LYRICS DEBUG] Re-intentando solo título: "${cleanTitle}"`);
         searches = await geniusClient.songs.search(cleanTitle);
       }
     }
@@ -81,13 +82,12 @@ router.get('/lyrics', async (req, res) => {
     if (!searches || searches.length === 0) {
       return res.json({ 
         status: 'ok', 
-        letra: 'No hemos podido localizar la letra. Esto suele ocurrir si la canción es muy reciente o está mal etiquetada en Genius.' 
+        letra: 'No se han encontrado registros en el satélite Genius para esta frecuencia.' 
       });
     }
 
     const song = searches[0];
-    console.log(`[LYRICS DEBUG] Canción encontrada: ${song.fullTitle}`);
-    
+    // Intentamos obtener las letras
     const lyrics = await song.lyrics(true);
     
     const cleanedLyrics = lyrics 
@@ -97,15 +97,23 @@ router.get('/lyrics', async (req, res) => {
           .replace(/You might also like/gi, '')
           .replace(/\[.*?\]/g, '')
           .trim() 
-      : 'Letra no disponible en este momento.';
+      : 'Frecuencia de letra vacía.';
     
     await cacheData(cacheKey, cleanedLyrics, 86400);
     return res.json({ status: 'ok', letra: cleanedLyrics });
   } catch (error) {
-    console.error('[LYRICS CRITICAL ERROR]:', error.message);
+    console.error('[LYRICS ERROR]:', error.message);
+    
+    if (error.message.includes('403')) {
+      return res.json({ 
+        status: 'error', 
+        letra: 'ERROR 403: Genius está bloqueando el acceso. Por favor, genera un NUEVO Access Token en genius.com y actualízalo en Render.' 
+      });
+    }
+
     return res.json({ 
       status: 'error', 
-      letra: `Error: ${error.message}. Verifica que GENIUS_ACCESS_TOKEN esté en Render.` 
+      letra: `Fallo en el enlace: ${error.message}` 
     });
   }
 });
