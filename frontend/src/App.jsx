@@ -5,26 +5,45 @@ import { useThemeStore } from './store/themeStore';
 import { useAuthStore } from './store/authStore';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 
-const MainLayout = lazy(() => import('./layouts/MainLayout'));
-const Home = lazy(() => import('./pages/Home'));
-const Buscador = lazy(() => import('./pages/Buscador'));
-const Quavedle = lazy(() => import('./pages/Quavedle'));
-const QuavedleGame = lazy(() => import('./pages/QuavedleGame'));
-const Valoraciones = lazy(() => import('./pages/Valoraciones'));
-const PerfilArtista = lazy(() => import('./pages/PerfilArtista'));
-const PerfilAlbum = lazy(() => import('./pages/PerfilAlbum'));
-const PerfilCancion = lazy(() => import('./pages/PerfilCancion'));
-const Genero = lazy(() => import('./pages/Genero'));
-const Escena = lazy(() => import('./pages/Escena'));
-const Boveda = lazy(() => import('./pages/Boveda'));
-const Login = lazy(() => import('./pages/Login'));
-const Register = lazy(() => import('./pages/Register'));
-const Generador = lazy(() => import('./pages/Generador'));
-const PerfilUsuario = lazy(() => import('./pages/PerfilUsuario'));
-const Comunidad = lazy(() => import('./pages/Comunidad'));
-const AdminPanel = lazy(() => import('./pages/AdminPanel'));
-const ProtectedRoute = lazy(() => import('./components/ProtectedRoute'));
-const AdminRoute = lazy(() => import('./components/AdminRoute'));
+const lazyWithRetry = (componentImport) => 
+  lazy(async () => {
+    const pageHasAlreadyBeenForceRefreshed = JSON.parse(
+      window.localStorage.getItem('page-has-been-force-refreshed') || 'false'
+    );
+
+    try {
+      const component = await componentImport();
+      window.localStorage.setItem('page-has-been-force-refreshed', 'false');
+      return component;
+    } catch (error) {
+      if (!pageHasAlreadyBeenForceRefreshed) {
+        window.localStorage.setItem('page-has-been-force-refreshed', 'true');
+        return window.location.reload();
+      }
+      throw error;
+    }
+  });
+
+const MainLayout = lazyWithRetry(() => import('./layouts/MainLayout'));
+const Home = lazyWithRetry(() => import('./pages/Home'));
+const Buscador = lazyWithRetry(() => import('./pages/Buscador'));
+const Quavedle = lazyWithRetry(() => import('./pages/Quavedle'));
+const QuavedleGame = lazyWithRetry(() => import('./pages/QuavedleGame'));
+const Valoraciones = lazyWithRetry(() => import('./pages/Valoraciones'));
+const PerfilArtista = lazyWithRetry(() => import('./pages/PerfilArtista'));
+const PerfilAlbum = lazyWithRetry(() => import('./pages/PerfilAlbum'));
+const PerfilCancion = lazyWithRetry(() => import('./pages/PerfilCancion'));
+const Genero = lazyWithRetry(() => import('./pages/Genero'));
+const Escena = lazyWithRetry(() => import('./pages/Escena'));
+const Boveda = lazyWithRetry(() => import('./pages/Boveda'));
+const Login = lazyWithRetry(() => import('./pages/Login'));
+const Register = lazyWithRetry(() => import('./pages/Register'));
+const Generador = lazyWithRetry(() => import('./pages/Generador'));
+const PerfilUsuario = lazyWithRetry(() => import('./pages/PerfilUsuario'));
+const Comunidad = lazyWithRetry(() => import('./pages/Comunidad'));
+const AdminPanel = lazyWithRetry(() => import('./pages/AdminPanel'));
+const ProtectedRoute = lazyWithRetry(() => import('./components/ProtectedRoute'));
+const AdminRoute = lazyWithRetry(() => import('./components/AdminRoute'));
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
