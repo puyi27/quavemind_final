@@ -1,3 +1,2 @@
-import { createContext } from 'react';
-
-export const PlayerContext = createContext(null);
+// Archivo movido a PlayerContext.jsx para evitar dependencias circulares
+export {};

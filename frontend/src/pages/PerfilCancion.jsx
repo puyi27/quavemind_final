@@ -11,7 +11,7 @@ import ReviewSection from '../components/ReviewSection';
 import OpinionesGlobales from '../components/OpinionesGlobales';
 import SpotifyEmbedPlayer from '../components/SpotifyEmbedPlayer';
 import api from '../services/api';
-import { usePlayer } from '../context/usePlayer';
+import { usePlayer } from '../context/MusicPlayerContext';
 import { useAuthStore } from '../store/authStore';
 import { useSpotifyEmbedStore } from '../store/spotifyEmbedStore';
 

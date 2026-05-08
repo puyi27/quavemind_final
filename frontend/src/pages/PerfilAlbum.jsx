@@ -8,7 +8,7 @@ import {
 } from 'react-icons/md';
 import OpinionesGlobales from '../components/OpinionesGlobales';
 import api from '../services/api';
-import { usePlayer } from '../context/usePlayer';
+import { usePlayer } from '../context/MusicPlayerContext';
 import { useAuthStore } from '../store/authStore';
 import { useSpotifyEmbedStore } from '../store/spotifyEmbedStore';
 import RatingSystem from '../components/RatingSystem';
