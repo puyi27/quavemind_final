@@ -427,12 +427,6 @@ const PerfilCancion = () => {
                   <span className="text-xs uppercase tracking-widest">ABRIR EN SPOTIFY</span>
                 </a>
               </div>
-              
-              <div className="mt-6 p-4 bg-white/5 border border-dashed border-[#ff6b00]/30 rounded-2xl max-w-md mx-auto lg:mx-0">
-                <p className="text-[10px] text-[#ff6b00] font-mono uppercase tracking-widest text-center lg:text-left leading-relaxed">
-                  ⚠️ SISTEMA DE ENLACE HÍBRIDO: PARA ESCUCHAR TEMAS COMPLETOS EN ESTE TERMINAL, INICIA SESIÓN EN TU CUENTA DE SPOTIFY EN ESTE NAVEGADOR. SI NO TIENES SESIÓN, LA PRE-ESCUCHA SERÁ DE 30 SEG.
-                </p>
-              </div>
             </div>
           </div>
         </div>
@@ -453,7 +447,13 @@ const PerfilCancion = () => {
 
             {/* SPOTIFY BRIDGE */}
             <div className="mt-8 group">
-              <p className="text-[9px] font-black text-gray-600 uppercase tracking-[0.4em] mb-4 text-center group-hover:text-[#ff6b00] transition-colors">Spotify Bridge: Digital Link</p>
+              <p className="text-[9px] font-black text-gray-600 uppercase tracking-[0.4em] mb-4 text-center group-hover:text-[#ff6b00] transition-colors font-mono">Spotify Bridge: Digital Link</p>
+              <div className="mb-4 px-4 py-2 bg-white/5 rounded-xl border border-white/5 flex items-center gap-2">
+                <MdInfoOutline className="text-[#ff6b00] text-xs shrink-0" />
+                <p className="text-[8px] text-gray-400 font-bold uppercase tracking-wider leading-tight">
+                  Inicia sesión en Spotify en este navegador para desbloquear tracks completos.
+                </p>
+              </div>
               <div className="rounded-[2.5rem] overflow-hidden border-4 border-black shadow-[15px_15px_0px_0px_rgba(0,0,0,0.5)] bg-black/40 backdrop-blur-xl">
                 <iframe
                   src={`https://open.spotify.com/embed/track/${id}?utm_source=generator&theme=0`}
