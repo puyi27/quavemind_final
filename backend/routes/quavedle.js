@@ -258,25 +258,25 @@ router.get('/:tipo', async (req, res) => {
         // Pistas para CANCIÓN
         clues.push(
           feats.length > 0
-            ? `🤝 COLABORACIÓN: Este tema cuenta con la participación de ${feats.join(' y ')}.`
-            : `🎵 TIPO: Es un sencillo lanzado sin colaboraciones.`
+            ? `COLABORACIÓN: Este tema cuenta con la participación de ${feats.join(' y ')}.`
+            : `TIPO: Es un sencillo lanzado sin colaboraciones.`
         );
-        clues.push(`📅 AÑO: Esta canción fue lanzada en ${releaseYear}.`);
-        clues.push(`💿 ÁLBUM: Pertenece al proyecto "${censurar(selectedItem.album?.title || '???', [selectedItem.title, artName])}".`);
-        clues.push(`🎤 ARTISTA: El artista tiene ${artName.length} letras en su nombre artístico y empieza por "${artName.charAt(0)}".`);
-        clues.push(`👤 ARTISTA REVELADO: Esta canción es de ${artName}.`);
+        clues.push(`AÑO: Esta canción fue lanzada en ${releaseYear}.`);
+        clues.push(`ÁLBUM: Pertenece al proyecto "${censurar(selectedItem.album?.title || '???', [selectedItem.title, artName])}".`);
+        clues.push(`ARTISTA: El artista tiene ${artName.length} letras en su nombre artístico y empieza por "${artName.charAt(0)}".`);
+        clues.push(`ARTISTA REVELADO: Esta canción es de ${artName}.`);
       } else if (activeType === 'cover') {
         // PISTAS ESTRICTAS PARA PORTADA (Solicitadas por el usuario)
         // 1. Año de lanzamiento y número de canciones
-        clues.push(`📅 LANZAMIENTO: ${releaseYear} • ${totalTracks || '?'} CANCIONES`);
+        clues.push(`LANZAMIENTO: ${releaseYear} • ${totalTracks || '?'} CANCIONES`);
         
         // 2. Inicial del artista e inicial del álbum
         const inicialArtista = artName.charAt(0).toUpperCase();
         const inicialAlbum = selectedItem.title.charAt(0).toUpperCase();
-        clues.push(`🔤 INICIALES: ARTISTA "${inicialArtista}" • ÁLBUM "${inicialAlbum}"`);
+        clues.push(`INICIALES: ARTISTA "${inicialArtista}" • ÁLBUM "${inicialAlbum}"`);
         
         // 3. Nombre del artista
-        clues.push(`👤 ARTISTA: ${artName}`);
+        clues.push(`ARTISTA: ${artName}`);
       } else {
         // Pistas estándar para ÁLBUM
         const trackHint = tracklist.length > 1
@@ -288,21 +288,21 @@ router.get('/:tipo', async (req, res) => {
 
         clues.push(
           feats.length > 0
-            ? `🤝 COLABORACIONES: Este álbum incluye participaciones de ${feats.slice(0, 2).join(', ')}.`
-            : `💿 TRACKLIST: Este álbum contiene ${totalTracks || 'varias'} canciones y no tiene colaboraciones externas.`
+            ? `COLABORACIONES: Este álbum incluye participaciones de ${feats.slice(0, 2).join(', ')}.`
+            : `TRACKLIST: Este álbum contiene ${totalTracks || 'varias'} canciones y no tiene colaboraciones externas.`
         );
-        clues.push(`📅 AÑO: Este proyecto fue lanzado en ${releaseYear}.`);
+        clues.push(`AÑO: Este proyecto fue lanzado en ${releaseYear}.`);
         clues.push(
           trackHint
-            ? `🎵 CANCIÓN INCLUIDA: Una de las canciones del álbum es "${censurar(trackHint, [selectedItem.title, artName])}".`
-            : `📀 TAMAÑO: El álbum tiene ${totalTracks || '?'} pistas.`
+            ? `CANCIÓN INCLUIDA: Una de las canciones del álbum es "${censurar(trackHint, [selectedItem.title, artName])}".`
+            : `TAMAÑO: El álbum tiene ${totalTracks || '?'} pistas.`
         );
         clues.push(
           trackHint2
-            ? `🎵 OTRA CANCIÓN: El álbum también incluye "${censurar(trackHint2, [selectedItem.title, artName])}".`
-            : `🎤 ARTISTA: Tiene ${artName.length} letras en el nombre, empieza por "${artName.charAt(0)}".`
+            ? `OTRA CANCIÓN: El álbum también incluye "${censurar(trackHint2, [selectedItem.title, artName])}".`
+            : `ARTISTA: Tiene ${artName.length} letras en el nombre, empieza por "${artName.charAt(0)}".`
         );
-        clues.push(`👤 ARTISTA REVELADO: Este álbum es de ${artName}.`);
+        clues.push(`ARTISTA REVELADO: Este álbum es de ${artName}.`);
       }
 
       challenge = {
@@ -395,38 +395,38 @@ router.get('/:tipo', async (req, res) => {
       // Pista 1: Nivel de fama + relaciones con artistas similares (sin dar el nombre)
       clues.push(
         relatedArtists.length > 1
-          ? `🌐 ESCENA: Es ${nivelFama}. Su música es similar a la de ${relatedArtists.slice(0, 2).join(' y ')}.`
-          : `📊 IMPACTO: Es ${nivelFama} con ${fansFormat} seguidores en Deezer.`
+          ? `ESCENA: Es ${nivelFama}. Su música es similar a la de ${relatedArtists.slice(0, 2).join(' y ')}.`
+          : `IMPACTO: Es ${nivelFama} con ${fansFormat} seguidores en Deezer.`
       );
 
       // Pista 2: Colaboraciones concretas
       clues.push(
         colabs.length > 0
-          ? `🤝 COLABORACIONES: Ha trabajado con ${colabs.join(', ')}.`
+          ? `COLABORACIONES: Ha trabajado con ${colabs.join(', ')}.`
           : relatedArtists.length > 2
-          ? `🤝 ESCENA: Comparte escena con artistas como ${relatedArtists.slice(1, 3).join(' y ')}.`
-          : `🎤 TRAYECTORIA: Tiene ${fansFormat} seguidores y lleva varios años activo en la escena.`
+          ? `ESCENA: Comparte escena con artistas como ${relatedArtists.slice(1, 3).join(' y ')}.`
+          : `TRAYECTORIA: Tiene ${fansFormat} seguidores y lleva varios años activo en la escena.`
       );
 
       // Pista 3: Álbum real
       clues.push(
         topAlbums.length > 0
-          ? `💿 ÁLBUM: Uno de sus proyectos se titula "${censurar(topAlbums[0], [nombreLimpio])}".`
-          : `💿 CARRERA: Ha publicado múltiples proyectos discográficos y sencillos.`
+          ? `ÁLBUM: Uno de sus proyectos se titula "${censurar(topAlbums[0], [nombreLimpio])}".`
+          : `CARRERA: Ha publicado múltiples proyectos discográficos y sencillos.`
       );
 
       // Pista 4: Canción real (censurar el nombre del artista)
       clues.push(
         topTracks.length > 0
-          ? `🎵 HIT: Una de sus canciones más escuchadas es "${censurar(topTracks[0], [nombreLimpio])}".`
+          ? `HIT: Una de sus canciones más escuchadas es "${censurar(topTracks[0], [nombreLimpio])}".`
           : topAlbums.length > 1
-          ? `💿 OTRO ÁLBUM: También tiene un proyecto llamado "${censurar(topAlbums[1], [nombreLimpio])}".`
-          : `🔤 NOMBRE: Su nombre artístico tiene ${nombreLimpio.length} letras.`
+          ? `OTRO ÁLBUM: También tiene un proyecto llamado "${censurar(topAlbums[1], [nombreLimpio])}".`
+          : `NOMBRE: Su nombre artístico tiene ${nombreLimpio.length} letras.`
       );
 
       // Pista 5: Nombre con inicial y longitud (hint de emergencia)
       clues.push(
-        `🔤 IDENTIDAD: Su nombre artístico empieza por "${nombreLimpio.charAt(0)}", termina por "${nombreLimpio.charAt(nombreLimpio.length - 1)}" y tiene ${nombreLimpio.length} caracteres en total.`
+        `IDENTIDAD: Su nombre artístico empieza por "${nombreLimpio.charAt(0)}", termina por "${nombreLimpio.charAt(nombreLimpio.length - 1)}" y tiene ${nombreLimpio.length} caracteres en total.`
       );
 
       challenge = {

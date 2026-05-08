@@ -361,7 +361,7 @@ export default function QuavedleGame() {
                   <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-4 flex items-center gap-2"><MdHelpOutline className="text-[#ff6b00] text-lg" /> Datos Desencriptados:</p>
                   {challenge.clues && challenge.clues.slice(0, attempts.length + 1).map((clue, idx) => (
                     <p key={idx} className="text-white font-bold text-sm bg-black/40 p-3 rounded-lg border border-white/5 animate-in fade-in slide-in-from-bottom-2">
-                      🔎 {clue}
+                      {clue}
                     </p>
                   ))}
                   {/* El TIP de artista se elimina en modo cover para evitar confusión con las nuevas pistas */}
