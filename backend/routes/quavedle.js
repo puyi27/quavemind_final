@@ -266,29 +266,17 @@ router.get('/:tipo', async (req, res) => {
         clues.push(`🎤 ARTISTA: El artista tiene ${artName.length} letras en su nombre artístico y empieza por "${artName.charAt(0)}".`);
         clues.push(`👤 ARTISTA REVELADO: Esta canción es de ${artName}.`);
       } else if (activeType === 'cover') {
-        // PISTAS ESPECÍFICAS PARA PORTADA (Solicitadas por el usuario)
+        // PISTAS ESTRICTAS PARA PORTADA (Solicitadas por el usuario)
         // 1. Año de lanzamiento y número de canciones
-        clues.push(`📅 LANZAMIENTO: Este proyecto fue lanzado en ${releaseYear} y cuenta con ${totalTracks || 'varias'} canciones.`);
+        clues.push(`📅 LANZAMIENTO: ${releaseYear} • ${totalTracks || '?'} CANCIONES`);
         
         // 2. Inicial del artista e inicial del álbum
         const inicialArtista = artName.charAt(0).toUpperCase();
         const inicialAlbum = selectedItem.title.charAt(0).toUpperCase();
-        clues.push(`🔤 INICIALES: El artista empieza por "${inicialArtista}" y el álbum empieza por "${inicialAlbum}".`);
+        clues.push(`🔤 INICIALES: ARTISTA "${inicialArtista}" • ÁLBUM "${inicialAlbum}"`);
         
         // 3. Nombre del artista
-        clues.push(`👤 AGENTE IDENTIFICADO: El artista es ${artName}.`);
-        
-        // 4. Una canción del álbum (para ayudar si sigue sin saberlo)
-        const trackHint = tracklist.length > 1 ? tracklist[0] : null;
-        if (trackHint) {
-           clues.push(`🎵 PISTA EXTRA: Incluye el tema "${censurar(trackHint, [selectedItem.title, artName])}".`);
-        } else {
-           clues.push(`💿 PISTA EXTRA: Es un proyecto clave en la discografía de ${artName}.`);
-        }
-        
-        // 5. Nombre del álbum (Revelación final)
-        clues.push(`📀 REVELACIÓN: El nombre del álbum es "${selectedItem.title}".`);
-
+        clues.push(`👤 ARTISTA: ${artName}`);
       } else {
         // Pistas estándar para ÁLBUM
         const trackHint = tracklist.length > 1

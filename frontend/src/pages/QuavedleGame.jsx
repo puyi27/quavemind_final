@@ -178,7 +178,7 @@ export default function QuavedleGame() {
     
     // 2. Verificar si es el artista (BONO DE PUNTOS)
     let bonusMessage = null;
-    if (!isCorrect && !artistGuessed && checkArtistCorrecto(guess)) {
+    if (!isCorrect && !artistGuessed && challenge?.tipo !== 'cover' && checkArtistCorrecto(guess)) {
       setArtistGuessed(true);
       setScore(s => s + 25);
       bonusMessage = "¡AGENTE IDENTIFICADO! (+25 QP). Ahora identifica el título.";
@@ -364,11 +364,7 @@ export default function QuavedleGame() {
                       🔎 {clue}
                     </p>
                   ))}
-                  {challenge.tipo === 'cover' && (
-                    <p className="text-[10px] font-black text-[#ff6b00] uppercase tracking-widest mt-4 animate-pulse">
-                      ⚡ TIP: Identificar al Agente otorga +25 QP.
-                    </p>
-                  )}
+                  {/* El TIP de artista se elimina en modo cover para evitar confusión con las nuevas pistas */}
                 </div>
               </div>
             )}
