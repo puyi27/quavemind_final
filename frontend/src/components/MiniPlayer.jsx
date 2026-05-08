@@ -143,10 +143,15 @@ export default function MiniPlayer() {
 
   const handleClose = (e) => {
     e.stopPropagation();
+    
+    // 1. Reset Spotify
     if (controllerRef.current) controllerRef.current.pause();
     controllerRef.current = null;
     lastLoadedUri.current = null;
-    reset();
+    spotify.reset();
+
+    // 2. Reset Custom Player
+    custom.stop();
   };
 
   const toggleFavorito = async (e) => {
