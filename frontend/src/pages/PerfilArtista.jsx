@@ -33,6 +33,7 @@ export default function PerfilArtista() {
   const [artista, setArtista] = useState(null);
   const [canciones, setCanciones] = useState([]);
   const [albumes, setAlbumes] = useState([]);
+  const [sencillos, setSencillos] = useState([]);
   const [relacionados, setRelacionados] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -54,6 +55,7 @@ export default function PerfilArtista() {
           setArtista(data.artista || null);
           setCanciones(data.topTracks || []);
           setAlbumes(data.albumes || []);
+          setSencillos(data.sencillos || []);
           setRelacionados(data.relacionados || []);
         } else {
           setError('No se pudo cargar el perfil del artista');
@@ -234,7 +236,7 @@ export default function PerfilArtista() {
             </div>
 
             <div className="space-y-3">
-              {canciones.slice(0, 10).map((t, i) => (
+              {canciones.slice(0, 15).map((t, i) => (
                 <div key={t.id} className="group flex items-center gap-5 bg-[#0a0a0a] p-4 rounded-3xl border border-white/5 hover:bg-[#111] hover:border-[#ff6b00]/30 transition-all">
                   <span className="w-8 text-center text-white/20 font-black italic text-xl group-hover:text-[#ff6b00]">{i + 1}</span>
                   <div className="relative overflow-hidden rounded-xl">
@@ -286,6 +288,75 @@ export default function PerfilArtista() {
                         <MdHistory className="text-[#ff6b00]" /> {album.fecha}
                       </p>
                     </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Sencillos Grid */}
+            {sencillos.length > 0 && (
+              <div className="mt-20">
+                <div className="flex items-center gap-4 mb-10">
+                  <div className="p-3 bg-white/5 rounded-2xl border border-white/5">
+                    <MdGraphicEq className="text-3xl text-[#ff6b00]" />
+                  </div>
+                  <div>
+                    <h2 className="text-4xl font-black uppercase tracking-tighter text-white">Sencillos y EPs</h2>
+                    <p className="text-gray-500 text-[10px] font-black uppercase tracking-widest mt-1">Lanzamientos individuales y colecciones cortas</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
+                  {sencillos.map(single => (
+                    <Link key={single.id} to={`/album/${single.id}`} className="group block">
+                      <div className="relative aspect-square overflow-hidden rounded-[2rem] border border-white/5 group-hover:border-[#ff6b00]/50 transition-all duration-500 mb-4 shadow-xl">
+                        <img src={single.imagen} alt={single.nombre} className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <div className="p-4 bg-[#ff6b00] rounded-2xl text-black shadow-2xl scale-50 group-hover:scale-100 transition-transform duration-500">
+                            <MdOpenInNew size={24} />
+                          </div>
+                        </div>
+                      </div>
+                      <h5 className="font-black text-white text-sm uppercase tracking-tight truncate group-hover:text-[#ff6b00] transition-colors">{single.nombre}</h5>
+                      <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest mt-1 flex items-center gap-1">
+                        <MdHistory className="text-[#ff6b00]" /> {single.fecha}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Catálogo de Canciones Extendido */}
+            {canciones.length > 0 && (
+              <div className="mt-20">
+                <div className="flex items-center gap-4 mb-10">
+                  <div className="p-3 bg-white/5 rounded-2xl border border-white/5">
+                    <MdGraphicEq className="text-3xl text-[#ff6b00]" />
+                  </div>
+                  <div>
+                    <h2 className="text-4xl font-black uppercase tracking-tighter text-white">Catálogo de Canciones</h2>
+                    <p className="text-gray-500 text-[10px] font-black uppercase tracking-widest mt-1">Base de datos completa de registros sonoros ({canciones.length} temas)</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[800px] overflow-y-auto pr-4 custom-scrollbar">
+                  {canciones.map((t, i) => (
+                    <div key={t.id} className="group flex items-center gap-4 bg-[#0a0a0a] p-4 rounded-2xl border border-white/5 hover:border-[#ff6b00]/30 transition-all">
+                      <div className="relative overflow-hidden rounded-lg shrink-0">
+                        <img src={t.imagen} alt="" className="w-10 h-10 object-cover opacity-60 group-hover:opacity-100" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="truncate font-black text-white text-xs uppercase tracking-tight group-hover:text-[#ff6b00]">{t.nombre}</h4>
+                        <div className="flex items-center gap-2 mt-1">
+                           <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest truncate">
+                             {t.artistas?.map(a => a.nombre).join(', ')}
+                           </p>
+                        </div>
+                      </div>
+                      <Link to={`/cancion/${t.id}`} className="p-2 bg-white/5 rounded-xl text-white hover:bg-white hover:text-black transition-all">
+                        <MdOpenInNew size={14} />
+                      </Link>
+                    </div>
                   ))}
                 </div>
               </div>

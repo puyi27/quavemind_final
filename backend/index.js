@@ -183,7 +183,7 @@ app.get(['/api/artista/:id', '/api/music/artista/:id'], async (req, res) => {
     const [artistaRes, topTracksRes, albumsRes, relatedRes, realStats] = await Promise.all([
       fetch(`${SPOTIFY_API_BASE}/artists/${id}`, { headers }),
       fetch(`${SPOTIFY_API_BASE}/artists/${id}/top-tracks?market=ES`, { headers }),
-      fetch(`${SPOTIFY_API_BASE}/artists/${id}/albums?include_groups=album&limit=50`, { headers }),
+      fetch(`${SPOTIFY_API_BASE}/artists/${id}/albums?include_groups=album,single&limit=50`, { headers }),
       fetch(`${SPOTIFY_API_BASE}/artists/${id}/related-artists`, { headers }),
       getRealArtistStats(id),
     ]);
@@ -204,6 +204,7 @@ app.get(['/api/artista/:id', '/api/music/artista/:id'], async (req, res) => {
         topTracks: [],
         canciones: [],
         albumes: [],
+        sencillos: [],
         relacionados: []
       });
     }
@@ -312,36 +313,48 @@ app.get(['/api/artista/:id', '/api/music/artista/:id'], async (req, res) => {
       .slice(0, 80);
 
     const uniqueAlbumesMap = new Map();
-    (albumsData.items || []).forEach((album) => {
-      if (!album || album.album_type !== 'album') return;
-      const ano = album.release_date?.substring(0, 4) || '';
-      const clave = `${(album.name || '').toLowerCase().trim()}__${ano}`;
-      if (!uniqueAlbumesMap.has(clave)) uniqueAlbumesMap.set(clave, album);
+    const uniqueSencillosMap = new Map();
+
+    (albumsData.items || []).forEach((item) => {
+      if (!item) return;
+      const ano = item.release_date?.substring(0, 4) || '';
+      const clave = `${(item.name || '').toLowerCase().trim()}__${ano}`;
+      
+      const mapped = {
+        id: item.id,
+        nombre: item.name,
+        imagen: item.images?.[0]?.url || '/default.png',
+        fecha: ano,
+        ano,
+        total_tracks: item.total_tracks,
+        total_canciones: item.total_tracks || 0,
+        spotifyUrl: item.external_urls?.spotify,
+        tipo: item.album_type
+      };
+
+      if (item.album_type === 'album') {
+        if (!uniqueAlbumesMap.has(clave)) uniqueAlbumesMap.set(clave, mapped);
+      } else {
+        if (!uniqueSencillosMap.has(clave)) uniqueSencillosMap.set(clave, mapped);
+      }
     });
 
-    const albumes = Array.from(uniqueAlbumesMap.values()).map((a) => ({
-        id: a.id,
-        nombre: a.name,
-        imagen: a.images?.[0]?.url || '/default.png',
-        ano: a.release_date?.substring(0, 4) || '',
-        fecha: a.release_date?.substring(0, 4) || '',
-        total_canciones: a.total_tracks || 0,
-        spotifyUrl: a.external_urls?.spotify
-      }));
+    const albumes = Array.from(uniqueAlbumesMap.values());
+    const sencillos = Array.from(uniqueSencillosMap.values());
 
-    const albumesParaCatalogo = albumes.slice(0, 12);
-    const tracksPorAlbum = await Promise.all(
-      albumesParaCatalogo.map(async (album) => {
+    const catalogosParaTracks = [...albumes.slice(0, 10), ...sencillos.slice(0, 10)];
+    const tracksPorCatalogo = await Promise.all(
+      catalogosParaTracks.map(async (item) => {
         try {
           const data = await fetchJsonWithRetry(
-            `${SPOTIFY_API_BASE}/albums/${album.id}/tracks?limit=50`,
+            `${SPOTIFY_API_BASE}/albums/${item.id}/tracks?limit=50`,
             { headers },
             1
           );
           return (data.items || []).map((track) => ({
             id: track.id,
             nombre: track.name,
-            imagen: album.imagen,
+            imagen: item.imagen,
             preview: track.preview_url || null,
             duracion: track.duration_ms,
             duracion_ms: track.duration_ms,
@@ -369,7 +382,7 @@ app.get(['/api/artista/:id', '/api/music/artista/:id'], async (req, res) => {
       });
     });
 
-    tracksPorAlbum.flat().forEach((track) => {
+    tracksPorCatalogo.flat().forEach((track) => {
       if (!track?.id || catalogoMap.has(track.id)) return;
       catalogoMap.set(track.id, track);
     });
@@ -380,7 +393,7 @@ app.get(['/api/artista/:id', '/api/music/artista/:id'], async (req, res) => {
         if (!a.preview && b.preview) return 1;
         return 0;
       })
-      .slice(0, 220);
+      .slice(0, 300);
 
     res.json({
       status: 'ok',
@@ -414,6 +427,7 @@ app.get(['/api/artista/:id', '/api/music/artista/:id'], async (req, res) => {
         }),
       canciones,
       albumes,
+      sencillos,
       relacionados
     });
   } catch (error) {
