@@ -367,10 +367,13 @@ export default function QuavedleGame() {
                     ))}
                   </div>
                 </div>
-                <div className="bg-[#111] p-4 rounded-2xl border border-white/5 text-left max-w-xl mx-auto">
-                  <p className="text-gray-400 font-bold text-[11px] uppercase tracking-widest mb-2">Pistas</p>
-                  <p className="text-white font-bold text-sm">Artista: {challenge.artista || 'Desconocido'}</p>
-                  {challenge.fecha && <p className="text-gray-300 font-bold text-xs mt-1">Año: {challenge.fecha}</p>}
+                <div className="space-y-3 text-left bg-[#111] p-6 rounded-3xl border border-white/5 max-w-xl mx-auto">
+                  <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-4 flex items-center gap-2"><MdHelpOutline className="text-[#ff6b00] text-lg" /> Pistas Desencriptadas:</p>
+                  {challenge.clues && challenge.clues.slice(0, attempts.length + 1).map((clue, idx) => (
+                    <p key={idx} className="text-white font-bold text-sm bg-black/40 p-3 rounded-lg border border-white/5 animate-in fade-in slide-in-from-bottom-2">
+                      🔎 {clue}
+                    </p>
+                  ))}
                   <p className="text-[10px] font-black text-[#ff6b00] uppercase tracking-widest mt-4 animate-pulse">
                     ⚡ TIP: Identificar al Agente otorga +25 QP.
                   </p>
@@ -390,7 +393,9 @@ export default function QuavedleGame() {
                 </div>
                 <div className="bg-[#111] p-4 rounded-2xl border border-white/5 text-left max-w-xl mx-auto">
                   <p className="text-gray-400 font-bold text-[11px] uppercase tracking-widest mb-2">Pistas</p>
-                  <p className="text-white font-bold text-sm">Artista: {challenge.artista || 'Desconocido'}</p>
+                  <p className="text-white font-bold text-sm">
+                    Artista: {attempts.length > 2 || artistGuessed ? challenge.artista : `🤫 [CLASIFICADO] - Inicial: ${(challenge.artista || '?').charAt(0)}`}
+                  </p>
                   <p className="text-gray-300 font-bold text-xs mt-1">Título empieza por: {(challenge.nombre || '?').charAt(0)}</p>
                   <p className="text-gray-300 font-bold text-xs mt-1">Letras del título: {(challenge.nombre || '').length || '?'}</p>
                   <p className="text-[10px] font-black text-[#ff6b00] uppercase tracking-widest mt-4 animate-pulse">

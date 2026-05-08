@@ -274,23 +274,33 @@ router.get('/:tipo', async (req, res) => {
           ? tracklist.find(t => t !== trackHint) || tracklist[tracklist.length - 1]
           : null;
 
+        // ─── PISTAS PROGRESIVAS PARA ÁLBUM (Deseo del usuario) ───────────────────
+        const trackHint = tracklist.length > 1
+          ? tracklist[Math.floor(Math.random() * Math.min(tracklist.length, 5))]
+          : null;
+
+        // Pista 1: Info General (Colabs o Tracklist)
         clues.push(
           feats.length > 0
-            ? `🤝 COLABORACIONES: Este álbum incluye participaciones de ${feats.slice(0, 2).join(', ')}.`
-            : `💿 TRACKLIST: Este álbum contiene ${totalTracks || 'varias'} canciones y no tiene colaboraciones externas.`
+            ? `🤝 COLABORACIONES: Este proyecto incluye participaciones de ${feats.slice(0, 2).join(', ')}.`
+            : `💿 TRACKLIST: Este álbum contiene ${totalTracks || 'varias'} canciones y es un proyecto en solitario.`
         );
-        clues.push(`📅 AÑO: Este proyecto fue lanzado en ${releaseYear}.`);
+
+        // Pista 2: Inicial del Artista
+        clues.push(`👤 AGENTE IDENTIFICADO: Su nombre empieza por la letra "${artName.charAt(0)}" y tiene ${artName.length} caracteres.`);
+
+        // Pista 3: Inicial del Álbum
+        clues.push(`💿 PROYECTO: El título de este álbum empieza por la letra "${(selectedItem.title || '?').charAt(0)}".`);
+
+        // Pista 4: Nombre del Artista (Revelado total)
+        clues.push(`🎤 IDENTIDAD REVELADA: El artista de este álbum es ${artName}.`);
+
+        // Pista 5: Año y Canción
         clues.push(
-          trackHint
-            ? `🎵 CANCIÓN INCLUIDA: Una de las canciones del álbum es "${censurar(trackHint, [selectedItem.title, artName])}".`
-            : `📀 TAMAÑO: El álbum tiene ${totalTracks || '?'} pistas.`
+          trackHint 
+            ? `📅 ARCHIVO: Lanzado en ${releaseYear}. Incluye el tema "${censurar(trackHint, [selectedItem.title, artName])}".`
+            : `📅 ARCHIVO: Este proyecto fue lanzado originalmente en el año ${releaseYear}.`
         );
-        clues.push(
-          trackHint2
-            ? `🎵 OTRA CANCIÓN: El álbum también incluye "${censurar(trackHint2, [selectedItem.title, artName])}".`
-            : `🎤 ARTISTA: Tiene ${artName.length} letras en el nombre, empieza por "${artName.charAt(0)}".`
-        );
-        clues.push(`👤 ARTISTA REVELADO: Este álbum es de ${artName}.`);
       }
 
       challenge = {
