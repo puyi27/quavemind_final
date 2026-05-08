@@ -11,6 +11,13 @@ export const PlayerProvider = ({ children }) => {
   const [queue, setQueueState] = useState([]);
   const [queueIndex, setQueueIndex] = useState(0);
 
+  const queueRef = useRef([]);
+  const queueIndexRef = useRef(0);
+
+  // Sincronizar refs con el estado para que los listeners los vean siempre actualizados
+  useEffect(() => { queueRef.current = queue; }, [queue]);
+  useEffect(() => { queueIndexRef.current = queueIndex; }, [queueIndex]);
+
   useEffect(() => {
     const audio = new Audio();
     audio.preload = 'auto';
@@ -20,28 +27,27 @@ export const PlayerProvider = ({ children }) => {
     const handleLoadedMetadata = () => setDuration(audio.duration || 0);
     const handlePlay = () => setIsPlaying(true);
     const handlePause = () => setIsPlaying(false);
+    
     const handleEnded = () => {
       setIsPlaying(false);
       setCurrentTime(0);
-      // Auto-avanzar a la siguiente canción de la cola
-      setQueueIndex(prev => {
-        setQueueState(q => {
-          if (prev < q.length - 1) {
-            const nextTrack = q[prev + 1];
-            if (nextTrack?.preview) {
-              audio.src = nextTrack.preview;
-              audio.load();
-              audio.play().catch(() => {});
-              setCurrentTrack(nextTrack);
-              setIsPlaying(true);
-            }
-            return q;
-          }
-          return q;
-        });
-        return prev < queue.length - 1 ? prev + 1 : prev;
-      });
+      
+      const q = queueRef.current;
+      const idx = queueIndexRef.current;
+
+      if (idx < q.length - 1) {
+        const next = q[idx + 1];
+        if (next?.preview) {
+          audio.src = next.preview;
+          audio.load();
+          audio.play().catch(() => {});
+          setCurrentTrack(next);
+          setQueueIndex(idx + 1);
+          setIsPlaying(true);
+        }
+      }
     };
+
     const handleError = () => {
       setError('No se ha podido reproducir esta preview.');
       setIsPlaying(false);

@@ -230,6 +230,9 @@ const PerfilAlbum = () => {
                       artista: album.artista,
                       imagen: album.imagen
                     }, tracks);
+                    if (tracks.length > 0) {
+                      playTrack({ ...tracks[0], image: album.imagen }, tracks.map(t => ({ ...t, image: album.imagen })), 0);
+                    }
                   }}
                   className="flex-1 sm:flex-none flex items-center justify-center gap-4 px-10 py-5 bg-white text-black font-black border-2 border-black rounded-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:bg-[#ff6b00] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all group"
                 >
@@ -296,7 +299,7 @@ const PerfilAlbum = () => {
                 <div className="flex items-center gap-3">
                   {track.preview && (
                     <button
-                      onClick={() => playTrack({ ...track, image: album.imagen })}
+                      onClick={() => playTrack({ ...track, image: album.imagen }, tracks.map(t => ({ ...t, image: album.imagen })), index)}
                       className="w-14 h-14 bg-[#ff6b00] text-black border-2 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 active:translate-y-1 active:shadow-none transition-all flex items-center justify-center"
                     >
                       {currentTrack?.id === track.id && isPlaying ? <MdPause size={28} /> : <MdPlayArrow size={28} />}
