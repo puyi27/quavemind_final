@@ -171,12 +171,12 @@ const PerfilCancion = () => {
         durationMs: t.duracion
       }));
       await playTrack(
-        { ...datosCancion, image: datosCancion.imagen, durationMs: datosCancion.duracion },
+        { ...datosCancion, imagen: datosCancion.imagen, durationMs: datosCancion.duracion },
         queue,
         currentIndex >= 0 ? currentIndex : 0
       );
     } else {
-      await playTrack({ ...datosCancion, image: datosCancion.imagen, durationMs: datosCancion.duracion });
+      await playTrack({ ...datosCancion, imagen: datosCancion.imagen, durationMs: datosCancion.duracion });
     }
   };
 
