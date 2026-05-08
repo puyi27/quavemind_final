@@ -71,7 +71,8 @@ router.post('/register', async (req, res) => {
         id: nuevoUsuario.id,
         email: nuevoUsuario.email,
         username: nuevoUsuario.username,
-        avatar: nuevoUsuario.avatar
+        avatar: nuevoUsuario.avatar,
+        rol: nuevoUsuario.rol
       }
     });
 
@@ -136,7 +137,8 @@ router.post('/login', async (req, res) => {
         id: usuario.id,
         email: usuario.email,
         username: usuario.username,
-        avatar: usuario.avatar
+        avatar: usuario.avatar,
+        rol: usuario.rol
       }
     });
 

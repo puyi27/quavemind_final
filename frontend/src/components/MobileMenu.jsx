@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { MdHome, MdExplore, MdSearch, MdSportsEsports, MdGroups, MdFolder, MdPerson, MdClose } from 'react-icons/md';
+import { MdHome, MdExplore, MdSearch, MdSportsEsports, MdGroups, MdFolder, MdPerson, MdClose, MdSecurity } from 'react-icons/md';
 import { useAuthStore } from '../store/authStore';
 import iconoLogo from '../assets/iconoLogo.png';
 
@@ -15,6 +15,7 @@ export default function MobileMenu({ isOpen, onClose }) {
     { to: '/quavedle', label: 'Juegos', icon: MdSportsEsports },
     { to: '/comunidad', label: 'Comunidad', icon: MdGroups },
     { to: '/boveda', label: 'Mi Bóveda', icon: MdFolder },
+    ...(user?.rol === 'ADMIN' ? [{ to: '/admin', label: 'Panel Admin', icon: MdSecurity }] : []),
   ];
 
   const isActive = (path) => {

@@ -4,7 +4,7 @@ import api from '../services/api';
 export const useAuthStore = create((set) => ({
   user: JSON.parse(localStorage.getItem('quave_user')) || null,
   isAuthenticated: !!localStorage.getItem('quave_logged_in'),
-  loading: false,
+  loading: !!localStorage.getItem('quave_token'),
 
   login: (userData, token) => {
     if (token) localStorage.setItem('quave_token', token);
