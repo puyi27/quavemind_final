@@ -5,7 +5,7 @@ import { useThemeStore } from './store/themeStore';
 import { useAuthStore } from './store/authStore';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 
-const lazyWithRetry = (componentImport) => 
+const lazyWithRetry = (componentImport) =>
   lazy(async () => {
     const pageHasAlreadyBeenForceRefreshed = JSON.parse(
       window.localStorage.getItem('page-has-been-force-refreshed') || 'false'
@@ -27,6 +27,7 @@ const lazyWithRetry = (componentImport) =>
 const MainLayout = lazyWithRetry(() => import('./layouts/MainLayout'));
 const Home = lazyWithRetry(() => import('./pages/Home'));
 const Buscador = lazyWithRetry(() => import('./pages/Buscador'));
+
 const Quavedle = lazyWithRetry(() => import('./pages/Quavedle'));
 const QuavedleGame = lazyWithRetry(() => import('./pages/QuavedleGame'));
 const Valoraciones = lazyWithRetry(() => import('./pages/Valoraciones'));
