@@ -12,10 +12,10 @@ import {
 } from 'react-icons/md';
 import { GENEROS_DATA } from '../data/generosData';
 import { ESCENAS_DATA } from '../data/escenasData';
-import RecomendacionesDiarias from '../components/RecomendacionesDiarias';
-import RankingQuave from '../components/RankingQuave';
+import RecomendacionesDiarias from '../components/RecomendacionesDiarias.jsx';
+import RankingQuave from '../components/RankingQuave.jsx';
 import iconoLogo from '../assets/iconoLogo.png';
-import { fetchArtistasBulk, buscarMusica } from '../services/musicApi';
+import { fetchArtistasBulk, buscarMusica } from '../services/musicApi.js';
 
 // Iconos mapeados para géneros
 const iconosGeneros = {

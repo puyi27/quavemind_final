@@ -6,15 +6,15 @@ import {
   MdArrowBack, MdWarning, MdGraphicEq, MdInfoOutline,
   MdStar, MdPeople, MdRateReview
 } from 'react-icons/md';
-import OpinionesGlobales from '../components/OpinionesGlobales';
-import api from '../services/api';
-import { usePlayer } from '../context/MusicPlayerContext';
-import { useAuthStore } from '../store/authStore';
-import { useSpotifyEmbedStore } from '../store/spotifyEmbedStore';
-import RatingSystem from '../components/RatingSystem';
-import ReviewSection from '../components/ReviewSection';
+import OpinionesGlobales from '../components/OpinionesGlobales.jsx';
+import api from '../services/api.js';
+import { usePlayer } from '../context/MusicPlayerContext.jsx';
+import { useAuthStore } from '../store/authStore.js';
+import { useSpotifyEmbedStore } from '../store/spotifyEmbedStore.js';
+import RatingSystem from '../components/RatingSystem.jsx';
+import ReviewSection from '../components/ReviewSection.jsx';
 
-const PerfilAlbum = () => {
+export default function PerfilAlbum() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { currentTrack, isPlaying, playTrack } = usePlayer();

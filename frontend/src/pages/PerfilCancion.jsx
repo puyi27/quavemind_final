@@ -6,14 +6,14 @@ import {
   MdTimer, MdSpeed, MdGraphicEq, MdStar, MdLock, MdPeople, MdRateReview,
   MdInfoOutline, MdArrowForward
 } from 'react-icons/md';
-import RatingSystem from '../components/RatingSystem';
-import ReviewSection from '../components/ReviewSection';
-import OpinionesGlobales from '../components/OpinionesGlobales';
-import SpotifyEmbedPlayer from '../components/SpotifyEmbedPlayer';
-import api from '../services/api';
-import { usePlayer } from '../context/MusicPlayerContext';
-import { useAuthStore } from '../store/authStore';
-import { useSpotifyEmbedStore } from '../store/spotifyEmbedStore';
+import RatingSystem from '../components/RatingSystem.jsx';
+import ReviewSection from '../components/ReviewSection.jsx';
+import OpinionesGlobales from '../components/OpinionesGlobales.jsx';
+import SpotifyEmbedPlayer from '../components/SpotifyEmbedPlayer.jsx';
+import api from '../services/api.js';
+import { usePlayer } from '../context/MusicPlayerContext.jsx';
+import { useAuthStore } from '../store/authStore.js';
+import { useSpotifyEmbedStore } from '../store/spotifyEmbedStore.js';
 
 function LoadingState() {
   return (
