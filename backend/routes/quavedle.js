@@ -209,14 +209,9 @@ router.get('/:tipo', async (req, res) => {
       let selectedItem = null;
       let isTrack = false;
 
-      if (activeType === 'cover' && Math.random() > 0.5) {
-        const tracks = await getTracksWithPreview(isDaily, seed);
-        selectedItem = isDaily ? selectWithSeed(tracks, seed, 2) : tracks[Math.floor(Math.random() * tracks.length)];
-        isTrack = true;
-      } else {
-        const albums = await getAlbumsFromDeezer(isDaily, seed);
-        selectedItem = isDaily ? selectWithSeed(albums, seed, 2) : albums[Math.floor(Math.random() * albums.length)];
-      }
+      // Forzamos siempre ALBUM para el modo cover y album, ya que las canciones/singles son demasiado difíciles
+      const albums = await getAlbumsFromDeezer(isDaily, seed);
+      selectedItem = isDaily ? selectWithSeed(albums, seed, 2) : albums[Math.floor(Math.random() * albums.length)];
 
       if (!selectedItem) {
         return res.status(503).json({ status: 'error', mensaje: 'No hay contenido disponible. Reintenta.' });
