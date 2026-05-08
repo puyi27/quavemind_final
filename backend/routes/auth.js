@@ -155,7 +155,7 @@ router.post('/logout', (req, res) => {
   res.clearCookie('quave_token', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict'
+    sameSite: 'lax'
   });
 
   res.status(200).json({

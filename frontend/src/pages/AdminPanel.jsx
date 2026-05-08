@@ -260,47 +260,47 @@ const AdminPanel = () => {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-[#0a0a0a] rounded-[3rem] border-2 border-white/10 w-full max-w-2xl p-12 relative z-10 shadow-[0_0_100px_rgba(0,0,0,1)]"
+              className="bg-[#0a0a0a] rounded-[2rem] md:rounded-[3rem] border-2 border-white/10 w-full max-w-2xl p-6 md:p-12 relative z-10 shadow-[0_0_100px_rgba(0,0,0,1)] overflow-y-auto max-h-[95vh] md:max-h-[90vh]"
             >
-              <div className="flex justify-between items-center mb-10">
-                <div className="flex items-center gap-5">
-                  <MdEdit className="text-[#ff6b00] text-3xl" />
-                  <h3 className="text-3xl font-black uppercase italic tracking-tighter">EDITAR EXPEDIENTE</h3>
+              <div className="flex justify-between items-center mb-8 md:mb-10">
+                <div className="flex items-center gap-3 md:gap-5">
+                  <MdEdit className="text-[#ff6b00] text-2xl md:text-3xl" />
+                  <h3 className="text-xl md:text-3xl font-black uppercase italic tracking-tighter">EDITAR EXPEDIENTE</h3>
                 </div>
-                <button onClick={() => setTargetedUserForEdit(null)} className="p-3 bg-white/5 hover:bg-red-500/20 rounded-2xl transition-colors">
-                  <MdClose size={24} />
+                <button onClick={() => setTargetedUserForEdit(null)} className="p-2 md:p-3 bg-white/5 hover:bg-red-500/20 rounded-xl md:rounded-2xl transition-colors">
+                  <MdClose size={20} />
                 </button>
               </div>
 
-              <form onSubmit={handleUpdateUser} className="space-y-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Username</label>
-                    <input type="text" className="w-full bg-black border-2 border-white/10 p-5 rounded-2xl font-bold focus:border-[#ff6b00] outline-none transition-all" value={targetedUserForEdit.username} onChange={e => setTargetedUserForEdit({...targetedUserForEdit, username: e.target.value})} />
+              <form onSubmit={handleUpdateUser} className="space-y-6 md:space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
+                  <div className="space-y-2 md:space-y-3">
+                    <label className="text-[9px] md:text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Username</label>
+                    <input type="text" className="w-full bg-black border-2 border-white/10 p-4 md:p-5 rounded-xl md:rounded-2xl font-bold focus:border-[#ff6b00] outline-none transition-all text-sm md:text-base" value={targetedUserForEdit.username} onChange={e => setTargetedUserForEdit({...targetedUserForEdit, username: e.target.value})} />
                   </div>
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Email</label>
-                    <input type="email" className="w-full bg-black border-2 border-white/10 p-5 rounded-2xl font-bold focus:border-[#ff6b00] outline-none transition-all" value={targetedUserForEdit.email} onChange={e => setTargetedUserForEdit({...targetedUserForEdit, email: e.target.value})} />
+                  <div className="space-y-2 md:space-y-3">
+                    <label className="text-[9px] md:text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Email</label>
+                    <input type="email" className="w-full bg-black border-2 border-white/10 p-4 md:p-5 rounded-xl md:rounded-2xl font-bold focus:border-[#ff6b00] outline-none transition-all text-sm md:text-base" value={targetedUserForEdit.email} onChange={e => setTargetedUserForEdit({...targetedUserForEdit, email: e.target.value})} />
                   </div>
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Rol del Sistema</label>
-                    <select className="w-full bg-black border-2 border-white/10 p-5 rounded-2xl font-bold focus:border-[#ff6b00] outline-none transition-all appearance-none" value={targetedUserForEdit.rol} onChange={e => setTargetedUserForEdit({...targetedUserForEdit, rol: e.target.value})}>
+                  <div className="space-y-2 md:space-y-3">
+                    <label className="text-[9px] md:text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Rol del Sistema</label>
+                    <select className="w-full bg-black border-2 border-white/10 p-4 md:p-5 rounded-xl md:rounded-2xl font-bold focus:border-[#ff6b00] outline-none transition-all appearance-none text-sm md:text-base" value={targetedUserForEdit.rol} onChange={e => setTargetedUserForEdit({...targetedUserForEdit, rol: e.target.value})}>
                       <option value="USER">USER</option>
                       <option value="ADMIN">ADMIN</option>
                     </select>
                   </div>
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Quave Points</label>
-                    <input type="number" className="w-full bg-black border-2 border-white/10 p-5 rounded-2xl font-bold focus:border-[#ff6b00] outline-none transition-all" value={targetedUserForEdit.quavePoints} onChange={e => setTargetedUserForEdit({...targetedUserForEdit, quavePoints: e.target.value})} />
+                  <div className="space-y-2 md:space-y-3">
+                    <label className="text-[9px] md:text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Quave Points</label>
+                    <input type="number" className="w-full bg-black border-2 border-white/10 p-4 md:p-5 rounded-xl md:rounded-2xl font-bold focus:border-[#ff6b00] outline-none transition-all text-sm md:text-base" value={targetedUserForEdit.quavePoints} onChange={e => setTargetedUserForEdit({...targetedUserForEdit, quavePoints: e.target.value})} />
                   </div>
-                  <div className="md:col-span-2 space-y-3">
-                    <label className="text-[10px] font-black text-red-500 uppercase tracking-widest ml-1">Nueva Contraseña (Dejar vacío para no cambiar)</label>
-                    <input type="password" placeholder="••••••••" className="w-full bg-black border-2 border-white/10 p-5 rounded-2xl font-bold focus:border-red-500 outline-none transition-all" onChange={e => setTargetedUserForEdit({...targetedUserForEdit, password: e.target.value})} />
+                  <div className="md:col-span-2 space-y-2 md:space-y-3">
+                    <label className="text-[9px] md:text-[10px] font-black text-red-500 uppercase tracking-widest ml-1">Nueva Contraseña (Dejar vacío para no cambiar)</label>
+                    <input type="password" placeholder="••••••••" className="w-full bg-black border-2 border-white/10 p-4 md:p-5 rounded-xl md:rounded-2xl font-bold focus:border-red-500 outline-none transition-all text-sm md:text-base" onChange={e => setTargetedUserForEdit({...targetedUserForEdit, password: e.target.value})} />
                   </div>
                 </div>
 
-                <div className="pt-6">
-                  <button type="submit" className="w-full py-6 bg-[#ff6b00] text-black font-black rounded-2xl shadow-[0_0_30px_rgba(255,107,0,0.2)] hover:shadow-[0_0_50px_rgba(255,107,0,0.4)] hover:scale-[1.01] transition-all uppercase tracking-[0.2em]">GUARDAR CAMBIOS EN LA RED</button>
+                <div className="pt-4 md:pt-6">
+                  <button type="submit" className="w-full py-5 md:py-6 bg-[#ff6b00] text-black font-black rounded-xl md:rounded-2xl shadow-[0_0_30px_rgba(255,107,0,0.2)] hover:shadow-[0_0_50px_rgba(255,107,0,0.4)] hover:scale-[1.01] transition-all uppercase tracking-[0.1em] md:tracking-[0.2em] text-xs md:text-base">GUARDAR CAMBIOS EN LA RED</button>
                 </div>
               </form>
             </motion.div>

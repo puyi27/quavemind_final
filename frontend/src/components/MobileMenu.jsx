@@ -64,7 +64,7 @@ export default function MobileMenu({ isOpen, onClose }) {
       <div className="mt-auto p-6 border-t border-white/10 bg-black/95 backdrop-blur-xl pb-10 sm:pb-6">
         {isAuthenticated ? (
           <div className="flex items-center justify-between gap-4">
-            <Link to="/perfil" onClick={onClose} className="flex items-center gap-3 min-w-0">
+            <Link to={`/perfil/${user?.id}`} onClick={onClose} className="flex items-center gap-3 min-w-0">
               <div className="w-14 h-14 rounded-xl bg-[#0a0a0a] border border-white/10 overflow-hidden shadow-2xl shrink-0">
                 <img 
                   src={user?.avatar || user?.fotoPerfil || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.username}`} 
