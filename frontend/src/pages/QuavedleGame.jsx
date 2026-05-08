@@ -340,11 +340,22 @@ export default function QuavedleGame() {
               </div>
             )}
 
-            {(challenge.tipo === 'album' || challenge.tipo === 'artist') && (
+            {(challenge.tipo === 'album' || challenge.tipo === 'artist' || challenge.tipo === 'cover') && (
               <div className="text-center py-2">
-                <div className={`mx-auto mb-8 overflow-hidden shadow-2xl border-4 border-[#222] ${challenge.tipo === 'artist' ? 'w-[68vw] h-[68vw] max-w-56 max-h-56 rounded-full' : 'w-[76vw] h-[76vw] max-w-64 max-h-64 rounded-3xl'}`}>
-                  <img src={challenge.imagen || 'https://via.placeholder.com/300'} alt="Pista visual" className="w-full h-full object-cover transition-all duration-700" style={{ filter: `blur(${Math.max(25 - attempts.length * 5, 0)}px) brightness(${50 + attempts.length * 10}%) grayscale(${100 - attempts.length * 20}%)` }} />
-                </div>
+                {challenge.tipo === 'cover' ? (
+                  <div className="relative w-[82vw] h-[82vw] max-w-72 max-h-72 mx-auto mb-8 rounded-3xl overflow-hidden border-4 border-[#222] shadow-2xl">
+                    <img src={challenge.imagen || 'https://via.placeholder.com/300'} alt="Cover" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 grid grid-cols-4 grid-rows-4">
+                      {[...Array(16)].map((_, i) => (
+                        <div key={i} className={`${revealed.includes(i) ? 'opacity-0' : 'bg-[#0a0a0a]'} border-[0.5px] border-white/5 transition-opacity duration-500`} />
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className={`mx-auto mb-8 overflow-hidden shadow-2xl border-4 border-[#222] ${challenge.tipo === 'artist' ? 'w-[68vw] h-[68vw] max-w-56 max-h-56 rounded-full' : 'w-[76vw] h-[76vw] max-w-64 max-h-64 rounded-3xl'}`}>
+                    <img src={challenge.imagen || 'https://via.placeholder.com/300'} alt="Pista visual" className="w-full h-full object-cover transition-all duration-700" style={{ filter: `blur(${Math.max(25 - attempts.length * 5, 0)}px) brightness(${50 + attempts.length * 10}%) grayscale(${100 - attempts.length * 20}%)` }} />
+                  </div>
+                )}
 
                 <div className="space-y-3 text-left bg-[#111] p-6 rounded-3xl border border-white/5">
                   <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-4 flex items-center gap-2"><MdHelpOutline className="text-[#ff6b00] text-lg" /> Datos Desencriptados:</p>
@@ -353,30 +364,11 @@ export default function QuavedleGame() {
                       🔎 {clue}
                     </p>
                   ))}
-                </div>
-              </div>
-            )}
-
-            {challenge.tipo === 'cover' && (
-              <div className="text-center py-2">
-                <div className="relative w-[82vw] h-[82vw] max-w-72 max-h-72 mx-auto mb-8 rounded-3xl overflow-hidden border-4 border-[#222] shadow-2xl">
-                  <img src={challenge.imagen || 'https://via.placeholder.com/300'} alt="Cover" className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 grid grid-cols-4 grid-rows-4">
-                    {[...Array(16)].map((_, i) => (
-                      <div key={i} className={`${revealed.includes(i) ? 'opacity-0' : 'bg-[#0a0a0a]'} border-[0.5px] border-white/5 transition-opacity duration-500`} />
-                    ))}
-                  </div>
-                </div>
-                <div className="space-y-3 text-left bg-[#111] p-6 rounded-3xl border border-white/5 max-w-xl mx-auto">
-                  <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-4 flex items-center gap-2"><MdHelpOutline className="text-[#ff6b00] text-lg" /> Pistas Desencriptadas:</p>
-                  {challenge.clues && challenge.clues.slice(0, attempts.length + 1).map((clue, idx) => (
-                    <p key={idx} className="text-white font-bold text-sm bg-black/40 p-3 rounded-lg border border-white/5 animate-in fade-in slide-in-from-bottom-2">
-                      🔎 {clue}
+                  {challenge.tipo === 'cover' && (
+                    <p className="text-[10px] font-black text-[#ff6b00] uppercase tracking-widest mt-4 animate-pulse">
+                      ⚡ TIP: Identificar al Agente otorga +25 QP.
                     </p>
-                  ))}
-                  <p className="text-[10px] font-black text-[#ff6b00] uppercase tracking-widest mt-4 animate-pulse">
-                    ⚡ TIP: Identificar al Agente otorga +25 QP.
-                  </p>
+                  )}
                 </div>
               </div>
             )}
@@ -393,9 +385,7 @@ export default function QuavedleGame() {
                 </div>
                 <div className="bg-[#111] p-4 rounded-2xl border border-white/5 text-left max-w-xl mx-auto">
                   <p className="text-gray-400 font-bold text-[11px] uppercase tracking-widest mb-2">Pistas</p>
-                  <p className="text-white font-bold text-sm">
-                    Artista: {attempts.length > 2 || artistGuessed ? challenge.artista : `🤫 [CLASIFICADO] - Inicial: ${(challenge.artista || '?').charAt(0)}`}
-                  </p>
+                  <p className="text-white font-bold text-sm">Artista: {challenge.artista || 'Desconocido'}</p>
                   <p className="text-gray-300 font-bold text-xs mt-1">Título empieza por: {(challenge.nombre || '?').charAt(0)}</p>
                   <p className="text-gray-300 font-bold text-xs mt-1">Letras del título: {(challenge.nombre || '').length || '?'}</p>
                   <p className="text-[10px] font-black text-[#ff6b00] uppercase tracking-widest mt-4 animate-pulse">
