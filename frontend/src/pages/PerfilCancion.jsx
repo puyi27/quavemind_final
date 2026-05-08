@@ -61,7 +61,7 @@ const PerfilCancion = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
-  const { currentTrack, isPlaying, playTrack, togglePlayback } = usePlayer();
+  const { currentTrack, isPlaying, loadUri } = useSpotifyEmbedStore();
   const [datosCancion, setDatosCancion] = useState(null);
   const [letra, setLetra] = useState(null);
   const [recomendaciones, setRecomendaciones] = useState([]);
@@ -147,31 +147,16 @@ const PerfilCancion = () => {
   const prevTrack = currentIndex > 0 ? albumTracks[currentIndex - 1] : null;
   const nextTrack = currentIndex >= 0 && currentIndex < albumTracks.length - 1 ? albumTracks[currentIndex + 1] : null;
 
-  const handlePlayWithQueue = async () => {
-    if (!datosCancion?.preview) {
-      // Si no hay preview MP3, scrollear al Spotify Bridge
-      document.getElementById('spotify-bridge')?.scrollIntoView({ behavior: 'smooth' });
-      return;
-    }
-
-    // Usamos el motor original playTrack con cola
-    if (albumTracks.length > 0) {
-      const queue = albumTracks.map(t => ({
-        id: t.id,
-        nombre: t.nombre,
-        artista: t.artista || datosCancion.artista,
-        imagen: datosCancion.imagen,
-        preview: t.preview,
-        durationMs: t.duracion
-      }));
-      await playTrack(
-        { ...datosCancion, imagen: datosCancion.imagen, durationMs: datosCancion.duracion },
-        queue,
-        currentIndex >= 0 ? currentIndex : 0
-      );
-    } else {
-      await playTrack({ ...datosCancion, imagen: datosCancion.imagen, durationMs: datosCancion.duracion });
-    }
+  const handlePreview = () => {
+    if (!datosCancion) return;
+    
+    // Si ya está sonando, solo pausamos/reanudamos a través del controller si fuera posible
+    // Pero loadUri es más seguro para asegurar sincronización con la barra
+    loadUri(id, 'track', {
+      nombre: datosCancion.nombre,
+      artista: datosCancion.artista,
+      imagen: datosCancion.imagen
+    }, albumTracks);
   };
 
   const toggleFavorito = async () => {
@@ -274,15 +259,6 @@ const PerfilCancion = () => {
     }
   };
 
-  const handlePreview = async () => {
-    if (!datosCancion?.preview) return;
-    if (currentTrack?.id === datosCancion.id && isPlaying) {
-      await togglePlayback();
-      return;
-    }
-    await handlePlayWithQueue();
-  };
-
   // Early return: Carga
   if (cargandoPrincipal) {
     return <LoadingState />;
@@ -342,14 +318,12 @@ const PerfilCancion = () => {
                 className="relative w-64 h-64 md:w-80 md:h-80 rounded-[2rem] shadow-2xl object-cover border border-white/10 group-hover:scale-[1.02] transition-transform duration-500"
                 onError={(e) => { e.target.src = '/default.png'; }}
               />
-              {datosCancion.preview && (
-                <button
-                  onClick={handlePreview}
-                  className="absolute bottom-6 right-6 w-20 h-20 bg-[#ff6b00] rounded-[1.5rem] flex items-center justify-center shadow-2xl hover:scale-110 transition-transform z-20"
-                >
-                  {currentTrack?.id === datosCancion.id && isPlaying ? <MdPause className="text-4xl text-black" /> : <MdPlayArrow className="text-4xl text-black" />}
-                </button>
-              )}
+              <button
+                onClick={handlePreview}
+                className="absolute bottom-6 right-6 w-20 h-20 bg-[#ff6b00] rounded-[1.5rem] flex items-center justify-center shadow-2xl hover:scale-110 transition-transform z-20"
+              >
+                {currentTrack?.id === id && isPlaying ? <MdPause className="text-4xl text-black" /> : <MdPlayArrow className="text-4xl text-black" />}
+              </button>
             </div>
 
             <div className="flex-1 text-center lg:text-left">

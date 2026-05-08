@@ -8,7 +8,6 @@ import {
 } from 'react-icons/md';
 import OpinionesGlobales from '../components/OpinionesGlobales';
 import api from '../services/api';
-import { usePlayer } from '../context/usePlayer';
 import { useAuthStore } from '../store/authStore';
 import { useSpotifyEmbedStore } from '../store/spotifyEmbedStore';
 import RatingSystem from '../components/RatingSystem';
@@ -17,7 +16,7 @@ import ReviewSection from '../components/ReviewSection';
 const PerfilAlbum = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { currentTrack, isPlaying, playTrack } = usePlayer();
+  const { currentTrack, isPlaying, loadUri } = useSpotifyEmbedStore();
   const { isAuthenticated } = useAuthStore();
 
   const [datos, setDatos] = useState(null);
@@ -216,21 +215,12 @@ const PerfilAlbum = () => {
                   </span>
                 </button>
 
-                <button
-                  onClick={() => {
-                    useSpotifyEmbedStore.getState().loadUri(album.id, 'album', {
-                      nombre: album.nombre,
-                      artista: album.artista,
-                      imagen: album.imagen
-                    }, tracks);
-                    if (tracks.length > 0) {
-                      playTrack({ ...tracks[0], image: album.imagen }, tracks.map(t => ({ ...t, image: album.imagen })), 0);
-                    }
-                  }}
-                  className="flex-1 sm:flex-none flex items-center justify-center gap-4 px-10 py-5 bg-white text-black font-black border-2 border-black rounded-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:bg-[#ff6b00] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all group"
+                <button 
+                  onClick={() => loadUri(id, 'album', { nombre: album.nombre, artista: album.artista, imagen: album.imagen }, tracks)}
+                  className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-8 py-4 bg-[#ff6b00] text-black font-black border-2 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-white hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all group"
                 >
                   <MdPlayArrow size={28} className="group-hover:scale-125 transition-transform" />
-                  <span className="text-sm uppercase tracking-widest">REPRODUCIR ÁLBUM</span>
+                  <span className="text-xs uppercase tracking-widest">REPRODUCIR ÁLBUM</span>
                 </button>
 
                 <a
@@ -286,7 +276,7 @@ const PerfilAlbum = () => {
                 <div className="flex items-center gap-3">
                   {track.preview && (
                     <button
-                      onClick={() => playTrack({ ...track, image: album.imagen }, tracks.map(t => ({ ...t, image: album.imagen })), index)}
+                      onClick={() => loadUri(track.id, 'track', { nombre: track.nombre, artista: track.artista, imagen: album.imagen }, tracks)}
                       className="w-14 h-14 bg-[#ff6b00] text-black border-2 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 active:translate-y-1 active:shadow-none transition-all flex items-center justify-center"
                     >
                       {currentTrack?.id === track.id && isPlaying ? <MdPause size={28} /> : <MdPlayArrow size={28} />}
