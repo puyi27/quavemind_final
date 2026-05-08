@@ -10,9 +10,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ESCENAS_DATA } from '../data/escenasData';
 import { GENEROS_DATA } from '../data/generosData';
 import iconoLogo from '../assets/iconoLogo.png';
-import { useAuthStore } from '../store/authStore.js';
-import MobileMenu from '../components/MobileMenu.jsx';
-import MiniPlayer from '../components/MiniPlayer.jsx';
+import { useAuthStore } from '../store/authStore';
+import MobileMenu from '../components/MobileMenu';
+import MiniPlayer from '../components/MiniPlayer';
 
 export default function MainLayout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

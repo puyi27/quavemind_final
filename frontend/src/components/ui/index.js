@@ -1,3 +1,2 @@
-// Barrel file eliminado para prevenir dependencias circulares en producción.
-// Importar componentes directamente desde sus archivos .jsx
-export {};
+export { default as ArtistCard } from './ArtistCard';
+export { default as SongCard } from './SongCard';

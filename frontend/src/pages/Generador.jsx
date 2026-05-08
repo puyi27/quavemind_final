@@ -4,8 +4,8 @@ import {
   MdGraphicEq, MdSpeed, MdMood, MdAutoFixHigh, 
   MdPlayArrow, MdPause, MdLibraryMusic 
 } from 'react-icons/md';
-import api from '../services/api';
-import { usePlayer } from '../context/MusicPlayerContext';
+import api from '../lib/api';
+import { usePlayer } from '../context/usePlayer';
 
 const Generador = () => {
   const navigate = useNavigate();

@@ -1,4 +1,12 @@
-// Archivo movido a PlayerContext.jsx para evitar dependencias circulares
+import { useContext } from 'react';
+import { PlayerContext } from './player-context';
+
 export const usePlayer = () => {
-  throw new Error('Importa usePlayer desde PlayerContext en su lugar.');
+  const context = useContext(PlayerContext);
+
+  if (!context) {
+    throw new Error('usePlayer debe usarse dentro de PlayerProvider');
+  }
+
+  return context;
 };

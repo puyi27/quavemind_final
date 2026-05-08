@@ -4,56 +4,61 @@ import {
   MdAlbum, MdFavorite, MdFavoriteBorder, MdPause, MdPlayArrow, 
   MdScience, MdWarning, MdArrowBack, MdOpenInNew, MdMusicNote,
   MdTimer, MdSpeed, MdGraphicEq, MdStar, MdLock, MdPeople, MdRateReview,
-  MdInfoOutline, MdArrowForward
+  MdInfoOutline
 } from 'react-icons/md';
-import RatingSystem from '../components/RatingSystem.jsx';
-import ReviewSection from '../components/ReviewSection.jsx';
-import OpinionesGlobales from '../components/OpinionesGlobales.jsx';
-import SpotifyEmbedPlayer from '../components/SpotifyEmbedPlayer.jsx';
-import api from '../services/api.js';
-import { usePlayer } from '../context/MusicPlayerContext.jsx';
-import { useAuthStore } from '../store/authStore.js';
-import { useSpotifyEmbedStore } from '../store/spotifyEmbedStore.js';
+import RatingSystem from '../components/RatingSystem';
+import ReviewSection from '../components/ReviewSection';
+import OpinionesGlobales from '../components/OpinionesGlobales';
+import SpotifyEmbedPlayer from '../components/SpotifyEmbedPlayer';
+import api from '../services/api';
+import { usePlayer } from '../context/usePlayer';
+import { useAuthStore } from '../store/authStore';
+import { useSpotifyEmbedStore } from '../store/spotifyEmbedStore';
 
-function LoadingState() {
-  return (
-    <div className="min-h-screen bg-black flex items-center justify-center">
-      <div className="w-16 h-16 border-4 border-[#ff6b00] border-t-transparent animate-spin rounded-full" />
-    </div>
-  );
-}
-
-function AuthErrorState({ onBack }) {
-  return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-6">
-      <div className="border-4 border-black bg-[#ff6b00] p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] max-w-md text-center">
-        <MdLock className="text-6xl text-black mx-auto mb-4" />
-        <h2 className="font-black uppercase text-black text-2xl mb-2 tracking-tighter">
-          Acceso Restringido
-        </h2>
-        <p className="font-mono text-xs uppercase text-black/80 mb-6 tracking-widest">
-          Debes iniciar sesión para guardar favoritos o valorar
-        </p>
-        <div className="flex gap-4 justify-center">
-          <button 
-            onClick={onBack}
-            className="border-4 border-black bg-transparent text-black px-6 py-3 font-black uppercase text-sm tracking-widest hover:bg-black hover:text-[#ff6b00] transition-colors"
-          >
-            Volver
-          </button>
-          <Link 
-            to="/login"
-            className="border-4 border-black bg-black text-[#ff6b00] px-6 py-3 font-black uppercase text-sm tracking-widest hover:bg-white hover:text-black transition-colors"
-          >
-            Log In
-          </Link>
-        </div>
+// Componente de carga neobrutalista
+const LoadingState = () => (
+  <div className="min-h-screen bg-black flex items-center justify-center">
+    <div className="border-4 border-[#ff6b00] bg-[#111] p-8 shadow-[8px_8px_0px_0px_#ff6b00] animate-pulse">
+      <div className="flex items-center gap-4">
+        <div className="w-8 h-8 border-4 border-[#ff6b00] border-t-transparent animate-spin rounded-full" />
+        <span className="font-black uppercase text-[#ff6b00] tracking-widest">
+          Analizando Track...
+        </span>
       </div>
     </div>
-  );
-}
+  </div>
+);
 
-export default function PerfilCancion() {
+// Componente de error de autenticación
+const AuthErrorState = ({ onBack }) => (
+  <div className="min-h-screen bg-black flex items-center justify-center p-6">
+    <div className="border-4 border-black bg-[#ff6b00] p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] max-w-md text-center">
+      <MdLock className="text-6xl text-black mx-auto mb-4" />
+      <h2 className="font-black uppercase text-black text-2xl mb-2 tracking-tighter">
+        Acceso Restringido
+      </h2>
+      <p className="font-mono text-xs uppercase text-black/80 mb-6 tracking-widest">
+        Debes iniciar sesión para guardar favoritos o valorar
+      </p>
+      <div className="flex gap-4 justify-center">
+        <button 
+          onClick={onBack}
+          className="border-4 border-black bg-transparent text-black px-6 py-3 font-black uppercase text-sm tracking-widest hover:bg-black hover:text-[#ff6b00] transition-colors"
+        >
+          Volver
+        </button>
+        <Link 
+          to="/login"
+          className="border-4 border-black bg-black text-[#ff6b00] px-6 py-3 font-black uppercase text-sm tracking-widest hover:bg-white hover:text-black transition-colors"
+        >
+          Iniciar Sesión
+        </Link>
+      </div>
+    </div>
+  </div>
+);
+
+const PerfilCancion = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
@@ -68,8 +73,6 @@ export default function PerfilCancion() {
   const [rating, setLocalRating] = useState(0);
   const [comentario, setComentario] = useState('');
   const [albumTracks, setAlbumTracks] = useState([]);
-  const [nextAlbumTrack, setNextAlbumTrack] = useState(null);
-  const [prevAlbumTrack, setPrevAlbumTrack] = useState(null);
   
   // Ref para evitar memory leaks
   const isMounted = useRef(true);
@@ -137,6 +140,16 @@ export default function PerfilCancion() {
             ? resRecom.value.data.recomendaciones || []
             : []
         );
+
+        // Si tiene albumId, cargamos los tracks del álbum para navegación
+        if (cancion.albumId) {
+          try {
+            const resAlbum = await api.get(`/album/${cancion.albumId}`);
+            setAlbumTracks(resAlbum.data.tracks || []);
+          } catch (err) {
+            console.warn('[PerfilCancion] No se pudieron cargar los tracks del álbum para navegación');
+          }
+        }
       } catch (cargaError) {
         console.error('Error al cargar la canción:', cargaError);
         if (isMounted.current) {
@@ -401,12 +414,20 @@ export default function PerfilCancion() {
                   {esFavorito ? <MdFavorite className="text-xl" /> : <MdFavoriteBorder className="text-xl" />}
                   <span className="text-xs uppercase tracking-widest">{esFavorito ? 'EN TUS FAVORITOS' : 'AÑADIR A FAVORITOS'}</span>
                 </button>
+
                 <button
                   onClick={() => {
                     useSpotifyEmbedStore.getState().loadUri(datosCancion.id, 'track', {
                       nombre: datosCancion.nombre,
                       artista: datosCancion.artistas?.map(a => a.nombre).join(', ') || datosCancion.artista,
                       imagen: datosCancion.imagen
+                    });
+                    playTrack({
+                      id: datosCancion.id,
+                      name: datosCancion.nombre,
+                      artist: datosCancion.artistaPrincipal || datosCancion.artista,
+                      image: datosCancion.imagen,
+                      preview: datosCancion.preview
                     });
                   }}
                   className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-8 py-4 bg-[#ff6b00] text-black font-black rounded-2xl hover:bg-white transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-[#ff6b00]/20 group"
@@ -415,38 +436,6 @@ export default function PerfilCancion() {
                   <span className="text-xs uppercase tracking-widest">REPRODUCIR TEMA</span>
                 </button>
               </div>
-
-              {albumTracks.length > 0 && (
-                <div className="mt-8 flex items-center justify-between gap-4 p-4 bg-white/5 border border-white/10 rounded-2xl">
-                  {prevAlbumTrack ? (
-                    <Link 
-                      to={`/cancion/${prevAlbumTrack.id}`}
-                      className="flex-1 flex items-center gap-3 p-2 hover:bg-white/5 rounded-xl transition-colors group overflow-hidden"
-                    >
-                      <MdArrowBack className="text-[#ff6b00] group-hover:-translate-x-1 transition-transform shrink-0" />
-                      <div className="min-w-0">
-                        <p className="text-[10px] text-gray-500 uppercase font-black">Anterior</p>
-                        <p className="text-xs text-white font-bold truncate">{prevAlbumTrack.nombre}</p>
-                      </div>
-                    </Link>
-                  ) : <div className="flex-1" />}
-
-                  <div className="w-[1px] h-8 bg-white/10" />
-
-                  {nextAlbumTrack ? (
-                    <Link 
-                      to={`/cancion/${nextAlbumTrack.id}`}
-                      className="flex-1 flex items-center justify-end gap-3 p-2 hover:bg-white/5 rounded-xl transition-colors group text-right overflow-hidden"
-                    >
-                      <div className="min-w-0">
-                        <p className="text-[10px] text-gray-500 uppercase font-black">Siguiente</p>
-                        <p className="text-xs text-white font-bold truncate">{nextAlbumTrack.nombre}</p>
-                      </div>
-                      <MdArrowForward className="text-[#ff6b00] group-hover:translate-x-1 transition-transform shrink-0" />
-                    </Link>
-                  ) : <div className="flex-1" />}
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -497,6 +486,49 @@ export default function PerfilCancion() {
                 <pre className="whitespace-pre-wrap font-sans text-xl leading-relaxed text-gray-300">
                   {letra || 'Letra no disponible en este sector del archivo.'}
                 </pre>
+
+                {/* NAVEGACIÓN DE ÁLBUM */}
+                {albumTracks.length > 0 && (
+                  <div className="mt-16 pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+                    {(() => {
+                      const currentIndex = albumTracks.findIndex(t => t.id === id);
+                      const prevTrack = currentIndex > 0 ? albumTracks[currentIndex - 1] : null;
+                      const nextTrack = currentIndex < albumTracks.length - 1 ? albumTracks[currentIndex + 1] : null;
+                      
+                      return (
+                        <>
+                          <div className="flex-1 w-full md:w-auto">
+                            {prevTrack && (
+                              <Link 
+                                to={`/cancion/${prevTrack.id}`}
+                                className="group flex flex-col items-start gap-2 p-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white hover:text-black transition-all"
+                              >
+                                <span className="text-[9px] font-black uppercase tracking-widest opacity-50">Anterior</span>
+                                <span className="text-sm font-black uppercase truncate max-w-[200px]">{prevTrack.nombre}</span>
+                              </Link>
+                            )}
+                          </div>
+                          
+                          <div className="flex-1 flex justify-center">
+                            <Link to={`/album/${datosCancion.albumId}`} className="text-[#ff6b00] font-black text-xs uppercase tracking-[0.3em] hover:underline underline-offset-8">Ver Álbum Completo</Link>
+                          </div>
+
+                          <div className="flex-1 w-full md:w-auto flex justify-end">
+                            {nextTrack && (
+                              <Link 
+                                to={`/cancion/${nextTrack.id}`}
+                                className="group flex flex-col items-end gap-2 p-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-[#ff6b00] hover:text-black transition-all text-right"
+                              >
+                                <span className="text-[9px] font-black uppercase tracking-widest opacity-50">Siguiente</span>
+                                <span className="text-sm font-black uppercase truncate max-w-[200px]">{nextTrack.nombre}</span>
+                              </Link>
+                            )}
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -545,4 +577,6 @@ export default function PerfilCancion() {
       </section>
     </div>
   );
-}
+};
+
+export default PerfilCancion;
