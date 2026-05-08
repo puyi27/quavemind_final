@@ -137,11 +137,7 @@ const PerfilAlbum = () => {
     return `${min}:${sec < 10 ? '0' : ''}${sec}`;
   };
 
-  if (cargando) return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-      <div className="w-16 h-16 border-4 border-[#ff6b00] border-t-transparent animate-spin rounded-full" />
-    </div>
-  );
+  if (cargando) return <LoadingState />;
 
   if (error || !datos) return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#0a0a0a] text-white p-6">
@@ -382,6 +378,4 @@ const PerfilAlbum = () => {
       </section>
     </div>
   );
-};
-
-export default PerfilAlbum;
+}

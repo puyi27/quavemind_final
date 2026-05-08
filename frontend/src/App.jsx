@@ -46,7 +46,7 @@ const AdminPanel = lazyWithRetry(() => import('./pages/AdminPanel'));
 const ProtectedRoute = lazyWithRetry(() => import('./components/ProtectedRoute'));
 const AdminRoute = lazyWithRetry(() => import('./components/AdminRoute'));
 
-const ScrollToTop = () => {
+function ScrollToTop() {
   const { pathname } = useLocation();
 
   useEffect(() => {
@@ -54,9 +54,9 @@ const ScrollToTop = () => {
   }, [pathname]);
 
   return null;
-};
+}
 
-const AppContent = () => {
+function AppContent() {
   const { initTheme } = useThemeStore();
   const { checkAuth } = useAuthStore();
 
@@ -117,9 +117,9 @@ const AppContent = () => {
       </Suspense>
     </>
   );
-};
+}
 
-const App = () => {
+function App() {
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <div className="min-h-screen bg-black text-white font-sans selection:bg-[var(--color-quave-orange)] selection:text-black">
@@ -128,7 +128,7 @@ const App = () => {
       </div>
     </Router>
   );
-};
+}
 
 export default App;
 

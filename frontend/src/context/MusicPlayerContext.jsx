@@ -2,15 +2,15 @@ import { useEffect, useRef, useState, useCallback, createContext, useContext } f
 
 export const PlayerContext = createContext(null);
 
-export const usePlayer = () => {
+export function usePlayer() {
   const context = useContext(PlayerContext);
   if (!context) {
     throw new Error('usePlayer must be used within a PlayerProvider');
   }
   return context;
-};
+}
 
-export const PlayerProvider = ({ children }) => {
+export function PlayerProvider({ children }) {
   const audioRef = useRef(null);
   const [currentTrack, setCurrentTrack] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
