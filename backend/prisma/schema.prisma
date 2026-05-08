@@ -80,6 +80,7 @@ model Valoracion {
   updatedAt  DateTime @updatedAt
 
   @@unique([usuarioId, tipo, itemId])
+  @@index([tipo, itemId])
 }
 
 model Anotacion {
@@ -109,6 +110,11 @@ model Anotacion {
 
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+
+  @@index([cancionId])
+  @@index([usuarioId])
+  @@index([estado])
+  @@index([createdAt])
 }
 
 model Cancion {
@@ -154,6 +160,8 @@ model Artista {
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([popularidad(sort: Desc)])
 }
 
 model CancionesOnArtistas {

@@ -434,7 +434,7 @@ router.get('/trending', async (req, res) => {
         JOIN "Anotacion" an ON an."cancionId" = c.id
         JOIN "CancionArtista" ca ON ca."cancionId" = c.id AND ca."esPrincipal" = true
         JOIN "Artista" a ON a.id = ca."artistaId"
-        WHERE an."createdAt" > NOW() - INTERVAL '${dias} days'
+        WHERE an."createdAt" > NOW() - (${Number(dias) || 7} * INTERVAL '1 day')
         GROUP BY c.id, a.nombre
         ORDER BY actividad DESC
         LIMIT 10
@@ -446,7 +446,7 @@ router.get('/trending', async (req, res) => {
         JOIN "CancionArtista" ca ON ca."artistaId" = a.id
         JOIN "Cancion" c ON c.id = ca."cancionId"
         JOIN "Anotacion" an ON an."cancionId" = c.id
-        WHERE an."createdAt" > NOW() - INTERVAL '${dias} days'
+        WHERE an."createdAt" > NOW() - (${Number(dias) || 7} * INTERVAL '1 day')
         GROUP BY a.id
         ORDER BY num_canciones DESC
         LIMIT 10
