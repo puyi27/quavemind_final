@@ -149,28 +149,31 @@ const PerfilCancion = () => {
 
   const handlePlayWithQueue = async () => {
     if (!datosCancion?.preview) return;
-    
-    // Si tenemos contexto de álbum, cargamos todo el álbum en la cola
+
+    // 1. Reproducción inmediata del tema actual para evitar bloqueos del navegador
+    const currentTrackData = {
+      id: datosCancion.id,
+      name: datosCancion.nombre,
+      artist: datosCancion.artista,
+      image: datosCancion.imagen,
+      preview: datosCancion.preview,
+      durationMs: datosCancion.duracion,
+    };
+
+    // 2. Si hay álbum, inyectamos la cola, si no, solo el tema
     if (albumTracks.length > 0) {
       const queue = albumTracks.map(t => ({
-        ...t,
-        image: t.imagen || datosCancion.imagen // Asegurar imagen si falta
+        id: t.id,
+        name: t.nombre,
+        artist: t.artista,
+        image: t.imagen || datosCancion.imagen,
+        preview: t.preview,
+        durationMs: t.duracion
       }));
-      await playTrack(
-        { ...datosCancion, image: datosCancion.imagen },
-        queue,
-        currentIndex >= 0 ? currentIndex : 0
-      );
+      
+      await playTrack(currentTrackData, queue, currentIndex >= 0 ? currentIndex : 0);
     } else {
-      // Si no hay álbum, reproducción individual normal
-      await playTrack({
-        id: datosCancion.id,
-        name: datosCancion.nombre,
-        artist: datosCancion.artista,
-        image: datosCancion.imagen,
-        preview: datosCancion.preview,
-        durationMs: datosCancion.duracion,
-      });
+      await playTrack(currentTrackData, [currentTrackData], 0);
     }
   };
 
