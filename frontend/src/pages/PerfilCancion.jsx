@@ -155,12 +155,13 @@ const PerfilCancion = () => {
     
     // Si tenemos contexto de álbum, cargamos el URI del álbum para que Spotify maneje la cola
     if (datosCancion.albumId) {
+      // Pasamos la lista de canciones para que las flechas del MiniPlayer funcionen
       embedStore.loadUri(datosCancion.albumId, 'album', {
         nombre: datosCancion.nombre,
         artista: datosCancion.artista,
         imagen: datosCancion.imagen,
-        trackId: datosCancion.id // Pasamos el trackId para que empiece por este
-      });
+        trackId: datosCancion.id
+      }, albumTracks);
     } else {
       // Si es una canción suelta
       embedStore.loadUri(datosCancion.id, 'track', {
