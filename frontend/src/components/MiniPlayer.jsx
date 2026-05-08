@@ -56,25 +56,40 @@ export default function MiniPlayer() {
   useEffect(() => {
     if (!isApiReady || !activeUri || !containerRef.current) return;
 
-    // Si ya hay un controlador y la URI cambió
-    if (controllerRef.current) {
-      if (lastLoadedUri.current !== activeUri) {
+    // Si ya tenemos un controlador activo y la URI es la misma, no hacemos nada
+    if (controllerRef.current && lastLoadedUri.current === activeUri) {
+      return;
+    }
+
+    // Si el controlador existe pero la URI cambió, cargamos la nueva
+    if (controllerRef.current && lastLoadedUri.current !== activeUri) {
+      try {
         controllerRef.current.loadUri(activeUri);
         lastLoadedUri.current = activeUri;
         controllerRef.current.play();
         setIsChangingTrack(false);
+      } catch (err) {
+        console.warn('[MiniPlayer] Error al cargar nueva URI, reintentando inicialización completa...');
+        controllerRef.current = null; // Forzar re-creación
       }
-      return;
+      if (controllerRef.current) return;
     }
 
-    // Inicialización por primera vez
+    // Inicialización (o re-inicialización si el anterior falló)
     const IFrameAPI = window.SpotifyIFrameAPI;
+    
+    // LIMPIEZA PREVIA: Importante para evitar duplicados en navegaciones rápidas
+    if (containerRef.current) {
+      containerRef.current.innerHTML = '';
+    }
+
     IFrameAPI.createController(containerRef.current, {
       uri: activeUri,
       width: '100%',
       height: '80',
       theme: '0'
     }, (ctrl) => {
+      if (!ctrl) return;
       controllerRef.current = ctrl;
       lastLoadedUri.current = activeUri;
       setController(ctrl);
@@ -83,7 +98,7 @@ export default function MiniPlayer() {
     });
 
     return () => {
-      // No reseteamos controllerRef.current aquí para evitar loops si el componente re-renderiza
+      // Mantenemos el controlador vivo entre renders, pero podríamos limpiar aquí si fuera necesario
     };
   }, [isApiReady, activeUri, setController, updatePlayback]);
 
