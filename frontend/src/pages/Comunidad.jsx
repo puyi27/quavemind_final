@@ -141,13 +141,22 @@ const Comunidad = () => {
                   to={`/perfil/${user.id}`} 
                   className="flex items-center gap-5 group"
                 >
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm border-2 ${
-                    index === 0 ? 'bg-[#ff6b00] border-black text-black scale-110' : 
-                    index === 1 ? 'bg-gray-300 border-black text-black' :
-                    index === 2 ? 'bg-[#cd7f32] border-black text-black' :
-                    'bg-white/5 border-white/10 text-white'
-                  }`}>
-                    {index + 1}
+                   <div className="relative">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm border-2 relative z-10 ${
+                      index === 0 ? 'bg-[#ff6b00] border-black text-black scale-110' : 
+                      index === 1 ? 'bg-gray-300 border-black text-black' :
+                      index === 2 ? 'bg-[#cd7f32] border-black text-black' :
+                      'bg-[#111] border-white/10 text-white'
+                    }`}>
+                      {index + 1}
+                    </div>
+                    <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-lg overflow-hidden border border-black z-20 shadow-lg">
+                      <img 
+                        src={user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`} 
+                        className="w-full h-full object-cover"
+                        alt=""
+                      />
+                    </div>
                   </div>
                   <div className="flex-1">
                     <p className="font-black uppercase tracking-tight group-hover:text-[#ff6b00] transition-colors">{user.username}</p>

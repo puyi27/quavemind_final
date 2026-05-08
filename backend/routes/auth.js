@@ -359,7 +359,8 @@ router.get('/leaderboard', async (req, res) => {
           id: true,
           username: true,
           quavePoints: true,
-          ubicacion: true
+          ubicacion: true,
+          avatar: true
         },
         take: 30
       });
@@ -371,7 +372,8 @@ router.get('/leaderboard', async (req, res) => {
           id: true,
           username: true,
           quavePoints: true,
-          ubicacion: true
+          ubicacion: true,
+          avatar: true
         },
         take: 30
       });
