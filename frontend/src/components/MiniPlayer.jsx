@@ -254,15 +254,23 @@ export default function MiniPlayer() {
                     <div className="h-full bg-[#ff6b00] transition-all" style={{ width: `${progPct}%` }} />
                   </div>
                 
-                <div className="flex items-center gap-1.5 shrink-0">
+                <div className="flex items-center gap-1 shrink-0">
                   <button 
-                    onClick={toggleFavorito}
-                    className={`p-2 transition-all ${esFavorito ? 'text-[#ff6b00]' : 'text-gray-700 hover:text-white'}`}
+                    onClick={(e) => { e.stopPropagation(); !isChangingTrack && previous(); }} 
+                    disabled={isChangingTrack}
+                    className={`p-1.5 transition-all ${isChangingTrack ? 'opacity-20' : 'text-gray-700 hover:text-white'}`}
                   >
-                    {esFavorito ? <MdFavorite size={20} /> : <MdFavoriteBorder size={20} />}
+                    <MdSkipPrevious size={20} />
                   </button>
                   <button onClick={handlePlayPause} className="w-10 h-10 bg-[#ff6b00] text-black rounded-xl flex items-center justify-center hover:scale-105 transition-all shadow-lg active:scale-90">
                     {isPlaying ? <MdPause size={20} /> : <MdPlayArrow size={20} className="ml-0.5" />}
+                  </button>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); !isChangingTrack && next(); }} 
+                    disabled={isChangingTrack}
+                    className={`p-1.5 transition-all ${isChangingTrack ? 'opacity-20' : 'text-gray-700 hover:text-white'}`}
+                  >
+                    <MdSkipNext size={20} />
                   </button>
                   <button onClick={handleClose} className="p-1 text-gray-700 hover:text-red-500 transition-colors">
                     <MdClose size={18} />

@@ -421,49 +421,57 @@ const PerfilCancion = () => {
                 </button>
 
                 {/* NAVEGACIÓN Y PLAY */}
-                <div className="flex items-center gap-2">
-                  {/* ANTERIOR */}
-                  {prevTrack && (
-                    <Link
-                      to={`/cancion/${prevTrack.id}`}
-                      className="flex items-center justify-center w-14 h-14 bg-white/5 text-white border border-white/10 rounded-xl hover:bg-[#ff6b00] hover:text-black hover:border-black transition-all group"
-                      title={`Anterior: ${prevTrack.nombre}`}
+                {datosCancion.albumId && (
+                  <div className="flex items-center gap-2 bg-white/5 p-1 rounded-2xl border border-white/10">
+                    {/* ANTERIOR */}
+                    <button
+                      onClick={() => prevTrack && navigate(`/cancion/${prevTrack.id}`)}
+                      disabled={!prevTrack || albumTracks.length === 0}
+                      className={`flex items-center justify-center w-14 h-14 rounded-xl transition-all group ${
+                        prevTrack 
+                          ? 'bg-[#ff6b00]/20 text-[#ff6b00] hover:bg-[#ff6b00] hover:text-black cursor-pointer' 
+                          : 'opacity-20 cursor-not-allowed'
+                      }`}
+                      title={prevTrack ? `Anterior: ${prevTrack.nombre}` : 'No hay tema anterior'}
                     >
-                      <MdSkipPrevious size={24} />
-                    </Link>
-                  )}
+                      {albumTracks.length === 0 ? <div className="w-5 h-5 border-2 border-[#ff6b00]/30 border-t-[#ff6b00] animate-spin rounded-full" /> : <MdSkipPrevious size={28} />}
+                    </button>
 
-                  {/* BOTÓN PLAY PRINCIPAL */}
-                  <button
-                    onClick={handlePlayWithQueue}
-                    disabled={!datosCancion.preview}
-                    className={`flex items-center justify-center gap-4 px-8 py-4 font-black border-2 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all group ${
-                      !datosCancion.preview 
-                        ? 'bg-gray-800 text-gray-500 cursor-not-allowed border-gray-700 shadow-none' 
-                        : 'bg-white text-black hover:bg-[#ff6b00]'
-                    }`}
-                  >
-                    {currentTrack?.id === id && isPlaying ? (
-                      <MdPause size={24} className="animate-pulse" />
-                    ) : (
-                      <MdPlayArrow size={24} className="group-hover:scale-125 transition-transform" />
-                    )}
-                    <span className="text-xs uppercase tracking-widest font-black">
-                      {!datosCancion.preview ? 'SIN PREVIEW' : 'REPRODUCIR'}
-                    </span>
-                  </button>
-
-                  {/* SIGUIENTE */}
-                  {nextTrack && (
-                    <Link
-                      to={`/cancion/${nextTrack.id}`}
-                      className="flex items-center justify-center w-14 h-14 bg-white/5 text-white border-2 border-white/10 rounded-xl hover:bg-[#ff6b00] hover:text-black hover:border-black transition-all group"
-                      title={`Siguiente: ${nextTrack.nombre}`}
+                    {/* BOTÓN PLAY PRINCIPAL */}
+                    <button
+                      onClick={handlePlayWithQueue}
+                      disabled={!datosCancion.preview}
+                      className={`flex items-center justify-center gap-4 px-8 py-4 font-black border-2 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all group ${
+                        !datosCancion.preview 
+                          ? 'bg-gray-800 text-gray-500 cursor-not-allowed border-gray-700 shadow-none' 
+                          : 'bg-white text-black hover:bg-[#ff6b00]'
+                      }`}
                     >
-                      <MdSkipNext size={24} />
-                    </Link>
-                  )}
-                </div>
+                      {currentTrack?.id === id && isPlaying ? (
+                        <MdPause size={24} className="animate-pulse" />
+                      ) : (
+                        <MdPlayArrow size={24} className="group-hover:scale-125 transition-transform" />
+                      )}
+                      <span className="text-xs uppercase tracking-widest font-black">
+                        {!datosCancion.preview ? 'SIN PREVIEW' : 'REPRODUCIR'}
+                      </span>
+                    </button>
+
+                    {/* SIGUIENTE */}
+                    <button
+                      onClick={() => nextTrack && navigate(`/cancion/${nextTrack.id}`)}
+                      disabled={!nextTrack || albumTracks.length === 0}
+                      className={`flex items-center justify-center w-14 h-14 rounded-xl transition-all group ${
+                        nextTrack 
+                          ? 'bg-[#ff6b00]/20 text-[#ff6b00] hover:bg-[#ff6b00] hover:text-black cursor-pointer' 
+                          : 'opacity-20 cursor-not-allowed'
+                      }`}
+                      title={nextTrack ? `Siguiente: ${nextTrack.nombre}` : 'No hay más temas'}
+                    >
+                      {albumTracks.length === 0 ? <div className="w-5 h-5 border-2 border-[#ff6b00]/30 border-t-[#ff6b00] animate-spin rounded-full" /> : <MdSkipNext size={28} />}
+                    </button>
+                  </div>
+                )}
 
                 <a
                   href={datosCancion.spotifyUrl}
