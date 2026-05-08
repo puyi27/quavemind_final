@@ -19,6 +19,85 @@ export const PlayerProvider = ({ children }) => {
   useEffect(() => { queueRef.current = queue; }, [queue]);
   useEffect(() => { queueIndexRef.current = queueIndex; }, [queueIndex]);
 
+  const pauseTrack = useCallback(() => {
+    audioRef.current?.pause();
+  }, []);
+
+  const playTrack = useCallback(async (track, trackQueue = null, startIndex = 0) => {
+    const audio = audioRef.current;
+    if (!audio || !track?.preview) {
+      setError('Esta canción no tiene preview disponible en Spotify.');
+      return false;
+    }
+
+    if (trackQueue) {
+      setQueueState(trackQueue);
+      setQueueIndex(startIndex);
+    }
+
+    const isSameTrack = currentTrack?.id === track.id;
+    setError('');
+    setCurrentTrack(track);
+
+    if (!isSameTrack || audio.src !== track.preview) {
+      audio.src = track.preview;
+      audio.load();
+      setCurrentTime(0);
+      setDuration(track.durationMs ? track.durationMs / 1000 : 0);
+    }
+
+    try {
+      await audio.play();
+      return true;
+    } catch {
+      setError('El navegador ha bloqueado la reproducción automática.');
+      setIsPlaying(false);
+      return false;
+    }
+  }, [currentTrack]);
+
+  const togglePlayback = useCallback(async () => {
+    const audio = audioRef.current;
+    if (!audio || !currentTrack?.preview) return;
+    if (audio.paused) {
+      try { await audio.play(); } catch { setError('No se ha podido reanudar.'); }
+    } else {
+      audio.pause();
+    }
+  }, [currentTrack]);
+
+  const seekTo = useCallback((percent) => {
+    const audio = audioRef.current;
+    if (!audio || !duration) return;
+    audio.currentTime = (percent / 100) * duration;
+  }, [duration]);
+
+  const nextTrack = useCallback(() => {
+    if (queueIndex < queue.length - 1) {
+      const next = queue[queueIndex + 1];
+      if (next?.preview) {
+        setQueueIndex(queueIndex + 1);
+        playTrack(next);
+      }
+    }
+  }, [queue, queueIndex, playTrack]);
+
+  const prevTrack = useCallback(() => {
+    const audio = audioRef.current;
+    // Si llevas más de 3 segundos → reiniciar, si no → canción anterior
+    if (audio && audio.currentTime > 3) {
+      audio.currentTime = 0;
+      return;
+    }
+    if (queueIndex > 0) {
+      const prev = queue[queueIndex - 1];
+      if (prev?.preview) {
+        setQueueIndex(queueIndex - 1);
+        playTrack(prev);
+      }
+    }
+  }, [queue, queueIndex, playTrack]);
+
   // Efecto para manejar el cambio automático de canción
   useEffect(() => {
     if (autoNextTrigger) {
@@ -79,85 +158,6 @@ export const PlayerProvider = ({ children }) => {
       audio.removeEventListener('error', handleError);
     };
   }, [playTrack]);
-
-  const playTrack = useCallback(async (track, trackQueue = null, startIndex = 0) => {
-    const audio = audioRef.current;
-    if (!audio || !track?.preview) {
-      setError('Esta canción no tiene preview disponible en Spotify.');
-      return false;
-    }
-
-    if (trackQueue) {
-      setQueueState(trackQueue);
-      setQueueIndex(startIndex);
-    }
-
-    const isSameTrack = currentTrack?.id === track.id;
-    setError('');
-    setCurrentTrack(track);
-
-    if (!isSameTrack || audio.src !== track.preview) {
-      audio.src = track.preview;
-      audio.load();
-      setCurrentTime(0);
-      setDuration(track.durationMs ? track.durationMs / 1000 : 0);
-    }
-
-    try {
-      await audio.play();
-      return true;
-    } catch {
-      setError('El navegador ha bloqueado la reproducción automática.');
-      setIsPlaying(false);
-      return false;
-    }
-  }, [currentTrack]);
-
-  const pauseTrack = useCallback(() => {
-    audioRef.current?.pause();
-  }, []);
-
-  const togglePlayback = useCallback(async () => {
-    const audio = audioRef.current;
-    if (!audio || !currentTrack?.preview) return;
-    if (audio.paused) {
-      try { await audio.play(); } catch { setError('No se ha podido reanudar.'); }
-    } else {
-      audio.pause();
-    }
-  }, [currentTrack]);
-
-  const seekTo = useCallback((percent) => {
-    const audio = audioRef.current;
-    if (!audio || !duration) return;
-    audio.currentTime = (percent / 100) * duration;
-  }, [duration]);
-
-  const nextTrack = useCallback(() => {
-    if (queueIndex < queue.length - 1) {
-      const next = queue[queueIndex + 1];
-      if (next?.preview) {
-        setQueueIndex(queueIndex + 1);
-        playTrack(next);
-      }
-    }
-  }, [queue, queueIndex, playTrack]);
-
-  const prevTrack = useCallback(() => {
-    const audio = audioRef.current;
-    // Si llevas más de 3 segundos → reiniciar, si no → canción anterior
-    if (audio && audio.currentTime > 3) {
-      audio.currentTime = 0;
-      return;
-    }
-    if (queueIndex > 0) {
-      const prev = queue[queueIndex - 1];
-      if (prev?.preview) {
-        setQueueIndex(queueIndex - 1);
-        playTrack(prev);
-      }
-    }
-  }, [queue, queueIndex, playTrack]);
 
   const progress = duration > 0 ? Math.min((currentTime / duration) * 100, 100) : 0;
 
