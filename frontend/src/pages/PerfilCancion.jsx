@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { 
   MdAlbum, MdFavorite, MdFavoriteBorder, MdPause, MdPlayArrow, 
-  MdScience, MdWarning, MdArrowBack, MdOpenInNew, MdMusicNote,
+  MdScience, MdWarning, MdArrowBack, MdMusicNote,
   MdTimer, MdSpeed, MdGraphicEq, MdStar, MdLock, MdPeople, MdRateReview,
   MdInfoOutline, MdSkipPrevious, MdSkipNext
 } from 'react-icons/md';
@@ -412,15 +412,7 @@ const PerfilCancion = () => {
                   </div>
                 )}
 
-                <a
-                  href={datosCancion.spotifyUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-8 py-4 bg-[#1DB954] text-white font-black border-2 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-white hover:text-black hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all group"
-                >
-                  <MdOpenInNew size={24} className="group-hover:scale-125 transition-transform" />
-                  <span className="text-xs uppercase tracking-widest">SPOTIFY</span>
-                </a>
+
               </div>
             </div>
           </div>

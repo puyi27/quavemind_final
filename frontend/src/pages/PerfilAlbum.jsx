@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { 
   MdAlbum, MdFavorite, MdFavoriteBorder, MdPlayArrow, 
-  MdPause, MdSchedule, MdOpenInNew, MdLibraryMusic,
+  MdPause, MdSchedule, MdLibraryMusic,
   MdArrowBack, MdWarning, MdGraphicEq, MdInfoOutline,
   MdStar, MdPeople, MdRateReview
 } from 'react-icons/md';
@@ -223,15 +223,7 @@ const PerfilAlbum = () => {
                   <span className="text-xs uppercase tracking-widest">REPRODUCIR ÁLBUM</span>
                 </button>
 
-                <a
-                  href={album.spotifyUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 sm:flex-none flex items-center justify-center gap-4 px-10 py-5 bg-[#1DB954] text-white font-black border-2 border-black rounded-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:bg-white hover:text-black hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all group"
-                >
-                  <MdOpenInNew size={28} className="group-hover:scale-125 transition-transform" />
-                  <span className="text-sm uppercase tracking-widest">ABRIR EN SPOTIFY</span>
-                </a>
+
               </div>
             </div>
           </div>

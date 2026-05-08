@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
   MdPlayArrow, MdPause, MdSkipNext, MdSkipPrevious,
-  MdOpenInNew, MdExpandMore, MdExpandLess, MdGraphicEq, MdClose, MdUnfoldMore,
+  MdExpandMore, MdExpandLess, MdGraphicEq, MdClose, MdUnfoldMore,
   MdFavorite, MdFavoriteBorder
 } from 'react-icons/md';
 import { useSpotifyEmbedStore } from '../store/spotifyEmbedStore';
