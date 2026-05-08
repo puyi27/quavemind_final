@@ -4,7 +4,7 @@ import {
   MdAlbum, MdFavorite, MdFavoriteBorder, MdPause, MdPlayArrow, 
   MdScience, MdWarning, MdArrowBack, MdOpenInNew, MdMusicNote,
   MdTimer, MdSpeed, MdGraphicEq, MdStar, MdLock, MdPeople, MdRateReview,
-  MdInfoOutline
+  MdInfoOutline, MdSkipPrevious, MdSkipNext
 } from 'react-icons/md';
 import RatingSystem from '../components/RatingSystem';
 import ReviewSection from '../components/ReviewSection';
@@ -66,6 +66,7 @@ const PerfilCancion = () => {
   const [datosCancion, setDatosCancion] = useState(null);
   const [letra, setLetra] = useState(null);
   const [recomendaciones, setRecomendaciones] = useState([]);
+  const [albumTracks, setAlbumTracks] = useState([]);
   const [cargandoPrincipal, setCargandoPrincipal] = useState(true);
   const [cargandoLetra, setCargandoLetra] = useState(true);
   const [cargandoRecomendaciones, setCargandoRecomendaciones] = useState(true);
@@ -82,6 +83,7 @@ const PerfilCancion = () => {
     setCargandoPrincipal(true);
     setCargandoLetra(true);
     setCargandoRecomendaciones(true);
+    setAlbumTracks([]);
     setError(null);
 
     const cargarDatos = async () => {
@@ -92,9 +94,16 @@ const PerfilCancion = () => {
         
         const cancion = resSpotify.data.cancion;
         setDatosCancion(cancion);
-        setCargandoPrincipal(false); // Liberamos la UI principal inmediatamente
+        setCargandoPrincipal(false); 
 
-        // 2. CARGA SECUNDARIA: Vault (Favoritos/Rating)
+        // 2. CARGA SECUNDARIA: Contexto de Álbum (para navegación)
+        if (cancion.albumId) {
+          api.get(`/album/${cancion.albumId}`).then(res => {
+            if (isMounted.current) setAlbumTracks(res.data.tracks || []);
+          }).catch(() => {});
+        }
+
+        // 3. CARGA SECUNDARIA: Vault (Favoritos/Rating)
         if (isAuthenticated) {
           api.get('/vault/favoritos').then(res => {
             if (isMounted.current) setEsFavorito(res.data.favoritos?.some(f => f.itemId === id && f.tipo === 'cancion'));
@@ -111,41 +120,19 @@ const PerfilCancion = () => {
           }).catch(() => {});
         }
 
-        // 3. CARGA PESADA: Letras y Recomendaciones (En paralelo)
+        // 4. CARGA PESADA: Letras y Recomendaciones
         const queryGenius = `${cancion.nombre} ${cancion.artistaPrincipal}`;
-        
         api.get('/music/lyrics', { params: { q: queryGenius, title: cancion.nombre, artist: cancion.artistaPrincipal } })
-          .then(res => {
-            if (isMounted.current) {
-              setLetra(res.data.letra);
-              setCargandoLetra(false);
-            }
-          })
-          .catch(() => {
-            if (isMounted.current) {
-              setLetra('Letra no disponible.');
-              setCargandoLetra(false);
-            }
-          });
+          .then(res => { if (isMounted.current) { setLetra(res.data.letra); setCargandoLetra(false); } })
+          .catch(() => { if (isMounted.current) { setLetra('Letra no disponible.'); setCargandoLetra(false); } });
 
         api.get(`/recomendaciones/cancion/${id}`)
-          .then(res => {
-            if (isMounted.current) {
-              setRecomendaciones(res.data.recomendaciones || []);
-              setCargandoRecomendaciones(false);
-            }
-          })
-          .catch(() => {
-            if (isMounted.current) {
-              setRecomendaciones([]);
-              setCargandoRecomendaciones(false);
-            }
-          });
+          .then(res => { if (isMounted.current) { setRecomendaciones(res.data.recomendaciones || []); setCargandoRecomendaciones(false); } })
+          .catch(() => { if (isMounted.current) { setRecomendaciones([]); setCargandoRecomendaciones(false); } });
 
       } catch (cargaError) {
-        console.error('Error al cargar la canción:', cargaError);
         if (isMounted.current) {
-          setError({ type: 'LOAD_ERROR', message: 'No se ha podido conectar con el nodo de datos.' });
+          setError({ type: 'LOAD_ERROR', message: 'Error en el nodo de datos.' });
           setCargandoPrincipal(false);
         }
       }
@@ -154,6 +141,38 @@ const PerfilCancion = () => {
     cargarDatos();
     return () => { isMounted.current = false; };
   }, [id, isAuthenticated]);
+
+  // Lógica de navegación entre temas del álbum
+  const currentIndex = albumTracks.findIndex(t => t.id === id);
+  const prevTrack = currentIndex > 0 ? albumTracks[currentIndex - 1] : null;
+  const nextTrack = currentIndex < albumTracks.length - 1 ? albumTracks[currentIndex + 1] : null;
+
+  const handlePlayWithQueue = async () => {
+    if (!datosCancion?.preview) return;
+    
+    // Si tenemos contexto de álbum, cargamos todo el álbum en la cola
+    if (albumTracks.length > 0) {
+      const queue = albumTracks.map(t => ({
+        ...t,
+        image: t.imagen || datosCancion.imagen // Asegurar imagen si falta
+      }));
+      await playTrack(
+        { ...datosCancion, image: datosCancion.imagen },
+        queue,
+        currentIndex >= 0 ? currentIndex : 0
+      );
+    } else {
+      // Si no hay álbum, reproducción individual normal
+      await playTrack({
+        id: datosCancion.id,
+        name: datosCancion.nombre,
+        artist: datosCancion.artista,
+        image: datosCancion.imagen,
+        preview: datosCancion.preview,
+        durationMs: datosCancion.duracion,
+      });
+    }
+  };
 
   const toggleFavorito = async () => {
     if (!isAuthenticated) {
@@ -390,6 +409,7 @@ const PerfilCancion = () => {
               </div>
 
               <div className="flex flex-wrap justify-center lg:justify-start gap-4 mt-8">
+                {/* FAVORITOS */}
                 <button
                   onClick={toggleFavorito}
                   className={`flex-1 sm:flex-none flex items-center justify-center gap-3 px-8 py-4 font-black rounded-2xl transition-all duration-300 ${
@@ -400,28 +420,59 @@ const PerfilCancion = () => {
                   <span className="text-xs uppercase tracking-widest">{esFavorito ? 'EN TUS FAVORITOS' : 'AÑADIR A FAVORITOS'}</span>
                 </button>
 
-                <button
-                  onClick={() => {
-                    useSpotifyEmbedStore.getState().loadUri(datosCancion.id, 'track', {
-                      nombre: datosCancion.nombre,
-                      artista: datosCancion.artistas?.map(a => a.nombre).join(', ') || datosCancion.artista,
-                      imagen: datosCancion.imagen
-                    });
-                  }}
-                  className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-8 py-4 bg-[#ff6b00] text-black font-black rounded-2xl hover:bg-white transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-[#ff6b00]/20 group"
-                >
-                  <MdPlayArrow size={24} className="group-hover:scale-125 transition-transform" />
-                  <span className="text-xs uppercase tracking-widest">REPRODUCIR TEMA</span>
-                </button>
+                {/* NAVEGACIÓN Y PLAY */}
+                <div className="flex items-center gap-2">
+                  {/* ANTERIOR */}
+                  {prevTrack && (
+                    <Link
+                      to={`/cancion/${prevTrack.id}`}
+                      className="flex items-center justify-center w-14 h-14 bg-white/5 text-white border border-white/10 rounded-xl hover:bg-[#ff6b00] hover:text-black hover:border-black transition-all group"
+                      title={`Anterior: ${prevTrack.nombre}`}
+                    >
+                      <MdSkipPrevious size={24} />
+                    </Link>
+                  )}
+
+                  {/* BOTÓN PLAY PRINCIPAL */}
+                  <button
+                    onClick={handlePlayWithQueue}
+                    disabled={!datosCancion.preview}
+                    className={`flex items-center justify-center gap-4 px-8 py-4 font-black border-2 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all group ${
+                      !datosCancion.preview 
+                        ? 'bg-gray-800 text-gray-500 cursor-not-allowed border-gray-700 shadow-none' 
+                        : 'bg-white text-black hover:bg-[#ff6b00]'
+                    }`}
+                  >
+                    {currentTrack?.id === id && isPlaying ? (
+                      <MdPause size={24} className="animate-pulse" />
+                    ) : (
+                      <MdPlayArrow size={24} className="group-hover:scale-125 transition-transform" />
+                    )}
+                    <span className="text-xs uppercase tracking-widest font-black">
+                      {!datosCancion.preview ? 'SIN PREVIEW' : 'REPRODUCIR'}
+                    </span>
+                  </button>
+
+                  {/* SIGUIENTE */}
+                  {nextTrack && (
+                    <Link
+                      to={`/cancion/${nextTrack.id}`}
+                      className="flex items-center justify-center w-14 h-14 bg-white/5 text-white border-2 border-white/10 rounded-xl hover:bg-[#ff6b00] hover:text-black hover:border-black transition-all group"
+                      title={`Siguiente: ${nextTrack.nombre}`}
+                    >
+                      <MdSkipNext size={24} />
+                    </Link>
+                  )}
+                </div>
 
                 <a
                   href={datosCancion.spotifyUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-8 py-4 bg-[#1DB954] text-white font-black rounded-2xl hover:bg-white hover:text-black transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-[#1DB954]/20 group"
+                  className="flex-1 sm:flex-none flex items-center justify-center gap-4 px-8 py-4 bg-[#1DB954] text-white font-black border-2 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-white hover:text-black hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all group"
                 >
-                  <MdOpenInNew size={24} className="group-hover:scale-125 transition-transform" />
-                  <span className="text-xs uppercase tracking-widest">ABRIR EN SPOTIFY</span>
+                  <MdOpenInNew size={20} className="group-hover:scale-125 transition-transform" />
+                  <span className="text-xs uppercase tracking-widest font-black">SPOTIFY</span>
                 </a>
               </div>
             </div>
