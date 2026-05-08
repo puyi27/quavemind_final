@@ -63,111 +63,96 @@ const PerfilCancion = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
   const { currentTrack, isPlaying, playTrack, togglePlayback } = usePlayer();
-
   const [datosCancion, setDatosCancion] = useState(null);
   const [letra, setLetra] = useState(null);
   const [recomendaciones, setRecomendaciones] = useState([]);
-  const [cargando, setCargando] = useState(true);
+  const [cargandoPrincipal, setCargandoPrincipal] = useState(true);
+  const [cargandoLetra, setCargandoLetra] = useState(true);
+  const [cargandoRecomendaciones, setCargandoRecomendaciones] = useState(true);
   const [esFavorito, setEsFavorito] = useState(false);
   const [error, setError] = useState(null);
   const [rating, setLocalRating] = useState(0);
   const [comentario, setComentario] = useState('');
-  const [albumTracks, setAlbumTracks] = useState([]);
   
   // Ref para evitar memory leaks
   const isMounted = useRef(true);
 
   useEffect(() => {
-    // Resetear flag al montar
     isMounted.current = true;
-    setCargando(true);
+    setCargandoPrincipal(true);
+    setCargandoLetra(true);
+    setCargandoRecomendaciones(true);
     setError(null);
 
     const cargarDatos = async () => {
       try {
+        // 1. CARGA PRIORITARIA: Spotify Data
         const resSpotify = await api.get(`/cancion/${id}`);
-        
         if (!isMounted.current) return;
         
         const cancion = resSpotify.data.cancion;
         setDatosCancion(cancion);
+        setCargandoPrincipal(false); // Liberamos la UI principal inmediatamente
 
-        // Si está autenticado, cargamos estado de bóveda
+        // 2. CARGA SECUNDARIA: Vault (Favoritos/Rating)
         if (isAuthenticated) {
-          try {
-            const [resFavs, resVault] = await Promise.all([
-              api.get('/vault/favoritos'),
-              api.get('/vault/valoraciones')
-            ]);
-            
-            if (!isMounted.current) return;
-            
-            setEsFavorito(resFavs.data.favoritos?.some(f => f.itemId === id && f.tipo === 'cancion'));
-            const miValoracion = resVault.data.valoraciones?.find(v => v.itemId === id && v.tipo === 'cancion');
-            if (miValoracion) {
-              setLocalRating(miValoracion.rating);
-              setComentario(miValoracion.comentario || '');
+          api.get('/vault/favoritos').then(res => {
+            if (isMounted.current) setEsFavorito(res.data.favoritos?.some(f => f.itemId === id && f.tipo === 'cancion'));
+          }).catch(() => {});
+          
+          api.get('/vault/valoraciones').then(res => {
+            if (isMounted.current) {
+              const miVal = res.data.valoraciones?.find(v => v.itemId === id && v.tipo === 'cancion');
+              if (miVal) {
+                setLocalRating(miVal.rating);
+                setComentario(miVal.comentario || '');
+              }
             }
-          } catch (err) {
-            // Silenciar error 401 - no es crítico para mostrar la canción
-            if (err.isAuthError || err.response?.status === 401) {
-              console.warn('[PerfilCancion] Sesión expirada, funcionalidad de vault no disponible');
-            }
-          }
+          }).catch(() => {});
         }
 
+        // 3. CARGA PESADA: Letras y Recomendaciones (En paralelo)
         const queryGenius = `${cancion.nombre} ${cancion.artistaPrincipal}`;
-        const [resGenius, resRecom] = await Promise.allSettled([
-          api.get('/music/lyrics', { 
-            params: { 
-              q: queryGenius,
-              title: cancion.nombre,
-              artist: cancion.artistaPrincipal
-            } 
-          }),
-          api.get(`/recomendaciones/cancion/${id}`),
-        ]);
+        
+        api.get('/music/lyrics', { params: { q: queryGenius, title: cancion.nombre, artist: cancion.artistaPrincipal } })
+          .then(res => {
+            if (isMounted.current) {
+              setLetra(res.data.letra);
+              setCargandoLetra(false);
+            }
+          })
+          .catch(() => {
+            if (isMounted.current) {
+              setLetra('Letra no disponible.');
+              setCargandoLetra(false);
+            }
+          });
 
-        if (!isMounted.current) return;
+        api.get(`/recomendaciones/cancion/${id}`)
+          .then(res => {
+            if (isMounted.current) {
+              setRecomendaciones(res.data.recomendaciones || []);
+              setCargandoRecomendaciones(false);
+            }
+          })
+          .catch(() => {
+            if (isMounted.current) {
+              setRecomendaciones([]);
+              setCargandoRecomendaciones(false);
+            }
+          });
 
-        setLetra(
-          resGenius.status === 'fulfilled'
-            ? resGenius.value.data.letra
-            : 'Letra no encontrada en la base de datos.'
-        );
-        setRecomendaciones(
-          resRecom.status === 'fulfilled'
-            ? resRecom.value.data.recomendaciones || []
-            : []
-        );
-
-        // Si tiene albumId, cargamos los tracks del álbum para navegación
-        if (cancion.albumId) {
-          try {
-            const resAlbum = await api.get(`/album/${cancion.albumId}`);
-            setAlbumTracks(resAlbum.data.tracks || []);
-          } catch (err) {
-            console.warn('[PerfilCancion] No se pudieron cargar los tracks del álbum para navegación');
-          }
-        }
       } catch (cargaError) {
         console.error('Error al cargar la canción:', cargaError);
         if (isMounted.current) {
-          setError({ type: 'LOAD_ERROR', message: 'No se ha podido cargar la información de esta canción.' });
-        }
-      } finally {
-        if (isMounted.current) {
-          setCargando(false);
+          setError({ type: 'LOAD_ERROR', message: 'No se ha podido conectar con el nodo de datos.' });
+          setCargandoPrincipal(false);
         }
       }
     };
 
     cargarDatos();
-    
-    // Cleanup
-    return () => { 
-      isMounted.current = false; 
-    };
+    return () => { isMounted.current = false; };
   }, [id, isAuthenticated]);
 
   const toggleFavorito = async () => {
@@ -301,7 +286,7 @@ const PerfilCancion = () => {
   };
 
   // Early return: Carga
-  if (cargando) {
+  if (cargandoPrincipal) {
     return <LoadingState />;
   }
 
@@ -422,19 +407,22 @@ const PerfilCancion = () => {
                       artista: datosCancion.artistas?.map(a => a.nombre).join(', ') || datosCancion.artista,
                       imagen: datosCancion.imagen
                     });
-                    playTrack({
-                      id: datosCancion.id,
-                      name: datosCancion.nombre,
-                      artist: datosCancion.artistaPrincipal || datosCancion.artista,
-                      image: datosCancion.imagen,
-                      preview: datosCancion.preview
-                    });
                   }}
                   className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-8 py-4 bg-[#ff6b00] text-black font-black rounded-2xl hover:bg-white transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-[#ff6b00]/20 group"
                 >
                   <MdPlayArrow size={24} className="group-hover:scale-125 transition-transform" />
                   <span className="text-xs uppercase tracking-widest">REPRODUCIR TEMA</span>
                 </button>
+
+                <a
+                  href={datosCancion.spotifyUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-8 py-4 bg-[#1DB954] text-white font-black rounded-2xl hover:bg-white hover:text-black transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-[#1DB954]/20 group"
+                >
+                  <MdOpenInNew size={24} className="group-hover:scale-125 transition-transform" />
+                  <span className="text-xs uppercase tracking-widest">ABRIR EN SPOTIFY</span>
+                </a>
               </div>
             </div>
           </div>
@@ -483,51 +471,16 @@ const PerfilCancion = () => {
                 <h3 className="font-black text-xl uppercase tracking-widest italic">Letra Encriptada</h3>
               </div>
               <div className="p-10 overflow-y-auto flex-1 custom-scrollbar">
-                <pre className="whitespace-pre-wrap font-sans text-xl leading-relaxed text-gray-300">
-                  {letra || 'Letra no disponible en este sector del archivo.'}
-                </pre>
-
-                {/* NAVEGACIÓN DE ÁLBUM */}
-                {albumTracks.length > 0 && (
-                  <div className="mt-16 pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-                    {(() => {
-                      const currentIndex = albumTracks.findIndex(t => t.id === id);
-                      const prevTrack = currentIndex > 0 ? albumTracks[currentIndex - 1] : null;
-                      const nextTrack = currentIndex < albumTracks.length - 1 ? albumTracks[currentIndex + 1] : null;
-                      
-                      return (
-                        <>
-                          <div className="flex-1 w-full md:w-auto">
-                            {prevTrack && (
-                              <Link 
-                                to={`/cancion/${prevTrack.id}`}
-                                className="group flex flex-col items-start gap-2 p-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white hover:text-black transition-all"
-                              >
-                                <span className="text-[9px] font-black uppercase tracking-widest opacity-50">Anterior</span>
-                                <span className="text-sm font-black uppercase truncate max-w-[200px]">{prevTrack.nombre}</span>
-                              </Link>
-                            )}
-                          </div>
-                          
-                          <div className="flex-1 flex justify-center">
-                            <Link to={`/album/${datosCancion.albumId}`} className="text-[#ff6b00] font-black text-xs uppercase tracking-[0.3em] hover:underline underline-offset-8">Ver Álbum Completo</Link>
-                          </div>
-
-                          <div className="flex-1 w-full md:w-auto flex justify-end">
-                            {nextTrack && (
-                              <Link 
-                                to={`/cancion/${nextTrack.id}`}
-                                className="group flex flex-col items-end gap-2 p-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-[#ff6b00] hover:text-black transition-all text-right"
-                              >
-                                <span className="text-[9px] font-black uppercase tracking-widest opacity-50">Siguiente</span>
-                                <span className="text-sm font-black uppercase truncate max-w-[200px]">{nextTrack.nombre}</span>
-                              </Link>
-                            )}
-                          </div>
-                        </>
-                      );
-                    })()}
+                {cargandoLetra ? (
+                  <div className="space-y-4 animate-pulse">
+                    {[1,2,3,4,5,6,7,8].map(i => (
+                      <div key={i} className="h-4 bg-white/5 rounded w-[80%] even:w-[60%]" />
+                    ))}
                   </div>
+                ) : (
+                  <pre className="whitespace-pre-wrap font-sans text-xl leading-relaxed text-gray-300">
+                    {letra || 'Letra no disponible en este sector del archivo.'}
+                  </pre>
                 )}
               </div>
             </div>
@@ -556,21 +509,31 @@ const PerfilCancion = () => {
         </div>
 
         {/* RECOMENDACIONES */}
-        {recomendaciones.length > 0 && (
+        {(cargandoRecomendaciones || recomendaciones.length > 0) && (
           <div className="mt-32">
             <h2 className="text-4xl font-black uppercase italic mb-12 border-l-8 border-[#ff6b00] pl-6">RESONANCIAS SIMILARES</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
-              {recomendaciones.slice(0, 5).map((track) => (
-                <Link 
-                  key={track.id} 
-                  to={`/cancion/${track.id}`}
-                  className="group relative block bg-[#111] p-4 rounded-[2rem] border border-white/5 hover:border-[#ff6b00] transition-all"
-                >
-                  <img src={track.imagen} className="w-full aspect-square object-cover rounded-2xl mb-4 group-hover:scale-105 transition-transform" alt={track.nombre} />
-                  <h4 className="font-black text-xs uppercase truncate mb-1">{track.nombre}</h4>
-                  <p className="text-[10px] text-gray-500 uppercase">{track.artista}</p>
-                </Link>
-              ))}
+              {cargandoRecomendaciones ? (
+                [1,2,3,4,5].map(i => (
+                  <div key={i} className="bg-[#111] p-4 rounded-[2rem] border border-white/5 animate-pulse">
+                    <div className="w-full aspect-square bg-white/5 rounded-2xl mb-4" />
+                    <div className="h-3 bg-white/5 rounded w-3/4 mb-2" />
+                    <div className="h-2 bg-white/5 rounded w-1/2" />
+                  </div>
+                ))
+              ) : (
+                recomendaciones.slice(0, 5).map((track) => (
+                  <Link 
+                    key={track.id} 
+                    to={`/cancion/${track.id}`}
+                    className="group relative block bg-[#111] p-4 rounded-[2rem] border border-white/5 hover:border-[#ff6b00] transition-all"
+                  >
+                    <img src={track.imagen} className="w-full aspect-square object-cover rounded-2xl mb-4 group-hover:scale-105 transition-transform" alt={track.nombre} />
+                    <h4 className="font-black text-xs uppercase truncate mb-1">{track.nombre}</h4>
+                    <p className="text-[10px] text-gray-500 uppercase">{track.artista}</p>
+                  </Link>
+                ))
+              )}
             </div>
           </div>
         )}

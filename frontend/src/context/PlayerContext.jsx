@@ -38,25 +38,12 @@ export const PlayerProvider = ({ children }) => {
       if (idx < q.length - 1) {
         const next = q[idx + 1];
         if (next?.preview) {
-          // Pequeño timeout para asegurar que el buffer anterior se limpie
-          setTimeout(() => {
-            audio.pause();
-            audio.src = next.preview;
-            audio.load();
-            
-            // Forzamos el play con una promesa controlada
-            const playPromise = audio.play();
-            if (playPromise !== undefined) {
-              playPromise.then(() => {
-                setCurrentTrack(next);
-                setQueueIndex(idx + 1);
-                setIsPlaying(true);
-              }).catch(err => {
-                console.error('[PLAYER] Error en salto automático:', err);
-                setIsPlaying(false);
-              });
-            }
-          }, 100);
+          audio.src = next.preview;
+          audio.load();
+          audio.play().catch(() => {});
+          setCurrentTrack(next);
+          setQueueIndex(idx + 1);
+          setIsPlaying(true);
         }
       }
     };

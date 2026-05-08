@@ -21,7 +21,7 @@ const PerfilAlbum = () => {
   const { isAuthenticated } = useAuthStore();
 
   const [datos, setDatos] = useState(null);
-  const [cargando, setCargando] = useState(true);
+  const [cargandoPrincipal, setCargandoPrincipal] = useState(true);
   const [esFavorito, setEsFavorito] = useState(false);
   const [error, setError] = useState('');
   const [rating, setLocalRating] = useState(0);
@@ -29,37 +29,31 @@ const PerfilAlbum = () => {
 
   useEffect(() => {
     const cargarAlbum = async () => {
-      setCargando(true);
+      setCargandoPrincipal(true);
+      setError('');
       try {
         const res = await api.get(`/album/${id}`);
         setDatos(res.data);
+        setCargandoPrincipal(false); // Renderizamos la UI principal ya
 
         if (isAuthenticated) {
-          try {
-            const [resFavs, resVault] = await Promise.all([
-              api.get('/vault/favoritos'),
-              api.get('/vault/valoraciones')
-            ]);
-            
-            if (resFavs.data?.favoritos) {
-              setEsFavorito(resFavs.data.favoritos.some(f => f.itemId === id && f.tipo === 'album'));
+          api.get('/vault/favoritos').then(res => {
+            if (res.data?.favoritos) {
+              setEsFavorito(res.data.favoritos.some(f => f.itemId === id && f.tipo === 'album'));
             }
-            
-            const miValoracion = resVault.data?.valoraciones?.find(v => v.itemId === id && v.tipo === 'album');
-            if (miValoracion) {
-              setLocalRating(miValoracion.rating);
-              setComentario(miValoracion.comentario || '');
+          }).catch(() => {});
+          
+          api.get('/vault/valoraciones').then(res => {
+            const miVal = res.data?.valoraciones?.find(v => v.itemId === id && v.tipo === 'album');
+            if (miVal) {
+              setLocalRating(miVal.rating);
+              setComentario(miVal.comentario || '');
             }
-          } catch (err) {
-            if (err.response?.status !== 401 && err.response?.status !== 404) {
-               console.warn('[Vault] Error al cargar datos sociales:', err.message);
-            }
-          }
+          }).catch(() => {});
         }
       } catch (err) {
         setError('Error en la conexión con el servidor de archivos.');
-      } finally {
-        setCargando(false);
+        setCargandoPrincipal(false);
       }
     };
     cargarAlbum();
@@ -137,7 +131,7 @@ const PerfilAlbum = () => {
     return `${min}:${sec < 10 ? '0' : ''}${sec}`;
   };
 
-  if (cargando) return (
+  if (cargandoPrincipal) return (
     <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
       <div className="w-16 h-16 border-4 border-[#ff6b00] border-t-transparent animate-spin rounded-full" />
     </div>
@@ -238,6 +232,16 @@ const PerfilAlbum = () => {
                   <MdPlayArrow size={28} className="group-hover:scale-125 transition-transform" />
                   <span className="text-sm uppercase tracking-widest">REPRODUCIR ÁLBUM</span>
                 </button>
+
+                <a
+                  href={album.spotifyUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 sm:flex-none flex items-center justify-center gap-4 px-10 py-5 bg-[#1DB954] text-white font-black border-2 border-black rounded-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:bg-white hover:text-black hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all group"
+                >
+                  <MdOpenInNew size={28} className="group-hover:scale-125 transition-transform" />
+                  <span className="text-sm uppercase tracking-widest">ABRIR EN SPOTIFY</span>
+                </a>
               </div>
             </div>
           </div>

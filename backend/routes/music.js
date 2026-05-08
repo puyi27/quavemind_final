@@ -106,10 +106,6 @@ router.get('/recomendaciones/:artistId', async (req, res) => {
   const { artistId } = req.params;
   if (!artistId) return res.status(400).json({ status: 'error', mensaje: 'Falta artistId' });
 
-  const cacheKey = `recom:artist:${artistId}`;
-  const cached = await getCachedData(cacheKey);
-  if (cached) return res.json({ status: 'ok', recomendaciones: cached });
-
   try {
     const token = await getSpotifyToken();
     const [relatedRes, topTracksRes] = await Promise.all([
@@ -134,7 +130,6 @@ router.get('/recomendaciones/:artistId', async (req, res) => {
       }))
     };
 
-    await cacheData(cacheKey, recomendaciones, 3600); // 1 hora
     return res.json({ status: 'ok', recomendaciones });
   } catch (error) {
     return res.status(500).json({ status: 'error', mensaje: error.message });
@@ -197,10 +192,6 @@ router.get('/buscar', async (req, res) => {
     return res.json({ status: 'ok', artistas: [], canciones: [], albumes: [] });
   }
 
-  const cacheKey = `search:${query.toLowerCase()}:${tipo}:${limit}`;
-  const cached = await getCachedData(cacheKey);
-  if (cached) return res.json({ status: 'ok', ...cached });
-
   try {
     const token = await getSpotifyToken();
     const headers = { Authorization: `Bearer ${token}` };
@@ -238,12 +229,11 @@ router.get('/buscar', async (req, res) => {
       spotifyUrl: a.external_urls?.spotify
     }));
 
-    const searchResults = { artistas, canciones, albumes };
-    await cacheData(cacheKey, searchResults, 3600); // 1 hora
-
     return res.json({
       status: 'ok',
-      ...searchResults
+      artistas,
+      canciones,
+      albumes
     });
   } catch (error) {
     console.error('[Music Search] Error:', error.message);
