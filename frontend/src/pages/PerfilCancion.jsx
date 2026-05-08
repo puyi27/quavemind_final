@@ -3,7 +3,8 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { 
   MdAlbum, MdFavorite, MdFavoriteBorder, MdPause, MdPlayArrow, 
   MdScience, MdWarning, MdArrowBack, MdOpenInNew, MdMusicNote,
-  MdTimer, MdSpeed, MdGraphicEq, MdStar, MdLock, MdPeople, MdRateReview
+  MdTimer, MdSpeed, MdGraphicEq, MdStar, MdLock, MdPeople, MdRateReview,
+  MdInfoOutline
 } from 'react-icons/md';
 import RatingSystem from '../components/RatingSystem';
 import ReviewSection from '../components/ReviewSection';
