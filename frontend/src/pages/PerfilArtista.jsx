@@ -38,6 +38,7 @@ export default function PerfilArtista() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [playingTrack, setPlayingTrack] = useState(null);
+  const [showSencillos, setShowSencillos] = useState(false);
 
   const { esFavorito, setEsFavorito } = useFavoritos(id, 'artista');
   const { toggleFavorito: toggleFav } = useToggleFavorito();
@@ -293,39 +294,6 @@ export default function PerfilArtista() {
               </div>
             )}
 
-            {/* Sencillos Grid */}
-            {sencillos.length > 0 && (
-              <div className="mt-20">
-                <div className="flex items-center gap-4 mb-10">
-                  <div className="p-3 bg-white/5 rounded-2xl border border-white/5">
-                    <MdGraphicEq className="text-3xl text-[#ff6b00]" />
-                  </div>
-                  <div>
-                    <h2 className="text-4xl font-black uppercase tracking-tighter text-white">Sencillos y EPs</h2>
-                    <p className="text-gray-500 text-[10px] font-black uppercase tracking-widest mt-1">Lanzamientos individuales y colecciones cortas</p>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
-                  {sencillos.map(single => (
-                    <Link key={single.id} to={`/album/${single.id}`} className="group block">
-                      <div className="relative aspect-square overflow-hidden rounded-[2rem] border border-white/5 group-hover:border-[#ff6b00]/50 transition-all duration-500 mb-4 shadow-xl">
-                        <img src={single.imagen} alt={single.nombre} className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                          <div className="p-4 bg-[#ff6b00] rounded-2xl text-black shadow-2xl scale-50 group-hover:scale-100 transition-transform duration-500">
-                            <MdOpenInNew size={24} />
-                          </div>
-                        </div>
-                      </div>
-                      <h5 className="font-black text-white text-sm uppercase tracking-tight truncate group-hover:text-[#ff6b00] transition-colors">{single.nombre}</h5>
-                      <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest mt-1 flex items-center gap-1">
-                        <MdHistory className="text-[#ff6b00]" /> {single.fecha}
-                      </p>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-
             {/* Catálogo de Canciones Extendido */}
             {canciones.length > 0 && (
               <div className="mt-20">
@@ -339,7 +307,7 @@ export default function PerfilArtista() {
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[800px] overflow-y-auto pr-4 custom-scrollbar">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[600px] overflow-y-auto pr-4 custom-scrollbar">
                   {canciones.map((t, i) => (
                     <div key={t.id} className="group flex items-center gap-4 bg-[#0a0a0a] p-4 rounded-2xl border border-white/5 hover:border-[#ff6b00]/30 transition-all">
                       <div className="relative overflow-hidden rounded-lg shrink-0">
@@ -359,7 +327,59 @@ export default function PerfilArtista() {
                     </div>
                   ))}
                 </div>
+
+                {!showSencillos && sencillos.length > 0 && (
+                  <button 
+                    onClick={() => setShowSencillos(true)}
+                    className="mt-12 w-full py-6 bg-white/5 border border-white/10 rounded-3xl font-black text-white uppercase tracking-[0.3em] hover:bg-[#ff6b00] hover:text-black hover:border-[#ff6b00] transition-all flex items-center justify-center gap-4 group"
+                  >
+                    <MdLayers className="text-[#ff6b00] group-hover:text-black transition-colors" size={24} />
+                    AMPLIAR DISCOGRAFÍA (SENCILLOS Y EPs)
+                  </button>
+                )}
               </div>
+            )}
+
+            {/* Sencillos Grid */}
+            {showSencillos && sencillos.length > 0 && (
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-20"
+              >
+                <div className="flex items-center gap-4 mb-10">
+                  <div className="p-3 bg-white/5 rounded-2xl border border-white/5">
+                    <MdGraphicEq className="text-3xl text-[#ff6b00]" />
+                  </div>
+                  <div>
+                    <h2 className="text-4xl font-black uppercase tracking-tighter text-white">Sencillos y EPs</h2>
+                    <p className="text-gray-500 text-[10px] font-black uppercase tracking-widest mt-1">Lanzamientos individuales y colecciones cortas</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
+                  {sencillos.map(single => (
+                    <Link key={single.id} to={`/album/${single.id}`} className="group block">
+                      <div className="relative aspect-square overflow-hidden rounded-[2rem] border border-white/5 group-hover:border-[#ff6b00]/50 transition-all duration-500 mb-4 shadow-xl">
+                        <img src={single.imagen} alt={single.nombre} className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <div className="p-4 bg-[#ff6b00] rounded-2xl text-black shadow-2xl scale-50 group-hover:scale-100 transition-transform duration-500">
+                            <MdOpenInNew size={24} />
+                          </div>
+                        </div>
+                        <div className="absolute top-4 left-4">
+                           <span className="px-3 py-1 bg-black/80 backdrop-blur-md border border-white/10 rounded-full text-[8px] font-black text-[#ff6b00] uppercase tracking-widest">
+                             {single.total_canciones > 3 ? 'EP' : 'SENCILLO'}
+                           </span>
+                        </div>
+                      </div>
+                      <h5 className="font-black text-white text-sm uppercase tracking-tight truncate group-hover:text-[#ff6b00] transition-colors">{single.nombre}</h5>
+                      <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest mt-1 flex items-center gap-1">
+                        <MdHistory className="text-[#ff6b00]" /> {single.fecha}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              </motion.div>
             )}
           </div>
 
