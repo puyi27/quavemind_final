@@ -4,7 +4,7 @@ import {
   MdAlbum, MdFavorite, MdFavoriteBorder, MdPause, MdPlayArrow, 
   MdScience, MdWarning, MdArrowBack, MdOpenInNew, MdMusicNote,
   MdTimer, MdSpeed, MdGraphicEq, MdStar, MdLock, MdPeople, MdRateReview,
-  MdInfoOutline
+  MdInfoOutline, MdArrowForward
 } from 'react-icons/md';
 import RatingSystem from '../components/RatingSystem';
 import ReviewSection from '../components/ReviewSection';
@@ -72,6 +72,9 @@ const PerfilCancion = () => {
   const [error, setError] = useState(null);
   const [rating, setLocalRating] = useState(0);
   const [comentario, setComentario] = useState('');
+  const [albumTracks, setAlbumTracks] = useState([]);
+  const [nextAlbumTrack, setNextAlbumTrack] = useState(null);
+  const [prevAlbumTrack, setPrevAlbumTrack] = useState(null);
   
   // Ref para evitar memory leaks
   const isMounted = useRef(true);
@@ -403,7 +406,6 @@ const PerfilCancion = () => {
                   {esFavorito ? <MdFavorite className="text-xl" /> : <MdFavoriteBorder className="text-xl" />}
                   <span className="text-xs uppercase tracking-widest">{esFavorito ? 'EN TUS FAVORITOS' : 'AÑADIR A FAVORITOS'}</span>
                 </button>
-
                 <button
                   onClick={() => {
                     useSpotifyEmbedStore.getState().loadUri(datosCancion.id, 'track', {
@@ -417,17 +419,39 @@ const PerfilCancion = () => {
                   <MdPlayArrow size={24} className="group-hover:scale-125 transition-transform" />
                   <span className="text-xs uppercase tracking-widest">REPRODUCIR TEMA</span>
                 </button>
-
-                <a
-                  href={datosCancion.spotifyUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-8 py-4 bg-[#1DB954] text-white font-black rounded-2xl hover:bg-white hover:text-black transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-[#1DB954]/20 group"
-                >
-                  <MdOpenInNew size={24} className="group-hover:scale-125 transition-transform" />
-                  <span className="text-xs uppercase tracking-widest">ABRIR EN SPOTIFY</span>
-                </a>
               </div>
+
+              {albumTracks.length > 0 && (
+                <div className="mt-8 flex items-center justify-between gap-4 p-4 bg-white/5 border border-white/10 rounded-2xl">
+                  {prevAlbumTrack ? (
+                    <Link 
+                      to={`/cancion/${prevAlbumTrack.id}`}
+                      className="flex-1 flex items-center gap-3 p-2 hover:bg-white/5 rounded-xl transition-colors group overflow-hidden"
+                    >
+                      <MdArrowBack className="text-[#ff6b00] group-hover:-translate-x-1 transition-transform shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-[10px] text-gray-500 uppercase font-black">Anterior</p>
+                        <p className="text-xs text-white font-bold truncate">{prevAlbumTrack.nombre}</p>
+                      </div>
+                    </Link>
+                  ) : <div className="flex-1" />}
+
+                  <div className="w-[1px] h-8 bg-white/10" />
+
+                  {nextAlbumTrack ? (
+                    <Link 
+                      to={`/cancion/${nextAlbumTrack.id}`}
+                      className="flex-1 flex items-center justify-end gap-3 p-2 hover:bg-white/5 rounded-xl transition-colors group text-right overflow-hidden"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-[10px] text-gray-500 uppercase font-black">Siguiente</p>
+                        <p className="text-xs text-white font-bold truncate">{nextAlbumTrack.nombre}</p>
+                      </div>
+                      <MdArrowForward className="text-[#ff6b00] group-hover:translate-x-1 transition-transform shrink-0" />
+                    </Link>
+                  ) : <div className="flex-1" />}
+                </div>
+              )}
             </div>
           </div>
         </div>

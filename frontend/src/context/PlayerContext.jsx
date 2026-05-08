@@ -10,6 +10,7 @@ export const PlayerProvider = ({ children }) => {
   const [error, setError] = useState('');
   const [queue, setQueueState] = useState([]);
   const [queueIndex, setQueueIndex] = useState(0);
+  const [autoNextTrigger, setAutoNextTrigger] = useState(false);
 
   const queueRef = useRef([]);
   const queueIndexRef = useRef(0);
@@ -17,6 +18,21 @@ export const PlayerProvider = ({ children }) => {
   // Sincronizar refs con el estado para que los listeners los vean siempre actualizados
   useEffect(() => { queueRef.current = queue; }, [queue]);
   useEffect(() => { queueIndexRef.current = queueIndex; }, [queueIndex]);
+
+  // Efecto para manejar el cambio automático de canción
+  useEffect(() => {
+    if (autoNextTrigger) {
+      const q = queueRef.current;
+      const idx = queueIndexRef.current;
+      if (idx < q.length) {
+        const next = q[idx];
+        if (next?.preview) {
+          playTrack(next);
+        }
+      }
+      setAutoNextTrigger(false);
+    }
+  }, [autoNextTrigger, playTrack]);
 
   useEffect(() => {
     const audio = new Audio();
@@ -36,15 +52,8 @@ export const PlayerProvider = ({ children }) => {
       const idx = queueIndexRef.current;
 
       if (idx < q.length - 1) {
-        const next = q[idx + 1];
-        if (next?.preview) {
-          audio.src = next.preview;
-          audio.load();
-          audio.play().catch(() => {});
-          setCurrentTrack(next);
-          setQueueIndex(idx + 1);
-          setIsPlaying(true);
-        }
+        setQueueIndex(prev => prev + 1);
+        setAutoNextTrigger(true);
       }
     };
 
@@ -69,7 +78,7 @@ export const PlayerProvider = ({ children }) => {
       audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('error', handleError);
     };
-  }, []);
+  }, [playTrack]);
 
   const playTrack = useCallback(async (track, trackQueue = null, startIndex = 0) => {
     const audio = audioRef.current;
