@@ -253,7 +253,7 @@ const PerfilAlbum = () => {
 
               <div className="mt-8 p-4 bg-white/5 border border-dashed border-[#ff6b00]/30 rounded-2xl max-w-lg mx-auto lg:mx-0">
                 <p className="text-[10px] text-[#ff6b00] font-mono uppercase tracking-widest text-center lg:text-left leading-relaxed">
-                  ⚠️ AVISO DEL SISTEMA: LA REPRODUCCIÓN EN ESTE TERMINAL ES DE 30 SEG. PARA ESCUCHAR EL ÁLBUM COMPLETO, INICIA EL ENLACE OFICIAL.
+                  ⚠️ SISTEMA DE ENLACE HÍBRIDO: PARA ESCUCHAR EL ÁLBUM COMPLETO EN ESTE TERMINAL, INICIA SESIÓN EN TU CUENTA DE SPOTIFY EN ESTE NAVEGADOR. SI NO TIENES SESIÓN, LA PRE-ESCUCHA SERÁ DE 30 SEG.
                 </p>
               </div>
             </div>

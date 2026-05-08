@@ -430,7 +430,7 @@ const PerfilCancion = () => {
               
               <div className="mt-6 p-4 bg-white/5 border border-dashed border-[#ff6b00]/30 rounded-2xl max-w-md mx-auto lg:mx-0">
                 <p className="text-[10px] text-[#ff6b00] font-mono uppercase tracking-widest text-center lg:text-left leading-relaxed">
-                  ⚠️ PROTOCOLO DE RED: LAS PRE-ESCUCHAS ESTÁN LIMITADAS A 30 SEGUNDOS. PARA EL TRACK COMPLETO, CONECTA CON EL NODO OFICIAL DE SPOTIFY.
+                  ⚠️ SISTEMA DE ENLACE HÍBRIDO: PARA ESCUCHAR TEMAS COMPLETOS EN ESTE TERMINAL, INICIA SESIÓN EN TU CUENTA DE SPOTIFY EN ESTE NAVEGADOR. SI NO TIENES SESIÓN, LA PRE-ESCUCHA SERÁ DE 30 SEG.
                 </p>
               </div>
             </div>
