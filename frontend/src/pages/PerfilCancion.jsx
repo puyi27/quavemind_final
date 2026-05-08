@@ -148,27 +148,35 @@ const PerfilCancion = () => {
   const nextTrack = currentIndex < albumTracks.length - 1 ? albumTracks[currentIndex + 1] : null;
 
   const handlePlayWithQueue = async () => {
-    if (!datosCancion) return;
-
-    // Usamos el store de Spotify Embed que es el que maneja el MiniPlayer de abajo
-    const embedStore = useSpotifyEmbedStore.getState();
-    
-    // Si tenemos contexto de álbum, cargamos el URI del álbum para que Spotify maneje la cola
-    if (datosCancion.albumId) {
-      // Pasamos la lista de canciones para que las flechas del MiniPlayer funcionen
-      embedStore.loadUri(datosCancion.albumId, 'album', {
+    if (!datosCancion?.preview) {
+      // Si no hay preview MP3, intentamos usar el Spotify Embed
+      const embedStore = useSpotifyEmbedStore.getState();
+      embedStore.loadUri(datosCancion.albumId || datosCancion.id, datosCancion.albumId ? 'album' : 'track', {
         nombre: datosCancion.nombre,
         artista: datosCancion.artista,
         imagen: datosCancion.imagen,
         trackId: datosCancion.id
       }, albumTracks);
+      return;
+    }
+
+    // Usamos el motor original playTrack (30s)
+    if (albumTracks.length > 0) {
+      const queue = albumTracks.map(t => ({
+        id: t.id,
+        nombre: t.nombre,
+        artista: t.artista,
+        imagen: t.imagen || datosCancion.imagen,
+        preview: t.preview,
+        durationMs: t.duracion
+      }));
+      await playTrack(
+        { ...datosCancion, image: datosCancion.imagen, durationMs: datosCancion.duracion },
+        queue,
+        currentIndex >= 0 ? currentIndex : 0
+      );
     } else {
-      // Si es una canción suelta
-      embedStore.loadUri(datosCancion.id, 'track', {
-        nombre: datosCancion.nombre,
-        artista: datosCancion.artista,
-        imagen: datosCancion.imagen
-      });
+      await playTrack({ ...datosCancion, image: datosCancion.imagen, durationMs: datosCancion.duracion });
     }
   };
 

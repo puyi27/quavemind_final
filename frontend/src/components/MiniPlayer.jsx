@@ -8,6 +8,7 @@ import {
 } from 'react-icons/md';
 import { useSpotifyEmbedStore } from '../store/spotifyEmbedStore';
 import { useAuthStore } from '../store/authStore';
+import { usePlayer } from '../context/usePlayer';
 import api from '../services/api';
 
 const loadSpotifyApi = () => {
@@ -28,16 +29,31 @@ const fmt = (ms) => {
 };
 
 export default function MiniPlayer() {
-  const { isPlaying, position, duration, currentTrack, activeUri, setController, updatePlayback, reset, next, previous } = useSpotifyEmbedStore();
+  // 1. Motor Spotify Embed
+  const spotify = useSpotifyEmbedStore();
+  
+  // 2. Motor Custom (usePlayer)
+  const custom = usePlayer();
+
   const [isExpanded, setIsExpanded] = useState(false);
   const [isApiReady, setIsApiReady] = useState(false);
   const [isChangingTrack, setIsChangingTrack] = useState(false);
+  
+  // Determinar qué track está activo (Prioridad al que esté sonando)
+  const activeSource = (custom.isPlaying || (!spotify.isPlaying && custom.currentTrack)) ? 'custom' : (spotify.currentTrack ? 'spotify' : null);
+  
+  const currentTrack = activeSource === 'custom' ? custom.currentTrack : spotify.currentTrack;
+  const isPlaying = activeSource === 'custom' ? custom.isPlaying : spotify.isPlaying;
+  const position = activeSource === 'custom' ? custom.currentTime * 1000 : spotify.position;
+  const duration = activeSource === 'custom' ? custom.duration * 1000 : spotify.duration;
+  const activeUri = activeSource === 'spotify' ? spotify.activeUri : null;
+
   const containerRef = useRef(null);
   const controllerRef = useRef(null);
   const progressRef = useRef(null);
   const lastLoadedUri = useRef(null);
 
-  // 1. Cargar API
+  // 1. Cargar API Spotify
   useEffect(() => {
     loadSpotifyApi();
     if (window.SpotifyIFrameAPI) {
@@ -52,11 +68,10 @@ export default function MiniPlayer() {
     }
   }, []);
 
-  // 2. Inicialización y Sincronización de URI
+  // 2. Inicialización y Sincronización de URI (Solo si el origen es Spotify)
   useEffect(() => {
-    if (!isApiReady || !activeUri || !containerRef.current) return;
+    if (!isApiReady || activeSource !== 'spotify' || !activeUri || !containerRef.current) return;
 
-    // Si ya hay un controlador y la URI cambió
     if (controllerRef.current) {
       if (lastLoadedUri.current !== activeUri) {
         controllerRef.current.loadUri(activeUri);
@@ -67,7 +82,6 @@ export default function MiniPlayer() {
       return;
     }
 
-    // Inicialización por primera vez
     const IFrameAPI = window.SpotifyIFrameAPI;
     IFrameAPI.createController(containerRef.current, {
       uri: activeUri,
@@ -77,31 +91,37 @@ export default function MiniPlayer() {
     }, (ctrl) => {
       controllerRef.current = ctrl;
       lastLoadedUri.current = activeUri;
-      setController(ctrl);
-      ctrl.addListener('playback_update', (e) => updatePlayback(e.data));
+      spotify.setController(ctrl);
+      ctrl.addListener('playback_update', (e) => spotify.updatePlayback(e.data));
       ctrl.play();
     });
-
-    return () => {
-      // No reseteamos controllerRef.current aquí para evitar loops si el componente re-renderiza
-    };
-  }, [isApiReady, activeUri, setController, updatePlayback]);
+  }, [isApiReady, activeSource, activeUri, spotify]);
 
   const handlePlayPause = useCallback(() => {
-    const ctrl = controllerRef.current;
-    if (!ctrl) return;
-    isPlaying ? ctrl.pause() : ctrl.resume();
-  }, [isPlaying]);
+    if (activeSource === 'custom') {
+      custom.togglePlayback();
+    } else {
+      const ctrl = controllerRef.current;
+      if (!ctrl) return;
+      isPlaying ? ctrl.pause() : ctrl.resume();
+    }
+  }, [activeSource, custom, isPlaying]);
 
   const handleProgressClick = useCallback((e) => {
-    const ctrl = controllerRef.current;
-    if (!ctrl || !duration) return;
+    if (!duration) return;
     const bar = progressRef.current;
     if (!bar) return;
     const rect = bar.getBoundingClientRect();
     const pct = Math.min(100, Math.max(0, ((e.clientX - rect.left) / rect.width) * 100));
-    ctrl.seek(Math.floor((pct / 100) * duration));
-  }, [duration]);
+
+    if (activeSource === 'custom') {
+      custom.seekTo(pct);
+    } else {
+      const ctrl = controllerRef.current;
+      if (!ctrl) return;
+      ctrl.seek(Math.floor((pct / 100) * duration));
+    }
+  }, [duration, activeSource, custom]);
 
   const [esFavorito, setEsFavorito] = useState(false);
   const { isAuthenticated, updatePoints } = useAuthStore();
@@ -221,11 +241,29 @@ export default function MiniPlayer() {
 
                 {/* Botones de control */}
                 <div className="flex items-center justify-between px-2">
-                  <button onClick={() => !isChangingTrack && previous()} className={`p-2 transition-all ${isChangingTrack ? 'opacity-20' : 'text-gray-500 hover:text-white'}`} disabled={isChangingTrack}><MdSkipPrevious size={28} /></button>
+                  <button 
+                    onClick={() => {
+                      if (isChangingTrack) return;
+                      activeSource === 'custom' ? custom.prevTrack() : spotify.previous();
+                    }} 
+                    className={`p-2 transition-all ${isChangingTrack ? 'opacity-20' : 'text-gray-500 hover:text-white'}`} 
+                    disabled={isChangingTrack}
+                  >
+                    <MdSkipPrevious size={28} />
+                  </button>
                   <button onClick={handlePlayPause} className="w-14 h-14 bg-white text-black rounded-2xl flex items-center justify-center shadow-xl hover:bg-[#ff6b00] transition-all active:scale-95">
                     {isPlaying ? <MdPause size={32} /> : <MdPlayArrow size={32} className="ml-1" />}
                   </button>
-                  <button onClick={() => !isChangingTrack && next()} className={`p-2 transition-all ${isChangingTrack ? 'opacity-20' : 'text-gray-500 hover:text-white'}`} disabled={isChangingTrack}><MdSkipNext size={28} /></button>
+                  <button 
+                    onClick={() => {
+                      if (isChangingTrack) return;
+                      activeSource === 'custom' ? custom.nextTrack() : spotify.next();
+                    }} 
+                    className={`p-2 transition-all ${isChangingTrack ? 'opacity-20' : 'text-gray-500 hover:text-white'}`} 
+                    disabled={isChangingTrack}
+                  >
+                    <MdSkipNext size={28} />
+                  </button>
                 </div>
               </div>
             ) : (
@@ -256,7 +294,11 @@ export default function MiniPlayer() {
                 
                 <div className="flex items-center gap-1 shrink-0">
                   <button 
-                    onClick={(e) => { e.stopPropagation(); !isChangingTrack && previous(); }} 
+                    onClick={(e) => { 
+                      e.stopPropagation(); 
+                      if (isChangingTrack) return;
+                      activeSource === 'custom' ? custom.prevTrack() : spotify.previous();
+                    }} 
                     disabled={isChangingTrack}
                     className={`p-1.5 transition-all ${isChangingTrack ? 'opacity-20' : 'text-gray-700 hover:text-white'}`}
                   >
@@ -266,7 +308,11 @@ export default function MiniPlayer() {
                     {isPlaying ? <MdPause size={20} /> : <MdPlayArrow size={20} className="ml-0.5" />}
                   </button>
                   <button 
-                    onClick={(e) => { e.stopPropagation(); !isChangingTrack && next(); }} 
+                    onClick={(e) => { 
+                      e.stopPropagation(); 
+                      if (isChangingTrack) return;
+                      activeSource === 'custom' ? custom.nextTrack() : spotify.next();
+                    }} 
                     disabled={isChangingTrack}
                     className={`p-1.5 transition-all ${isChangingTrack ? 'opacity-20' : 'text-gray-700 hover:text-white'}`}
                   >
