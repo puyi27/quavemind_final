@@ -484,43 +484,7 @@ export default function Escena() {
                 </div>
               )}
 
-              {/* PLAYLIST SECTION */}
-              <div className="relative overflow-hidden bg-gradient-to-br from-[#111] to-black rounded-[4rem] p-10 md:p-20 border border-white/5 shadow-2xl">
-                 <MdGraphicEq className="absolute -bottom-20 -right-20 text-[25rem] text-[#ff6b00]/5" />
-                 
-                 <div className="relative z-10">
-                  <div className="flex flex-col lg:flex-row items-center justify-between gap-10 mb-16">
-                    <div className="text-center lg:text-left">
-                      <div className="flex items-center justify-center lg:justify-start gap-4 mb-6">
-                        <div className="p-4 bg-[#ff6b00]/10 rounded-3xl">
-                          <MdQueueMusic className="text-4xl text-[#ff6b00]" />
-                        </div>
-                      </div>
-                      <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter text-white mb-4">{info.nombre}</h2>
-                      <p className="text-gray-500 font-bold uppercase tracking-widest">Las piezas fundamentales de este rompecabezas sonoro</p>
-                    </div>
-                    <button className="px-12 py-6 bg-[#ff6b00] text-black font-black rounded-3xl hover:bg-[#ff8533] transition-all hover:scale-105 shadow-[0_0_50px_rgba(255,107,0,0.3)] flex items-center gap-4 uppercase text-sm tracking-widest">
-                      <MdPlayArrow className="text-2xl" /> REPRODUCIR TODO
-                    </button>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {canciones.slice(0, 10).map((c, i) => (
-                      <div key={c.id} className="group flex items-center gap-6 p-5 bg-white/[0.02] border border-white/5 rounded-[2rem] hover:bg-white/5 hover:border-[#ff6b00]/30 transition-all duration-300">
-                        <span className="text-[#ff6b00]/30 font-black text-2xl italic group-hover:text-[#ff6b00] transition-colors">{String(i + 1).padStart(2, '0')}</span>
-                        <img src={c.imagen} alt="" className="w-16 h-16 rounded-2xl object-cover shadow-2xl group-hover:scale-105 transition-transform" />
-                        <div className="flex-1 min-w-0">
-                          <p className="font-black text-lg text-white uppercase tracking-tight truncate group-hover:text-[#ff6b00] transition-colors">{c.nombre}</p>
-                          <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1">{c.artista}</p>
-                        </div>
-                        <Link to={`/cancion/${c.id}`} className="p-3 bg-white/5 text-white rounded-xl hover:bg-[#ff6b00] hover:text-black transition-all">
-                          <MdArrowForward className="text-xl" />
-                        </Link>
-                      </div>
-                    ))}
-                  </div>
-                 </div>
-              </div>
+
             </div>
           )}
 

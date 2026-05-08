@@ -193,7 +193,7 @@ export default function MainLayout() {
 
           {/* LADO DERECHO: ACCIONES Y PERFIL - Centrado vertical forzado */}
           <div className="flex-1 flex items-center justify-end gap-3 pointer-events-auto h-12">
-            {user?.role === 'ADMIN' && (
+            {user?.rol === 'ADMIN' && (
               <Link 
                 to="/admin"
                 className={`hidden md:flex items-center gap-2 px-5 py-2.5 rounded-full text-[11px] font-bold uppercase tracking-[0.1em] transition-all duration-500 h-10 border border-white/20 ${
