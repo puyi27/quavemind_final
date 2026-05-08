@@ -342,6 +342,14 @@ const PerfilCancion = () => {
                 className="relative w-64 h-64 md:w-80 md:h-80 rounded-[2rem] shadow-2xl object-cover border border-white/10 group-hover:scale-[1.02] transition-transform duration-500"
                 onError={(e) => { e.target.src = '/default.png'; }}
               />
+              {datosCancion.preview && (
+                <button
+                  onClick={handlePreview}
+                  className="absolute bottom-6 right-6 w-20 h-20 bg-[#ff6b00] rounded-[1.5rem] flex items-center justify-center shadow-2xl hover:scale-110 transition-transform z-20"
+                >
+                  {currentTrack?.id === datosCancion.id && isPlaying ? <MdPause className="text-4xl text-black" /> : <MdPlayArrow className="text-4xl text-black" />}
+                </button>
+              )}
             </div>
 
             <div className="flex-1 text-center lg:text-left">
@@ -411,7 +419,7 @@ const PerfilCancion = () => {
                         <MdPlayArrow size={24} className="group-hover:scale-125 transition-transform" />
                       )}
                       <span className="text-xs uppercase tracking-widest font-black">
-                        {currentTrack?.id === id && isPlaying ? 'Pausar' : 'Reproducir'}
+                        REPRODUCIR
                       </span>
                     </button>
 
