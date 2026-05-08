@@ -15,25 +15,18 @@ export const useSpotifyEmbedStore = create((set, get) => ({
   loadUri: (id, type, info, tracks = []) => {
     const uri = `spotify:${type}:${id}`;
     const queue = tracks.length > 0 ? tracks : [];
+    const currentIndex = tracks.length > 0 ? 0 : -1;
     
-    // Encontrar el índice inicial si se proporciona un trackId
-    let currentIndex = -1;
-    if (queue.length > 0) {
-      if (info.trackId) {
-        currentIndex = queue.findIndex(t => t.id === info.trackId);
-      }
-      if (currentIndex === -1) currentIndex = 0;
-    }
-    
-    // Si es un álbum y tenemos tracks, cargamos el track específico o el primero
-    const targetTrack = currentIndex >= 0 ? queue[currentIndex] : null;
-    const actualUri = targetTrack ? `spotify:track:${targetTrack.id}` : uri;
+    // Si es un álbum y tenemos tracks, cargamos el primero para tener control total
+    const actualUri = (type === 'album' && queue.length > 0) 
+      ? `spotify:track:${queue[0].id}` 
+      : uri;
 
-    const trackInfo = targetTrack 
+    const trackInfo = (type === 'album' && queue.length > 0)
       ? { 
-          id: targetTrack.id, 
-          nombre: targetTrack.nombre, 
-          artista: targetTrack.artista, 
+          id: queue[0].id, 
+          nombre: queue[0].nombre, 
+          artista: queue[0].artista, 
           imagen: info.imagen,
           tipo: 'cancion'
         }
@@ -49,7 +42,6 @@ export const useSpotifyEmbedStore = create((set, get) => ({
       activeUri: actualUri,
       queue,
       currentIndex,
-      isPlaying: true, // Forzamos estado play
       currentTrack: { 
         ...trackInfo,
         uri: actualUri,

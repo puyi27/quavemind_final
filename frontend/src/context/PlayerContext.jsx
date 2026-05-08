@@ -174,13 +174,6 @@ export const PlayerProvider = ({ children }) => {
         seekTo,
         nextTrack,
         prevTrack,
-        stop: () => {
-          audioRef.current?.pause();
-          setCurrentTrack(null);
-          setIsPlaying(false);
-          setQueueState([]);
-          setQueueIndex(0);
-        },
         queue,
         queueIndex,
         setQueue: setQueueState,
