@@ -416,6 +416,22 @@ const PerfilCancion = () => {
                   <MdPlayArrow size={24} className="group-hover:scale-125 transition-transform" />
                   <span className="text-xs uppercase tracking-widest">REPRODUCIR TEMA</span>
                 </button>
+
+                <a
+                  href={datosCancion.spotifyUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-8 py-4 bg-[#1DB954] text-white font-black rounded-2xl hover:bg-white hover:text-black transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-[#1DB954]/20 group"
+                >
+                  <MdOpenInNew size={24} className="group-hover:scale-125 transition-transform" />
+                  <span className="text-xs uppercase tracking-widest">ABRIR EN SPOTIFY</span>
+                </a>
+              </div>
+              
+              <div className="mt-6 p-4 bg-white/5 border border-dashed border-[#ff6b00]/30 rounded-2xl max-w-md mx-auto lg:mx-0">
+                <p className="text-[10px] text-[#ff6b00] font-mono uppercase tracking-widest text-center lg:text-left leading-relaxed">
+                  ⚠️ PROTOCOLO DE RED: LAS PRE-ESCUCHAS ESTÁN LIMITADAS A 30 SEGUNDOS. PARA EL TRACK COMPLETO, CONECTA CON EL NODO OFICIAL DE SPOTIFY.
+                </p>
               </div>
             </div>
           </div>

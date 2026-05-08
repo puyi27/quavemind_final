@@ -236,6 +236,22 @@ const PerfilAlbum = () => {
                   <MdPlayArrow size={28} className="group-hover:scale-125 transition-transform" />
                   <span className="text-sm uppercase tracking-widest">REPRODUCIR ÁLBUM</span>
                 </button>
+
+                <a
+                  href={album.spotifyUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 sm:flex-none flex items-center justify-center gap-4 px-10 py-5 bg-[#1DB954] text-white font-black border-2 border-black rounded-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:bg-white hover:text-black hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all group"
+                >
+                  <MdOpenInNew size={28} className="group-hover:scale-125 transition-transform" />
+                  <span className="text-sm uppercase tracking-widest">ABRIR EN SPOTIFY</span>
+                </a>
+              </div>
+
+              <div className="mt-8 p-4 bg-white/5 border border-dashed border-[#ff6b00]/30 rounded-2xl max-w-lg mx-auto lg:mx-0">
+                <p className="text-[10px] text-[#ff6b00] font-mono uppercase tracking-widest text-center lg:text-left leading-relaxed">
+                  ⚠️ AVISO DEL SISTEMA: LA REPRODUCCIÓN EN ESTE TERMINAL ES DE 30 SEG. PARA ESCUCHAR EL ÁLBUM COMPLETO, INICIA EL ENLACE OFICIAL.
+                </p>
               </div>
             </div>
           </div>

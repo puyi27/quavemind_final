@@ -42,8 +42,17 @@ const RatingSystem = ({ initialRating = 0, label = 'Auditar Track', onRate }) =>
             <button
               key={star}
               type="button"
-              className="relative transition-all duration-200 hover:scale-110 focus:outline-none cursor-pointer group"
+              className="relative transition-all duration-200 hover:scale-110 focus:outline-none cursor-pointer group p-1 md:p-0"
               onMouseMove={(e) => handleMouseMove(e, star)}
+              onTouchStart={(e) => {
+                const touch = e.touches[0];
+                const { left, width } = e.currentTarget.getBoundingClientRect();
+                const isHalf = (touch.clientX - left) / width < 0.5;
+                const val = isHalf ? star - 0.5 : star;
+                setHover(0);
+                setRating(val);
+                if (onRate) onRate(val);
+              }}
               onClick={handleClick}
             >
               {showFull ? (
