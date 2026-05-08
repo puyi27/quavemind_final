@@ -439,13 +439,14 @@ const PerfilCancion = () => {
 
                     {/* BOTÓN PLAY PRINCIPAL */}
                     <button
-                      onClick={handlePlayWithQueue}
-                      disabled={!datosCancion.preview}
-                      className={`flex items-center justify-center gap-4 px-8 py-4 font-black border-2 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all group ${
-                        !datosCancion.preview 
-                          ? 'bg-gray-800 text-gray-500 cursor-not-allowed border-gray-700 shadow-none' 
-                          : 'bg-white text-black hover:bg-[#ff6b00]'
-                      }`}
+                      onClick={() => {
+                        if (datosCancion.preview) {
+                          handlePlayWithQueue();
+                        } else {
+                          document.getElementById('spotify-bridge')?.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }}
+                      className="flex items-center justify-center gap-4 px-8 py-4 font-black border-2 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all group bg-white text-black hover:bg-[#ff6b00]"
                     >
                       {currentTrack?.id === id && isPlaying ? (
                         <MdPause size={24} className="animate-pulse" />
@@ -453,7 +454,7 @@ const PerfilCancion = () => {
                         <MdPlayArrow size={24} className="group-hover:scale-125 transition-transform" />
                       )}
                       <span className="text-xs uppercase tracking-widest font-black">
-                        {!datosCancion.preview ? 'SIN PREVIEW' : 'REPRODUCIR'}
+                        REPRODUCIR
                       </span>
                     </button>
 
