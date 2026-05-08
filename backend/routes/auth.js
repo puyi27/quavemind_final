@@ -393,4 +393,30 @@ router.get('/leaderboard', async (req, res) => {
   }
 });
 
+/**
+ * Eliminar cuenta de usuario (Permanente).
+ */
+router.delete('/delete-account', authenticate, async (req, res) => {
+  try {
+    const usuarioId = req.usuario.id;
+
+    // Eliminar el usuario (Prisma se encarga de Favoritos/Valoraciones por Cascade)
+    await prisma.usuario.delete({
+      where: { id: usuarioId }
+    });
+
+    // Limpiar cookie de sesión
+    res.clearCookie('quave_token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax'
+    });
+
+    res.json({ status: 'ok', mensaje: 'Tu cuenta ha sido eliminada permanentemente de la red Quave.' });
+  } catch (error) {
+    console.error('Error al eliminar cuenta:', error);
+    res.status(500).json({ status: 'error', mensaje: 'No se pudo eliminar la cuenta. Error en el servidor central.' });
+  }
+});
+
 export default router;

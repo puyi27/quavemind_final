@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   MdPerson,
   MdEdit,
@@ -45,7 +45,8 @@ const LoadingState = () => (
 
 export default function PerfilUsuario() {
   const { id } = useParams();
-  const { user: authUser, updateUser } = useAuthStore();
+  const navigate = useNavigate();
+  const { user: authUser, updateUser, logout } = useAuthStore();
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -133,6 +134,27 @@ export default function PerfilUsuario() {
       setEditData(prev => ({ ...prev, avatar: base64String }));
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleDeleteAccount = async () => {
+    const confirmacion = window.confirm("¿ESTÁS SEGURO? Esta acción es irreversible y eliminará permanentEMENTE tu historial de puntos, favoritos y valoraciones de la red Quave.");
+    
+    if (confirmacion) {
+      const confirmacionFinal = window.prompt("Para confirmar la eliminación permanente, escribe tu nombre de usuario:");
+      
+      if (confirmacionFinal === userProfile.username) {
+        try {
+          await fetchOptimizer.delete('/auth/delete-account');
+          logout(); // Limpiar estado global
+          navigate('/');
+          alert('Cuenta eliminada con éxito. Desconexión del terminal completada.');
+        } catch (err) {
+          alert('Error crítico al intentar purgar el expediente. Reintenta más tarde.');
+        }
+      } else if (confirmacionFinal !== null) {
+        alert('Nombre de usuario incorrecto. Abortando purga de datos.');
+      }
+    }
   };
 
   const handleStartEdit = () => {
@@ -332,9 +354,16 @@ export default function PerfilUsuario() {
                   />
                 </div>
               </div>
-              <div className="pt-6">
-                <button type="submit" className="w-full py-5 bg-[#ff6b00] text-black font-black uppercase rounded-2xl hover:bg-white transition-all transform hover:scale-[1.02]">
+              <div className="pt-6 flex flex-col sm:flex-row gap-4">
+                <button type="submit" className="flex-1 py-5 bg-[#ff6b00] text-black font-black uppercase rounded-2xl hover:bg-white transition-all transform hover:scale-[1.02]">
                   Sincronizar Cambios
+                </button>
+                <button 
+                  type="button" 
+                  onClick={handleDeleteAccount}
+                  className="px-8 py-5 bg-red-900/20 border border-red-500/30 text-red-500 font-black uppercase rounded-2xl hover:bg-red-500 hover:text-white transition-all"
+                >
+                  Borrar Usuario
                 </button>
               </div>
             </form>
