@@ -33,7 +33,7 @@ router.get('/diarias', async (req, res) => {
     const token = await getSpotifyToken();
     const headers = { Authorization: `Bearer ${token}` };
     
-    const queries = ['genre:"trap latino"', 'genre:"reggaeton"', 'genre:"urbano español"', 'genre:"pop latino"', 'genre:"trap español"'];
+    const queries = ['trap latino', 'reggaeton', 'urbano español', 'pop latino'];
     const query = queries[seed % queries.length];
     
     // Ejecutamos en paralelo para mayor velocidad
@@ -43,37 +43,7 @@ router.get('/diarias', async (req, res) => {
     ]);
 
     const trackItems = dataTracks?.tracks?.items || [];
-    
-    // Filtrado estricto para asegurar que son ÁLBUMES reales de artistas y no recopilatorios/playlists
-    const albumItems = (dataAlbums?.albums?.items || []).filter(a => {
-      if (a.album_type !== 'album') return false;
-      if (!a.images || a.images.length === 0) return false;
-      
-      const name = a.name.toLowerCase();
-      const isVarious = a.artists.some(art => 
-        art.name.toLowerCase().includes('various artists') || 
-        art.name.toLowerCase() === 'varios artistas' ||
-        art.name.toLowerCase() === 'vários artistas'
-      );
-      
-      if (isVarious) return false;
-
-      // Palabras clave que suelen indicar recopilatorios o playlists empaquetadas como álbumes
-      const compilationKeywords = [
-        'hits', 'best of', 'essential', 'recopilatorio', 'antología', 
-        'greatest', 'colección', 'collection', 'vol.', 'volume', 
-        'lo mejor de', 'exitos', 'éxitos', 'sus mejores', 'lo mejor',
-        'karaoke', 'tributo', 'tribute', 'remixes', 'remix'
-      ];
-
-      const isCompilation = compilationKeywords.some(keyword => name.includes(keyword));
-      if (isCompilation) return false;
-
-      // Si tiene demasiados artistas principales y no es un artista conocido, suele ser un recopilatorio de sello
-      if (a.artists.length > 3) return false;
-
-      return true;
-    });
+    const albumItems = (dataAlbums?.albums?.items || []).filter(a => a.album_type === 'album');
 
     const cancionDelDia = selectWithSeed(trackItems.map(item => ({
       id: item.id,
