@@ -33,6 +33,7 @@ const selectWithSeed = (array, seed, offset = 0) => {
 };
 
 const ARTISTAS = [
+  // URBANO LATINO / REGGAETON / TRAP (Existentes + Refuerzos)
   'Bad Bunny', 'Karol G', 'Feid', 'Rauw Alejandro', 'Ozuna', 'Anuel AA',
   'Myke Towers', 'Mora', 'Eladio Carrion', 'Jhayco', 'Sech', 'Dalex',
   'Duki', 'Bizarrap', 'Trueno', 'Milo J', 'Nicki Nicole', 'Emilia',
@@ -46,8 +47,22 @@ const ARTISTAS = [
   'Wisín & Yandel', 'Don Omar', 'Tego Calderon', 'Ivy Queen', 'Zion & Lennox',
   'Plan B', 'Ñengo Flow', 'Farruko', 'Justin Quiles', 'Luar La L', 'Hovicky',
   'Youngchimi', 'Brytiago', 'Noriel', 'Jon Z', 'Darell', 'Pusho', 'Mikie Woodz',
-  'Beny Jr', 'Lucho RK'
+  'Beny Jr', 'Lucho RK', 'Young Miko', 'Dei V', 'Omar Courtz',
+
+  // HIP HOP ESPAÑA
+  'Kase.O', 'Nach', 'SFDK', 'Mala Rodriguez', 'Ayax y Prok', 'Foyone', 'Hard GZ', 
+  'Fernandocosta', 'Natos y Waor', 'Jarfaiter', 'ToteKing', 'Sho-Hai', 'Violadores del Verso',
+  'El Piezas', 'Rayden', 'Sharif', 'Rapsusklei', 'Falsalarma', 'Juancho Marqués', 'Recycled J',
+  '7 Notas 7 Colores', 'CPV', 'Chojin', 'Duo Kie', 'Hablando en Plata', 'Capaz',
+
+  // HIP HOP / RAP LATAM
+  'Acru', 'Akapellah', 'Nanpa Básico', 'Homer el Mero Mero', 'Canserbero', 'Residente', 
+  'Calle 13', 'Santa Fe Klan', 'Gera MX', 'Alemán', 'Cartel de Santa', 'Lil Supa', 
+  'Apache', 'Rxnde Akozta', 'Alcolirykoz', 'Movimiento Original', 'Portavoz', 
+  'Tiro de Gracia', 'Ana Tijoux', 'Control Machete', 'Caballeros del Plan G'
 ];
+
+
 
 const getTracksWithPreview = async (isDaily, seed) => {
   const shuffled = isDaily

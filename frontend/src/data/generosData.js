@@ -89,7 +89,9 @@ export const GENEROS_DATA = {
       establecidos: [
         'Nach', 'Kase.O', 'Wos', 'Residente', 'Calle 13',
         'Foyone', 'SFDK', 'Toteking', 'Shotta', 'Elphomega',
-        'Rapsusklei', 'Kultama', 'Gata Cattana', 'Bejo', 'Soto Asa'
+        'Rapsusklei', 'Kultama', 'Gata Cattana', 'Bejo', 'Soto Asa',
+        'Canserbero', 'Lil Supa', 'Akapellah', 'Apache', 'Acru',
+        'CPV', '7 Notas 7 Colores', 'Hablando en Plata', 'Duo Kie', 'Control Machete'
       ],
       emergentes: [
         'Recycled J', 'Cruz Cafuné', 'Juancho Marqués', 'Kaze',

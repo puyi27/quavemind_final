@@ -521,6 +521,58 @@ export const albumCluePool = [
       'La figura central es Daddy Yankee.',
     ],
   },
+  {
+    id: 'lujo-iberico',
+    answer: 'Lujo Iberico',
+    artist: 'Mala Rodriguez',
+    coverQuery: 'Lujo Iberico Mala Rodriguez',
+    clues: [
+      'Es un disco fundacional que mezclo por primera vez el rap con el quejio y el duende flamenco.',
+      'Representa la fuerza femenina en una escena que entonces era casi exclusivamente masculina.',
+      'Incluye temas como Tengo un Trato, La Cocinera y En mi Ciudad de Malaga.',
+      'Se publico en el ano 2000 y cambio las reglas del juego en Espana.',
+      'La artista principal es Mala Rodriguez.',
+    ],
+  },
+  {
+    id: 'hecho-es-simple',
+    answer: 'Hecho, es Simple',
+    artist: '7 Notas 7 Colores',
+    coverQuery: 'Hecho es Simple 7 Notas 7 Colores',
+    clues: [
+      'Es considerado por muchos como el disco que profesionalizo el sonido del rap en Espana.',
+      'Mucho Muchacho marca aqui un estilo de flow chulo, directo y muy influenciado por NY.',
+      'Produccion a cargo de Dive Dibosso con samples crudos y ritmos pesados.',
+      'Contiene el himno Puercos y el tema homonimo del disco.',
+      'El grupo liderado por Mucho Muchacho es 7 Notas 7 Colores.',
+    ],
+  },
+  {
+    id: 'el-circulo',
+    answer: 'El Circulo',
+    artist: 'Kase.O',
+    coverQuery: 'El Circulo Kase.O',
+    clues: [
+      'Es el esperado regreso en solitario de la voz mas respetada del rap en espanol.',
+      'Se mueve entre la introspeccion profunda, el jazz y la pureza del hip hop.',
+      'Temas como Esto No Para, Yemen y Mazas y Catapultas definen su sonido.',
+      'No es un disco de grupo, sino el manifiesto personal de Javier Ibarra.',
+      'La firma es de Kase.O.',
+    ],
+  },
+  {
+    id: 'vicios-y-virtudes',
+    answer: 'Vicios y Virtudes',
+    artist: 'Violadores del Verso',
+    coverQuery: 'Vicios y Virtudes Violadores del Verso',
+    clues: [
+      'Es un pilar fundamental del rap en espanol de principios de los 2000.',
+      'Zaragoza es el centro de gravedad de este proyecto cargado de barras tecnicas.',
+      'R de Rumba firma una produccion oscura y clasica de boom bap.',
+      'Contiene cortes como Vivir para Contarlo (tema homonimo posterior pero aqui destaca la esencia) y Vicios y Virtudes.',
+      'El grupo responsable es Violadores del Verso.',
+    ],
+  },
 ];
 
 export const coverRevealPool = albumCluePool
@@ -596,6 +648,37 @@ export const songdlePool = [
     answer: 'Mala Mujer',
     artist: 'C. Tangana',
     query: 'Mala Mujer C. Tangana',
+  },
+  {
+    id: 'jeremias-17-5',
+    answer: 'Jeremias 17 5',
+    artist: 'Canserbero',
+    query: 'Jeremias 17:5 Canserbero',
+    acceptedAnswers: ['Jeremias 17:5'],
+  },
+  {
+    id: 'un-dia-en-suburbia',
+    answer: 'Un Dia en Suburbia',
+    artist: 'Nach',
+    query: 'Un Dia en Suburbia Nach',
+  },
+  {
+    id: 'que-no-hay-alcohol',
+    answer: 'Que No Hay Alcohol',
+    artist: 'Kase.O',
+    query: 'Que No Hay Alcohol Kase.O',
+  },
+  {
+    id: 'el-liricista-en-el-tejado',
+    answer: 'El Liricista en el Tejado',
+    artist: 'SFDK',
+    query: 'El Liricista en el Tejado SFDK',
+  },
+  {
+    id: 'puresa',
+    answer: 'Puresa',
+    artist: 'Ayax',
+    query: 'Puresa Ayax',
   },
   {
     id: 'muriendo-de-envidia',

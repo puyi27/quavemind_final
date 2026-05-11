@@ -11,7 +11,10 @@ export const ESCENAS_DATA = {
       establecidos: [
         'C. Tangana', 'Bad Gyal', 'Dellafuente', 'Quevedo', 'Saiko', 
         'Morad', 'Kidd Keo', 'Rels B', 'Omar Montes', 'Cruz Cafuné',
-        'Maikel Delacalle', 'Recycled J', 'Lola Indigo', 'Aitana', 'Yung Beef'
+        'Maikel Delacalle', 'Recycled J', 'Lola Indigo', 'Aitana', 'Yung Beef',
+        'Kase.O', 'Nach', 'SFDK', 'Mala Rodriguez', 'Ayax y Prok', 'Foyone',
+        'Hard GZ', 'Fernandocosta', 'Natos y Waor', 'ToteKing', 'Sho-Hai',
+        'CPV', '7 Notas 7 Colores', 'Hablando en Plata', 'Duo Kie', 'Chojin'
       ],
       emergentes: [
         'JC Reyes', 'Abhir Hathi', 'Bb trickz', 'Judeline', 'La Zowi',
@@ -58,7 +61,8 @@ export const ESCENAS_DATA = {
       establecidos: [
         'Duki', 'Bizarrap', 'Nicki Nicole', 'Trueno', 'Wos', 'Khea',
         'Lit Killah', 'Tiago PZK', 'Rusherking', 'Maria Becerra',
-        'Emilia', 'Tini', 'Lali', 'Cazzu', 'Ysy A', 'Neo Pistea', 'Milo j'
+        'Emilia', 'Tini', 'Lali', 'Cazzu', 'Ysy A', 'Neo Pistea', 'Milo j',
+        'Acru', 'Homer el Mero Mero', 'C.R.O'
       ],
       emergentes: [
         'La Joaqui', 'Rei', 'Callejero Fino', 'BM', 'Luck Ra',
@@ -388,7 +392,7 @@ export const ESCENAS_DATA = {
     artistas: {
       establecidos: [
         'Bad Bunny (Miami based)', 'Eladio Carrion (USA/PR)', 'Nicky Jam', 'Farruko',
-        'De La Ghetto', 'Pitbull', 'Becky G', 'Camila Cabello'
+        'De La Ghetto', 'Pitbull', 'Becky G', 'Camila Cabello', 'Snow Tha Product', 'Fuego'
       ],
       emergentes: [
         'Fuego', 'Messiah', 'Lito Kirino'
