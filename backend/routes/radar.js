@@ -80,15 +80,15 @@ router.get('/diario', async (req, res) => {
       const [artistasPopulares, artistasUnder, canciones, albumes] = await Promise.all([
         // Artistas populares (>70 popularidad)
         prisma.$queryRaw`
-          SELECT * FROM "Artista" WHERE popularidad > 70 ORDER BY popularidad DESC LIMIT 50
+          SELECT id, nombre, imagen, popularidad, seguidores, generos FROM "Artista" WHERE popularidad > 70 ORDER BY popularidad DESC LIMIT 50
         `.catch(() => []),
         // Artistas under (<50 popularidad)
         prisma.$queryRaw`
-          SELECT * FROM "Artista" WHERE popularidad < 50 OR popularidad IS NULL ORDER BY RANDOM() LIMIT 100
+          SELECT id, nombre, imagen, popularidad, seguidores, generos FROM "Artista" WHERE popularidad < 50 OR popularidad IS NULL ORDER BY RANDOM() LIMIT 100
         `.catch(() => []),
         // Canciones con letra
         prisma.$queryRaw`
-          SELECT c.*, a.nombre as artista_nombre, al.imagen as album_imagen
+          SELECT c.id, c.nombre, c.duracion_ms, c.preview_url, a.nombre as artista_nombre, al.imagen as album_imagen
           FROM "Cancion" c
           LEFT JOIN "CancionArtista" ca ON ca."cancionId" = c.id AND ca."esPrincipal" = true
           LEFT JOIN "Artista" a ON a.id = ca."artistaId"
@@ -97,7 +97,7 @@ router.get('/diario', async (req, res) => {
         `.catch(() => []),
         // Álbumes recientes
         prisma.$queryRaw`
-          SELECT al.*, ar.nombre as artista_nombre
+          SELECT al.id, al.nombre, al.imagen, al.fecha, ar.nombre as artista_nombre
           FROM "Album" al
           JOIN "Artista" ar ON ar.id = al."artistaId"
           ORDER BY al.fecha DESC NULLS LAST
@@ -146,7 +146,7 @@ router.get('/diario', async (req, res) => {
     const [artistaDestacado, descubrimientoUnder, cancionDelDia, albumDelDia, trending] = await Promise.all([
       // Artista destacado
       seleccion.artistaDestacadoId ? prisma.$queryRaw`
-        SELECT a.*, 
+        SELECT a.id, a.nombre, a.imagen, a.popularidad, a.seguidores, a.generos, a.biografia, a.spotifyUrl,
           (SELECT COUNT(*) FROM "Album" WHERE "artistaId" = a.id) as total_albumes,
           (SELECT COUNT(*) FROM "CancionArtista" ca JOIN "Cancion" c ON c.id = ca."cancionId" WHERE ca."artistaId" = a.id) as total_canciones
         FROM "Artista" a WHERE a.id = ${seleccion.artistaDestacadoId}
@@ -154,12 +154,12 @@ router.get('/diario', async (req, res) => {
       
       // Descubrimiento under
       seleccion.descubrimientoUnderId ? prisma.$queryRaw`
-        SELECT a.* FROM "Artista" a WHERE a.id = ${seleccion.descubrimientoUnderId}
+        SELECT a.id, a.nombre, a.imagen, a.popularidad, a.seguidores, a.generos FROM "Artista" a WHERE a.id = ${seleccion.descubrimientoUnderId}
       `.catch(() => []) : [],
       
       // Canción del día
       seleccion.cancionDelDiaId ? prisma.$queryRaw`
-        SELECT c.*, a.nombre as artista_nombre, al.imagen as album_imagen
+        SELECT c.id, c.nombre, c.duracion_ms, c.preview_url, a.nombre as artista_nombre, al.imagen as album_imagen
         FROM "Cancion" c
         LEFT JOIN "CancionArtista" ca ON ca."cancionId" = c.id AND ca."esPrincipal" = true
         LEFT JOIN "Artista" a ON a.id = ca."artistaId"
@@ -169,7 +169,7 @@ router.get('/diario', async (req, res) => {
       
       // Álbum del día
       seleccion.albumDelDiaId ? prisma.$queryRaw`
-        SELECT al.*, ar.nombre as artista_nombre, ar.imagen as artista_imagen
+        SELECT al.id, al.nombre, al.imagen, al.fecha, ar.nombre as artista_nombre, ar.imagen as artista_imagen
         FROM "Album" al
         JOIN "Artista" ar ON ar.id = al."artistaId"
         WHERE al.id = ${seleccion.albumDelDiaId}
@@ -177,13 +177,13 @@ router.get('/diario', async (req, res) => {
 
       // Trending
       prisma.$queryRaw`
-        SELECT c.*, a.nombre as artista_nombre, COUNT(an.id) as num_anotaciones
+        SELECT c.id, c.nombre, a.nombre as artista_nombre, COUNT(an.id) as num_anotaciones
         FROM "Cancion" c
         JOIN "Anotacion" an ON an."cancionId" = c.id
         JOIN "CancionArtista" ca ON ca."cancionId" = c.id AND ca."esPrincipal" = true
         JOIN "Artista" a ON a.id = ca."artistaId"
         WHERE an."createdAt" > NOW() - INTERVAL '7 days'
-        GROUP BY c.id, a.nombre
+        GROUP BY c.id, c.nombre, a.nombre
         ORDER BY num_anotaciones DESC
         LIMIT 5
       `.catch(() => [])

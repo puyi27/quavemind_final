@@ -118,6 +118,7 @@ router.get('/recomendaciones/:artistId', async (req, res) => {
         id: a.id,
         nombre: a.name,
         imagen: a.images?.[0]?.url,
+        imagen_small: a.images?.[2]?.url || a.images?.[1]?.url || a.images?.[0]?.url,
         seguidores: a.followers?.total,
         popularidad: a.popularity
       })),
@@ -125,6 +126,7 @@ router.get('/recomendaciones/:artistId', async (req, res) => {
         id: t.id,
         nombre: t.name,
         imagen: t.album?.images?.[0]?.url,
+        album_imagen_small: t.album?.images?.[2]?.url || t.album?.images?.[1]?.url || t.album?.images?.[0]?.url,
         artista: t.artists?.[0]?.name,
         preview: t.preview_url
       }))
@@ -203,6 +205,7 @@ router.get('/buscar', async (req, res) => {
       id: a.id,
       nombre: a.name,
       imagen: a.images?.[0]?.url || '/default.png',
+      imagen_small: a.images?.[2]?.url || a.images?.[1]?.url || a.images?.[0]?.url || '/default.png',
       popularidad: a.popularity || 0,
       seguidores: a.followers?.total || 0,
       generos: a.genres || [],
@@ -215,6 +218,7 @@ router.get('/buscar', async (req, res) => {
       artista: t.artists?.[0]?.name,
       artistas: (t.artists || []).map(a => ({ id: a.id, nombre: a.name })),
       imagen: t.album?.images?.[0]?.url || '/default.png',
+      album_imagen_small: t.album?.images?.[2]?.url || t.album?.images?.[1]?.url || t.album?.images?.[0]?.url || '/default.png',
       preview: t.preview_url,
       duracion: t.duration_ms,
       spotifyUrl: t.external_urls?.spotify
@@ -225,6 +229,7 @@ router.get('/buscar', async (req, res) => {
       nombre: a.name,
       artista: a.artists?.[0]?.name,
       imagen: a.images?.[0]?.url || '/default.png',
+      imagen_small: a.images?.[2]?.url || a.images?.[1]?.url || a.images?.[0]?.url || '/default.png',
       fecha: a.release_date?.substring(0, 4) || '',
       spotifyUrl: a.external_urls?.spotify
     }));

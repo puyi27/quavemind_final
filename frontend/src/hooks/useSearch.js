@@ -137,12 +137,7 @@ export const useSearch = (query, tipo) => {
         }
 
         setHasSearched(true);
-
-        const timeout = setTimeout(() => {
-            buscarTodo();
-        }, 400);
-
-        return () => clearTimeout(timeout);
+        buscarTodo();
     }, [query, tipo]);
 
     const clearSearch = () => {

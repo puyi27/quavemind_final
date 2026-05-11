@@ -1,17 +1,33 @@
 import { Link } from 'react-router-dom';
 import { MdPerson, MdVerified } from 'react-icons/md';
+import { useQueryClient } from '@tanstack/react-query';
+import { musicService } from '../../services/musicService';
 
 export default function ArtistCard({ artist, featured = false }) {
+  const queryClient = useQueryClient();
+
+  const handlePrefetch = () => {
+    queryClient.prefetchQuery({
+      queryKey: ['artista', artist.id],
+      queryFn: () => musicService.getArtista(artist.id),
+      staleTime: 60000,
+    });
+  };
+
+  const displayImage = artist.imagen_small || artist.imagen || '/placeholder-artist.jpg';
+
   return (
     <Link 
       to={`/artista/${artist.id}`}
+      onMouseEnter={handlePrefetch}
       className={`group block ${featured ? 'col-span-2 row-span-2' : ''}`}
     >
       <div className="neo-card overflow-hidden h-full">
         <div className="relative aspect-square overflow-hidden">
           <img
-            src={artist.imagen || '/placeholder-artist.jpg'}
+            src={displayImage}
             alt={artist.nombre}
+            loading="lazy"
             className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />

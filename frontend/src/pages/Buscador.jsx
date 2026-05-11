@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
   MdSearch, MdFilterList, MdPerson, MdAlbum, MdMusicNote,
@@ -6,11 +6,16 @@ import {
   MdPlayArrow
 } from 'react-icons/md';
 import { useSearch } from '../hooks/useSearch';
+import { useDebounce } from '../hooks/useDebounce';
 
 export default function Buscador() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [query, setQuery] = useState('');
   const [tipo, setTipo] = useState('todos');
+  const [isPending, startTransition] = useTransition();
+
+  // Debounce de 500ms para no saturar la API mientras se escribe
+  const debouncedQuery = useDebounce(query, 500);
 
   const {
     artistas,
@@ -23,7 +28,7 @@ export default function Buscador() {
     error,
     hasSearched,
     clearSearch
-  } = useSearch(query, tipo);
+  } = useSearch(debouncedQuery, tipo);
 
   useEffect(() => {
     const q = searchParams.get('q');
@@ -36,11 +41,14 @@ export default function Buscador() {
     const newValue = e.target.value;
     setQuery(newValue);
 
-    if (newValue.length >= 2) {
-      setSearchParams({ q: newValue }, { replace: true });
-    } else {
-      setSearchParams({}, { replace: true });
-    }
+    // Envolvemos la actualización de la URL en una transición para mantener la fluidez
+    startTransition(() => {
+      if (newValue.length >= 2) {
+        setSearchParams({ q: newValue }, { replace: true });
+      } else {
+        setSearchParams({}, { replace: true });
+      }
+    });
   };
 
   const handleClear = () => {

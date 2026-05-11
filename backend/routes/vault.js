@@ -12,6 +12,14 @@ router.get('/valoraciones', authenticate, async (req, res) => {
   try {
     const valoraciones = await prisma.valoracion.findMany({
       where: { usuarioId: req.usuario.id },
+      select: {
+        id: true,
+        itemId: true,
+        tipo: true,
+        rating: true,
+        snapshot: true,
+        updatedAt: true
+      },
       orderBy: { updatedAt: 'desc' }
     });
     res.json({ status: 'ok', valoraciones });
@@ -93,6 +101,13 @@ router.post('/valoraciones', authenticate, async (req, res) => {
     try {
       const favoritos = await prisma.favorito.findMany({
         where: { usuarioId: req.usuario.id },
+        select: {
+          id: true,
+          itemId: true,
+          tipo: true,
+          snapshot: true,
+          createdAt: true
+        },
         orderBy: { createdAt: 'desc' }
       });
       res.json({ status: 'ok', favoritos });

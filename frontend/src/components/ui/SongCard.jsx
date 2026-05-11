@@ -1,7 +1,19 @@
 import { Link } from 'react-router-dom';
 import { MdPlayArrow, MdPause, MdExplicit } from 'react-icons/md';
+import { useQueryClient } from '@tanstack/react-query';
+import { musicService } from '../../services/musicService';
 
 export default function SongCard({ song, showAlbum = true, compact = false }) {
+  const queryClient = useQueryClient();
+
+  const handlePrefetch = () => {
+    queryClient.prefetchQuery({
+      queryKey: ['cancion', song.id],
+      queryFn: () => musicService.getCancion(song.id),
+      staleTime: 60000,
+    });
+  };
+
   const formatDuration = (ms) => {
     const minutes = Math.floor(ms / 60000);
     const seconds = Math.floor((ms % 60000) / 1000);
@@ -12,13 +24,15 @@ export default function SongCard({ song, showAlbum = true, compact = false }) {
     return (
       <Link 
         to={`/cancion/${song.id}`}
+        onMouseEnter={handlePrefetch}
         className="group flex items-center gap-3 p-3 bg-[var(--bg-card)] border-2 border-[var(--border-primary)] hover:border-[var(--color-quave-orange)] transition-all"
         style={{ boxShadow: 'var(--shadow-neo)' }}
       >
         <div className="relative w-12 h-12 overflow-hidden flex-shrink-0">
           <img
-            src={song.album_imagen || '/placeholder-album.jpg'}
+            src={song.album_imagen_small || song.album_imagen || '/placeholder-album.jpg'}
             alt={song.nombre}
+            loading="lazy"
             className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all"
           />
           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -45,13 +59,15 @@ export default function SongCard({ song, showAlbum = true, compact = false }) {
   return (
     <Link 
       to={`/cancion/${song.id}`}
+      onMouseEnter={handlePrefetch}
       className="group block bg-[var(--bg-card)] border-2 border-[var(--border-primary)] hover:border-[var(--color-quave-orange)] transition-all hover:-translate-y-1"
       style={{ boxShadow: 'var(--shadow-neo)' }}
     >
       <div className="relative aspect-square overflow-hidden">
         <img
-          src={song.album_imagen || '/placeholder-album.jpg'}
+          src={song.album_imagen_small || song.album_imagen || '/placeholder-album.jpg'}
           alt={song.nombre}
+          loading="lazy"
           className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105 grayscale group-hover:grayscale-0"
         />
         

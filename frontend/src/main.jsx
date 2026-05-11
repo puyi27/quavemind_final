@@ -9,7 +9,9 @@ import './index.css'
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      refetchOnWindowFocus: false,
+      staleTime: 1000 * 60 * 5, // 5 minutos: la info se considera fresca
+      gcTime: 1000 * 60 * 10,   // 10 minutos de vida en la memoria
+      refetchOnWindowFocus: false, // para que no recargue al cambiar de pestaña
       retry: 1,
     },
   },

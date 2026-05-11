@@ -1,3 +1,5 @@
+import { getCachedData, cacheData } from './redis.js';
+
 const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 const SPOTIFY_TOKEN_URL = 'https://accounts.spotify.com/api/token';
@@ -38,12 +40,19 @@ export const getSpotifyToken = async () => {
 };
 
 export const fetchJsonWithRetry = async (url, options = {}, retries = 1) => {
+  const isGet = !options.method || options.method.toUpperCase() === 'GET';
+  const cacheKey = isGet ? `spotify_cache:${url}` : null;
+
+  if (cacheKey) {
+    const cached = await getCachedData(cacheKey);
+    if (cached) return cached;
+  }
+
   let lastError = null;
   for (let attempt = 0; attempt <= retries; attempt += 1) {
     try {
       const response = await fetch(url, options);
       
-      // Manejar respuestas sin contenido (204 No Content)
       if (response.status === 204) return null;
 
       const contentType = response.headers.get('content-type');
@@ -61,17 +70,21 @@ export const fetchJsonWithRetry = async (url, options = {}, retries = 1) => {
 
       if (!response.ok) {
         const message = data?.error?.message || data?.mensaje || `HTTP ${response.status}`;
-        // Reintentar solo en errores temporales (429 o 5xx)
         if ((response.status === 429 || response.status >= 500) && attempt < retries) {
           continue;
         }
         throw new Error(message);
       }
+
+      // Cachear resultados exitosos de GET por 1 hora
+      if (cacheKey && data) {
+        await cacheData(cacheKey, data, 3600);
+      }
+
       return data;
     } catch (error) {
       lastError = error;
       if (attempt >= retries) throw lastError;
-      // Pequeña espera antes de reintentar
       await new Promise(resolve => setTimeout(resolve, 500 * (attempt + 1)));
     }
   }
