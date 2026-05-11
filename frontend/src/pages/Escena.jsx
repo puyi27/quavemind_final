@@ -18,6 +18,7 @@ export default function Escena() {
   const [artistasEmergentes, setArtistasEmergentes] = useState([]);
   const [artistasMujeres, setArtistasMujeres] = useState([]);
   const [canciones, setCanciones] = useState([]);
+  const [cancionesDescubrimiento, setCancionesDescubrimiento] = useState([]);
   const [albumes, setAlbumes] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -111,12 +112,22 @@ export default function Escena() {
         
         try {
            const [hitsRes, albRes] = await Promise.all([
-             Promise.all(top2.map(art => api.get(`/music/buscar?q=${encodeURIComponent(art.nombre)}&tipo=track&limit=5`).then(r => r.data?.resultados?.canciones || []).catch(() => []))),
-             Promise.all(top2.map(art => api.get(`/music/buscar?q=${encodeURIComponent(art.nombre)}&tipo=album&limit=4`).then(r => r.data?.resultados?.albumes || []).catch(() => [])))
+             Promise.all(top2.map(art => api.get(`/music/buscar?q=${encodeURIComponent(art.nombre)}&tipo=track&limit=5`).then(r => r.data?.canciones || []).catch(() => []))),
+             Promise.all(top2.map(art => api.get(`/music/buscar?q=${encodeURIComponent(art.nombre)}&tipo=album&limit=4`).then(r => r.data?.albumes || []).catch(() => [])))
            ]);
            
            setCanciones(hitsRes.flat().slice(0, 10));
            setAlbumes(albRes.flat().slice(0, 8));
+
+           // Cargar canciones de descubrimiento por género
+           if (info.generos && info.generos.length > 0) {
+             const randomGenre = info.generos[Math.floor(Math.random() * info.generos.length)];
+             api.get(`/music/buscar?q=genre:"${encodeURIComponent(randomGenre)}"&tipo=track&limit=12`)
+               .then(res => {
+                 setCancionesDescubrimiento(res.data?.canciones || []);
+               })
+               .catch(() => {});
+           }
         } catch (e) {
            console.warn('[Escena] Error hits/álbumes:', e);
            setCanciones([]); setAlbumes([]);
@@ -267,6 +278,42 @@ export default function Escena() {
                         <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mt-1">{(a.seguidores / 1000000).toFixed(1)}M SEGUIDORES</p>
                       </Link>
                     ))}
+                  </div>
+                </div>
+              )}
+
+              {/* DISCOVERY SONGS */}
+              {cancionesDescubrimiento.length > 0 && (
+                <div className="relative overflow-hidden bg-gradient-to-br from-[#111] to-[#050505] rounded-[3rem] p-10 md:p-16 border border-[#ff6b00]/20">
+                   <div className="absolute top-0 right-0 w-64 h-64 bg-[#ff6b00]/5 blur-[80px] rounded-full" />
+                   <div className="relative z-10">
+                    <div className="flex items-center justify-between mb-10">
+                      <div className="flex items-center gap-4">
+                        <div className="p-3 bg-[#ff6b00]/10 rounded-2xl">
+                          <MdGraphicEq className="text-3xl text-[#ff6b00]" />
+                        </div>
+                        <div>
+                          <h2 className="text-3xl font-black uppercase tracking-tighter">Exploración de Géneros</h2>
+                          <p className="text-[10px] font-black text-[#ff6b00] uppercase tracking-[0.2em] mt-1">Sonidos detectados en la escena de {info.nombre}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {cancionesDescubrimiento.map((c) => (
+                        <Link key={c.id} to={`/cancion/${c.id}`} className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/5 hover:border-[#ff6b00]/40 transition-all group">
+                          <div className="w-16 h-16 shrink-0 rounded-xl overflow-hidden shadow-lg">
+                            <img src={c.imagen} alt={c.nombre} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-black text-sm text-white truncate uppercase tracking-tight group-hover:text-[#ff6b00] transition-colors">{c.nombre}</h4>
+                            <p className="text-[10px] font-bold text-gray-500 truncate uppercase tracking-widest">{c.artista}</p>
+                          </div>
+                          <div className="p-2 bg-white/5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                            <MdPlayArrow className="text-xl text-[#ff6b00]" />
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
