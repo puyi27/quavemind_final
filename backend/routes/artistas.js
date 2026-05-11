@@ -57,54 +57,51 @@ router.get('/bulk', async (req, res) => {
     if (!nombresRaw) return res.json({ status: 'ok', artistas: [] });
     
     const names = nombresRaw.split(',').map((n) => n.trim()).filter(Boolean).slice(0, 40);
+    const cacheKey = `bulk_artists:${Buffer.from(names.join(',')).toString('base64')}`;
+    
+    const cachedBulk = await getCachedData(cacheKey);
+    if (cachedBulk) return res.json({ status: 'ok', artistas: cachedBulk });
+
     const token = await getSpotifyToken();
     const headers = { Authorization: `Bearer ${token}` };
+    const artistasRaw = [];
 
-    const results = await Promise.all(
-      names.map(async (name) => {
-        try {
-          const cacheKey = `search:artist:${name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')}`;
-          const cached = await getCachedData(cacheKey);
-          if (cached) return cached;
+    for (let i = 0; i < names.length; i += 5) {
+      const batch = names.slice(i, i + 5);
+      const batchResults = await Promise.all(
+        batch.map(async (name) => {
+          try {
+            const url = `${SPOTIFY_API_BASE}/search?q=artist:${encodeURIComponent(name)}&type=artist&limit=1`;
+            const response = await fetch(url, { headers });
+            const data = await response.json();
+            const artist = data.artists?.items?.[0];
+            if (!artist) return null;
+            return {
+              id: artist.id,
+              nombre: artist.name,
+              imagen: artist.images?.[0]?.url || '/default.png',
+              popularidad: artist.popularity || 0,
+              seguidores: artist.followers?.total || 0,
+              generos: artist.genres || [],
+              spotifyUrl: artist.external_urls?.spotify
+            };
+          } catch {
+            return null;
+          }
+        })
+      );
+      artistasRaw.push(...batchResults.filter(Boolean));
+    }
 
-          const url = `${SPOTIFY_API_BASE}/search?q=artist:${encodeURIComponent(name)}&type=artist&limit=1`;
-          const response = await fetch(url, { headers });
-          const data = await response.json();
-          const artist = data.artists?.items?.[0];
-          if (!artist) return null;
-          
-          const result = {
-            id: artist.id,
-            nombre: artist.name,
-            imagen: artist.images?.[0]?.url || '/default.png',
-            popularidad: artist.popularity || 0,
-            seguidores: artist.followers?.total || 0,
-            generos: artist.genres || [],
-            spotifyUrl: artist.external_urls?.spotify
-          };
-
-          await cacheData(cacheKey, result, 86400); // Cachear por 24h
-          return result;
-        } catch {
-          return null;
-        }
-      })
-    );
-
-    const artistasRaw = results.filter(Boolean);
-    
-    // Normalización de artistas si existe la utilidad
     let artistas = artistasRaw;
     try {
       const { normalizeArtistList } = await import('../lib/artistValidator.js');
       artistas = normalizeArtistList(artistasRaw, { scene: req.query.escena || req.query.scene });
-    } catch (e) {
-      console.warn('[Backend] normalizeArtistList no disponible en bulk:', e.message);
-    }
+    } catch (e) {}
     
+    await cacheData(cacheKey, artistas, 86400);
     return res.json({ status: 'ok', artistas });
   } catch (error) {
-    console.error('[Backend] Error en artistas bulk:', error.message);
     return res.status(500).json({ status: 'error', mensaje: error.message, artistas: [] });
   }
 });

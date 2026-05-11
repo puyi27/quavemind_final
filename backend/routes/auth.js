@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import prisma from '../db.js';
 import { authenticate } from '../middleware/auth.js';
+import { getCachedData, cacheData } from '../lib/redis.js';
 
 const router = express.Router();
 
@@ -350,45 +351,22 @@ router.get('/search', async (req, res) => {
  */
 router.get('/leaderboard', async (req, res) => {
   try {
-    // Intentar ordenar por quavePoints, si falla usar createdAt como fallback
-    let usuarios = [];
-    try {
-      usuarios = await prisma.usuario.findMany({
-        orderBy: { quavePoints: 'desc' },
-        select: {
-          id: true,
-          username: true,
-          quavePoints: true,
-          ubicacion: true,
-          avatar: true
-        },
-        take: 30
-      });
-    } catch (e) {
-      // Fallback si quavePoints no existe
-      usuarios = await prisma.usuario.findMany({
-        orderBy: { createdAt: 'desc' },
-        select: {
-          id: true,
-          username: true,
-          quavePoints: true,
-          ubicacion: true,
-          avatar: true
-        },
-        take: 30
-      });
-    }
+    const cached = await getCachedData('ranking_comunidad');
+    if (cached) return res.json({ status: 'ok', leaderboard: cached });
 
-    // Asegurar que cada usuario tenga quavePoints
-    const usuariosConPuntos = usuarios.map(u => ({
-      ...u,
-      quavePoints: u.quavePoints || 0
-    }));
+    const usuarios = await prisma.usuario.findMany({
+      orderBy: { quavePoints: 'desc' },
+      select: {
+        username: true,
+        avatar: true,
+        quavePoints: true
+      },
+      take: 50
+    });
 
-    res.json({ status: 'ok', leaderboard: usuariosConPuntos });
+    await cacheData('ranking_comunidad', usuarios, 300);
+    res.json({ status: 'ok', leaderboard: usuarios });
   } catch (error) {
-    console.error('Error en leaderboard:', error);
-    // Devolver array vacío en lugar de error 500
     res.json({ status: 'ok', leaderboard: [] });
   }
 });

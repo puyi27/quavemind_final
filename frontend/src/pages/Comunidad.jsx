@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   MdSearch, 
@@ -9,6 +9,7 @@ import {
 } from 'react-icons/md';
 import api from '../services/api';
 import RouteLoading from '../components/ui/RouteLoading';
+import { useDebounce } from '../hooks/useDebounce';
 
 const Comunidad = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -16,6 +17,9 @@ const Comunidad = () => {
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -35,7 +39,7 @@ const Comunidad = () => {
 
   useEffect(() => {
     const searchUsers = async () => {
-      if (searchTerm.length < 2) {
+      if (debouncedSearchTerm.length < 2) {
         setSearchResults([]);
         setIsSearching(false);
         return;
@@ -43,8 +47,11 @@ const Comunidad = () => {
 
       setIsSearching(true);
       try {
-        const res = await api.get(`/auth/search?q=${searchTerm}`);
-        setSearchResults(res.data.usuarios || []);
+        const res = await api.get(`/auth/search?q=${debouncedSearchTerm}`);
+        // Envolvemos la actualización de resultados en una transición
+        startTransition(() => {
+          setSearchResults(res.data.usuarios || []);
+        });
       } catch (err) {
         console.error('Error en búsqueda:', err);
       } finally {
@@ -52,9 +59,8 @@ const Comunidad = () => {
       }
     };
 
-    const timer = setTimeout(searchUsers, 500);
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
+    searchUsers();
+  }, [debouncedSearchTerm]);
 
   if (loading) return <RouteLoading />;
 
