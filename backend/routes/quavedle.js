@@ -62,8 +62,6 @@ const ARTISTAS = [
   'Tiro de Gracia', 'Ana Tijoux', 'Control Machete', 'Caballeros del Plan G'
 ];
 
-
-
 const getTracksWithPreview = async (isDaily, seed) => {
   const shuffled = isDaily
     ? ARTISTAS.slice(seed % ARTISTAS.length, (seed % ARTISTAS.length) + 8)
@@ -98,7 +96,6 @@ const getAlbumsFromDeezer = async (isDaily, seed) => {
     try {
       const resp = await safeFetch(`${DEEZER_API_BASE}/search/album?q=${encodeURIComponent(q)}&limit=30`);
       const data = await resp.json();
-      // Filtrar para asegurar que sean ÁLBUMES REALES (nb_tracks > 5) y no singles/EPs cortos
       const albums = (data.data || []).filter((a) => 
         a.cover_big && 
         a.title && 
@@ -121,12 +118,11 @@ const getArtistsFromDeezer = async (isDaily, seed) => {
   try {
     const resp = await safeFetch(`${DEEZER_API_BASE}/search/artist?q=${encodeURIComponent(q)}&limit=5`);
     const data = await resp.json();
-    // Filtramos para asegurar que el nombre coincida lo máximo posible y tenga relevancia
     return (data.data || []).filter((a) => 
       a.picture_big && 
       a.name && 
       (a.name.toLowerCase().includes(q.toLowerCase()) || q.toLowerCase().includes(a.name.toLowerCase())) &&
-      a.nb_fan > 50000 // Subimos el listón a 50k fans mínimo para evitar artistas totalmente desconocidos
+      a.nb_fan > 50000
     );
   } catch (e) {
     return [];
@@ -163,14 +159,13 @@ router.get('/:tipo', async (req, res) => {
 
     let activeType = tipo;
     if (tipo === 'maraton' || tipo === 'contrarreloj') {
-      const allTypes = ['songdle', 'album', 'artist', 'cover', 'lyrics'];
+      const allTypes = ['songdle', 'artist', 'cover', 'lyrics'];
       activeType = allTypes[Math.floor(Math.random() * allTypes.length)];
     }
 
     const seed = isDaily ? getSeedFromDate() : Math.floor(Math.random() * ARTISTAS.length * 1000);
     let challenge = null;
 
-    // Función para censurar nombres en las pistas
     const censurar = (texto, terminos = []) => {
       let resultado = texto;
       terminos.forEach(t => {
@@ -188,10 +183,7 @@ router.get('/:tipo', async (req, res) => {
       }
 
       const track = isDaily ? selectWithSeed(tracks, seed, 1) : tracks[Math.floor(Math.random() * tracks.length)];
-      
-      if (!track) {
-        return res.status(503).json({ status: 'error', mensaje: 'No se pudo seleccionar una canción. Reintenta.' });
-      }
+      if (!track) return res.status(503).json({ status: 'error', mensaje: 'No se pudo seleccionar una canción. Reintenta.' });
 
       if (activeType === 'songdle') {
         challenge = {
@@ -220,115 +212,40 @@ router.get('/:tipo', async (req, res) => {
           inicio: lyricsBlock?.inicio || 0,
         };
       }
-    } else if (activeType === 'album' || activeType === 'cover') {
-      let selectedItem = null;
-      let isTrack = false;
-
-      // Forzamos siempre ALBUM para el modo cover y album, ya que las canciones/singles son demasiado difíciles
+    } else if (activeType === 'cover') {
       const albums = await getAlbumsFromDeezer(isDaily, seed);
-      selectedItem = isDaily ? selectWithSeed(albums, seed, 2) : albums[Math.floor(Math.random() * albums.length)];
+      const selectedItem = isDaily ? selectWithSeed(albums, seed, 2) : albums[Math.floor(Math.random() * albums.length)];
 
       if (!selectedItem) {
         return res.status(503).json({ status: 'error', mensaje: 'No hay contenido disponible. Reintenta.' });
       }
 
       const artName = selectedItem.artist?.name || 'Artista Desconocido';
-
-      // Hidratar con datos reales del álbum/track
-      let tracklist = [];
       let releaseYear = selectedItem.release_date?.substring(0, 4) || '???';
-      let feats = [];
       let totalTracks = selectedItem.nb_tracks;
 
       try {
-        const detailUrl = isTrack
-          ? `${DEEZER_API_BASE}/track/${selectedItem.id}`
-          : `${DEEZER_API_BASE}/album/${selectedItem.id}`;
-        const detailResp = await safeFetch(detailUrl);
+        const detailResp = await safeFetch(`${DEEZER_API_BASE}/album/${selectedItem.id}`);
         const detailData = await detailResp.json();
-
-        if (isTrack) {
-          releaseYear = detailData.release_date?.substring(0, 4) || releaseYear;
-          feats = (detailData.contributors || [])
-            .filter(c => c.name !== artName && c.role !== 'Producer')
-            .map(c => c.name)
-            .slice(0, 3);
-        } else {
-          releaseYear = detailData.release_date?.substring(0, 4) || releaseYear;
-          totalTracks = detailData.nb_tracks || totalTracks;
-          tracklist = (detailData.tracks?.data || []).map(t => t.title).filter(Boolean);
-          // Colaboraciones: artistas distintos al principal en el álbum
-          feats = [...new Set(
-            (detailData.tracks?.data || [])
-              .map(t => t.artist?.name)
-              .filter(n => n && n !== artName)
-          )].slice(0, 4);
-        }
+        releaseYear = detailData.release_date?.substring(0, 4) || releaseYear;
+        totalTracks = detailData.nb_tracks || totalTracks;
       } catch (e) {}
 
-      // ─── PISTAS PROGRESIVAS (de más difícil a más fácil) ───────────────────
-      const clues = [];
-
-      if (isTrack) {
-        // Pistas para CANCIÓN
-        clues.push(
-          feats.length > 0
-            ? `COLABORACIÓN: Este tema cuenta con la participación de ${feats.join(' y ')}.`
-            : `TIPO: Es un sencillo lanzado sin colaboraciones.`
-        );
-        clues.push(`AÑO: Esta canción fue lanzada en ${releaseYear}.`);
-        clues.push(`ÁLBUM: Pertenece al proyecto "${censurar(selectedItem.album?.title || '???', [selectedItem.title, artName])}".`);
-        clues.push(`ARTISTA: El artista tiene ${artName.length} letras en su nombre artístico y empieza por "${artName.charAt(0)}".`);
-        clues.push(`ARTISTA REVELADO: Esta canción es de ${artName}.`);
-      } else if (activeType === 'cover') {
-        // PISTAS ESTRICTAS PARA PORTADA (Solicitadas por el usuario)
-        // 1. Año de lanzamiento y número de canciones
-        clues.push(`LANZAMIENTO: ${releaseYear} • ${totalTracks || '?'} CANCIONES`);
-        
-        // 2. Inicial del artista e inicial del álbum
-        const inicialArtista = artName.charAt(0).toUpperCase();
-        const inicialAlbum = selectedItem.title.charAt(0).toUpperCase();
-        clues.push(`INICIALES: ARTISTA "${inicialArtista}" • ÁLBUM "${inicialAlbum}"`);
-        
-        // 3. Nombre del artista
-        clues.push(`ARTISTA: ${artName}`);
-      } else {
-        // Pistas estándar para ÁLBUM
-        const trackHint = tracklist.length > 1
-          ? tracklist[Math.floor(Math.random() * Math.min(tracklist.length, 5))]
-          : null;
-        const trackHint2 = tracklist.length > 2
-          ? tracklist.find(t => t !== trackHint) || tracklist[tracklist.length - 1]
-          : null;
-
-        clues.push(
-          feats.length > 0
-            ? `COLABORACIONES: Este álbum incluye participaciones de ${feats.slice(0, 2).join(', ')}.`
-            : `TRACKLIST: Este álbum contiene ${totalTracks || 'varias'} canciones y no tiene colaboraciones externas.`
-        );
-        clues.push(`AÑO: Este proyecto fue lanzado en ${releaseYear}.`);
-        clues.push(
-          trackHint
-            ? `CANCIÓN INCLUIDA: Una de las canciones del álbum es "${censurar(trackHint, [selectedItem.title, artName])}".`
-            : `TAMAÑO: El álbum tiene ${totalTracks || '?'} pistas.`
-        );
-        clues.push(
-          trackHint2
-            ? `OTRA CANCIÓN: El álbum también incluye "${censurar(trackHint2, [selectedItem.title, artName])}".`
-            : `ARTISTA: Tiene ${artName.length} letras en el nombre, empieza por "${artName.charAt(0)}".`
-        );
-        clues.push(`ARTISTA REVELADO: Este álbum es de ${artName}.`);
-      }
+      const clues = [
+        `LANZAMIENTO: ${releaseYear} • ${totalTracks || '?'} CANCIONES`,
+        `INICIALES: ARTISTA "${artName.charAt(0).toUpperCase()}" • ÁLBUM "${selectedItem.title.charAt(0).toUpperCase()}"`,
+        `ARTISTA: ${artName}`
+      ];
 
       challenge = {
-        tipo: activeType,
+        tipo: 'cover',
         id: String(selectedItem.id),
         nombre: selectedItem.title,
-        artista: selectedItem.artist?.name || '?',
-        imagen: isTrack ? (selectedItem.album?.cover_big || selectedItem.album?.cover_medium) : selectedItem.cover_big,
+        artista: artName,
+        imagen: selectedItem.cover_big,
         fecha: releaseYear,
         clues,
-        esCancion: isTrack
+        esCancion: false
       };
     } else if (activeType === 'artist') {
       const artists = await getArtistsFromDeezer(isDaily, seed);

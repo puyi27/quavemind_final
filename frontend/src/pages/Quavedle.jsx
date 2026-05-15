@@ -14,14 +14,6 @@ const games = [
     shadow: 'hover:shadow-[0_0_40px_rgba(219,39,119,0.3)]'
   },
   {
-    slug: 'album',
-    title: 'ÁLBUM',
-    description: 'Adivina el disco usando pistas del artista y año.',
-    icon: <MdAlbum className="text-5xl text-white" />,
-    color: 'from-blue-600 to-cyan-600',
-    shadow: 'hover:shadow-[0_0_40px_rgba(6,182,212,0.3)]'
-  },
-  {
     slug: 'artist',
     title: 'ARTISTADLE',
     description: 'Descifra la foto pixelada. Se aclara con cada fallo.',

@@ -5,7 +5,6 @@ import api from '../services/api';
 
 const GAME_CONFIG = {
   songdle: { title: 'SONGDLE', color: 'from-purple-600 to-pink-600' },
-  album: { title: 'ÁLBUM', color: 'from-blue-600 to-cyan-600' },
   artist: { title: 'ARTISTADLE', color: 'from-green-600 to-emerald-600' },
   cover: { title: 'PORTADA', color: 'from-orange-600 to-red-600' },
   lyrics: { title: 'LYRICSDLE', color: 'from-pink-600 to-rose-600' },
@@ -105,7 +104,7 @@ export default function QuavedleGame() {
       setChallenge(nuevoReto);
       setGameState('playing');
     } catch (error) {
-      const tipoFallback = gameSlug === 'album' || gameSlug === 'cover' || gameSlug === 'artist' || gameSlug === 'lyrics'
+      const tipoFallback = gameSlug === 'cover' || gameSlug === 'artist' || gameSlug === 'lyrics'
         ? gameSlug
         : 'songdle';
       setChallenge({ ...FALLBACK_RETO, tipo: tipoFallback });
@@ -199,7 +198,7 @@ export default function QuavedleGame() {
     }
     
     if (!isCorrect && challenge?.tipo === 'lyrics') setLyricsRevealCount((prev) => prev + 1);
-    if (!isCorrect && (challenge?.tipo === 'cover' || challenge?.tipo === 'album' || challenge?.tipo === 'artist')) revealSquare(3);
+    if (!isCorrect && (challenge?.tipo === 'cover' || challenge?.tipo === 'artist')) revealSquare(3);
     setGuess('');
   };
 
@@ -266,11 +265,6 @@ export default function QuavedleGame() {
           </p>
         </>
       )}
-      {challenge?.tipo === 'album' && (
-        <p className="text-[#ff6b00] font-bold text-sm uppercase tracking-widest">
-          {challenge?.artista} • {challenge?.fecha}
-        </p>
-      )}
       {(challenge?.tipo === 'songdle' || challenge?.tipo === 'lyrics' || challenge?.tipo === 'cover') && (
         <p className="text-[#ff6b00] font-bold text-sm uppercase tracking-widest">
           {challenge?.artista}
@@ -321,7 +315,7 @@ export default function QuavedleGame() {
 
             {(gameSlug === 'maraton' || gameSlug === 'contrarreloj') && (
               <p className="text-center font-bold text-gray-500 uppercase tracking-widest text-xs mb-6 pb-4 border-b border-white/5">
-                OBJETIVO ACTUAL: ADIVINAR {challenge.tipo === 'artist' ? 'ARTISTA' : challenge.tipo === 'album' ? 'ÁLBUM' : challenge.tipo === 'lyrics' ? 'CANCIÓN (POR LETRA)' : 'CANCIÓN (POR AUDIO)'}
+                OBJETIVO ACTUAL: ADIVINAR {challenge.tipo === 'artist' ? 'ARTISTA' : challenge.tipo === 'lyrics' ? 'CANCIÓN (POR LETRA)' : 'CANCIÓN (POR AUDIO)'}
               </p>
             )}
 
@@ -340,7 +334,7 @@ export default function QuavedleGame() {
               </div>
             )}
 
-            {(challenge.tipo === 'album' || challenge.tipo === 'artist' || challenge.tipo === 'cover') && (
+            {(challenge.tipo === 'artist' || challenge.tipo === 'cover') && (
               <div className="text-center py-2">
                 {challenge.tipo === 'cover' ? (
                   <div className="relative w-[82vw] h-[82vw] max-w-72 max-h-72 mx-auto mb-8 rounded-3xl overflow-hidden border-4 border-[#222] shadow-2xl">
@@ -352,7 +346,7 @@ export default function QuavedleGame() {
                     </div>
                   </div>
                 ) : (
-                  <div className={`mx-auto mb-8 overflow-hidden shadow-2xl border-4 border-[#222] ${challenge.tipo === 'artist' ? 'w-[68vw] h-[68vw] max-w-56 max-h-56 rounded-full' : 'w-[76vw] h-[76vw] max-w-64 max-h-64 rounded-3xl'}`}>
+                  <div className={`mx-auto mb-8 overflow-hidden shadow-2xl border-4 border-[#222] w-[68vw] h-[68vw] max-w-56 max-h-56 rounded-full`}>
                     <img src={challenge.imagen || 'https://via.placeholder.com/300'} alt="Pista visual" className="w-full h-full object-cover transition-all duration-700" style={{ filter: `blur(${Math.max(25 - attempts.length * 5, 0)}px) brightness(${50 + attempts.length * 10}%) grayscale(${100 - attempts.length * 20}%)` }} />
                   </div>
                 )}
