@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/logo.png" alt="QUAVEMIND Logo" width="80" style="vertical-align: middle;">
+
   <br>
   <strong>QUAVEMIND</strong>
 </p>
