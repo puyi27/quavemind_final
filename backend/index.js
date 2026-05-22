@@ -9,7 +9,6 @@ import { getCachedData, cacheData } from './lib/redis.js';
 import { getSpotifyToken, fetchJsonWithRetry, SPOTIFY_API_BASE } from './lib/spotify.js';
 import quavedleRoutes from './routes/quavedle.js';
 import musicRoutes from './routes/music.js';
-import anotacionesRoutes from './routes/anotaciones.js';
 import versoOcultoRoutes from './routes/versoOculto.js';
 import radarRoutes from './routes/radar.js';
 import recomendacionesRoutes from './routes/recomendacionesDiarias.js';
@@ -48,10 +47,8 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(cookieParser());
 
-// Rutas modulares
 app.use('/api/quavedle', quavedleRoutes);
 app.use('/api/music', musicRoutes);
-app.use('/api/anotaciones', anotacionesRoutes);
 app.use('/api/verso-oculto', versoOcultoRoutes);
 app.use('/api/radar', radarRoutes);
 app.use('/api/recomendaciones', recomendacionesRoutes);
@@ -69,8 +66,6 @@ const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY || '';
 const RAPIDAPI_URBAN_HOST = process.env.RAPIDAPI_URBAN_HOST || 'mashape-community-urban-dictionary.p.rapidapi.com';
 const RAPIDAPI_URBAN_URL = process.env.RAPIDAPI_URBAN_URL || `https://${RAPIDAPI_URBAN_HOST}`;
 
-// Utilidad movida a lib/stats.js
-
 const limpiarUrbanText = (value) => `${value || ''}`.replace(/\[(.*?)\]/g, '$1').replace(/\r?\n+/g, ' ').trim();
 const limpiarTexto = (value) => `${value || ''}`.replace(/\[(.*?)\]/g, '$1').replace(/\r?\n+/g, ' ').trim();
 const decodeHtmlEntities = (value) => `${value || ''}`.replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCodePoint(parseInt(hex, 16))).replace(/<[^>]+>/g, ' ').trim();
@@ -86,7 +81,6 @@ const puntuarJerga = (entrada, query) => {
   return 0;
 };
 
-// Rutas Misceláneas (Jerga, Deezer, etc.)
 app.get('/api/jerga/urban', async (req, res) => {
   const query = `${req.query.q || ''}`.trim();
   if (!query) return res.json({ status: 'ok', entradas: [], proveedor: 'urban_dictionary' });
@@ -136,26 +130,13 @@ app.get('/api/quavedle/spotify-artist', async (req, res) => {
   } catch (error) { return res.status(500).json({ status: 'error' }); }
 });
 
-// ==========================================
-// 🚀 RUTAS DE BÚSQUEDA Y PERFILES (UNIVERSALES)
-// ==========================================
-
-// Redirección de búsqueda para compatibilidad
 app.get('/api/buscar', (req, res) => {
   res.redirect(307, `/api/music/buscar?${new URLSearchParams(req.query).toString()}`);
 });
 
-// ==========================================
-// RUTAS DE ARTISTAS (Compatibilidad Escenas/Géneros)
-// ==========================================
-// Las rutas de artistas (/bulk y GET por ID) han sido movidas a routes/artistas.js
-
-
-// 🔥 RESTAURADA: PERFIL DE ARTISTA 🔥
 app.get(['/api/artista/:id', '/api/music/artista/:id'], async (req, res) => {
   const { id } = req.params;
 
-  // Sanitización de IDs corruptos o marcadores de posición
   if (!id || id.length < 15 || id.includes('j1k2l') || id === 'undefined' || id === 'null') {
     return res.json({ 
       status: 'ok', 
@@ -189,7 +170,6 @@ app.get(['/api/artista/:id', '/api/music/artista/:id'], async (req, res) => {
     ]);
 
     if (!artistaRes.ok) {
-      // Si el artista no existe en Spotify, devolvemos un objeto parcial en lugar de 400/404
       return res.json({ 
         status: 'ok', 
         artista: { 
@@ -438,7 +418,6 @@ app.get(['/api/artista/:id', '/api/music/artista/:id'], async (req, res) => {
 app.get(['/api/cancion/:id', '/api/music/cancion/:id'], async (req, res) => {
   const { id } = req.params;
   
-  // 1. Fallback inmediato para IDs de marcador (evita 500 y 404 innecesarios)
   if (!id || id.length < 10 || id === 'track1' || id === 'undefined' || id === 'null') {
     return res.json({
       status: 'ok',
@@ -498,7 +477,7 @@ app.get(['/api/cancion/:id', '/api/music/cancion/:id'], async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Error en ruta cancion:', error.message);
+    console.error(error.message);
     return res.status(500).json({ status: 'error', mensaje: 'Error interno del servidor' });
   }
 });
@@ -513,7 +492,6 @@ app.get(['/api/recomendaciones/cancion/:id', '/api/music/recomendaciones/cancion
     const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
     
     if (!response.ok) {
-       // Si es 404 o similar, devolvemos vacio en vez de error
        return res.json({ status: 'ok', recomendaciones: [] });
     }
 
@@ -528,7 +506,7 @@ app.get(['/api/recomendaciones/cancion/:id', '/api/music/recomendaciones/cancion
     }));
     return res.json({ status: 'ok', recomendaciones });
   } catch (error) { 
-    console.error(`ERROR en recomendaciones canción ${id}:`, error.message);
+    console.error(error.message);
     return res.json({ status: 'ok', recomendaciones: [] }); 
   }
 });
@@ -577,12 +555,11 @@ app.get(['/api/album/:id', '/api/music/album/:id'], async (req, res) => {
       }))
     });
   } catch (error) { 
-    console.error(`ERROR en perfil álbum ${id}:`, error.message);
+    console.error(error.message);
     return res.status(500).json({ status: 'error', mensaje: error.message }); 
   }
 });
 
-// PLAYLISTS (Top Mundial, Rankings...)
 app.get(['/api/playlist/:id', '/api/music/playlist/:id'], async (req, res) => {
   const { id } = req.params;
   try {
@@ -601,14 +578,13 @@ app.get(['/api/playlist/:id', '/api/music/playlist/:id'], async (req, res) => {
       tracks: (data.tracks?.items || []).map(item => item.track ? ({ id: item.track.id, nombre: item.track.name, artista: item.track.artists[0]?.name, imagen: item.track.album?.images[0]?.url, preview: item.track.preview_url, duracion: item.track.duration_ms }) : null).filter(Boolean)
     });
   } catch (error) { 
-    console.error(`ERROR en playlist ${id}:`, error.message);
+    console.error(error.message);
     res.status(500).json({ status: 'error', mensaje: error.message }); 
   }
 });
 
-// Middleware de error global para evitar crashes del servidor
 app.use((err, req, res, next) => {
-  console.error('[GLOBAL ERROR]:', err.stack);
+  console.error(err.stack);
   res.status(500).json({ 
     status: 'error', 
     mensaje: 'Ha ocurrido un error inesperado en el servidor.',
