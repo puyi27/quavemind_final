@@ -16,11 +16,13 @@ const AINeuralDiscovery = ({ title, type, data, description }) => {
       .slice(0, 10);
   }, [data, type]);
 
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   const [radius, setRadius] = useState(200);
 
   useEffect(() => {
     const handleResize = () => {
-      setRadius(window.innerWidth < 768 ? 110 : (window.innerWidth < 1024 ? 150 : 200));
+      setIsMobile(window.innerWidth < 1024);
+      setRadius(window.innerWidth < 1024 ? 110 : 200);
     };
     handleResize();
     window.addEventListener('resize', handleResize);
@@ -40,7 +42,7 @@ const AINeuralDiscovery = ({ title, type, data, description }) => {
   };
 
   return (
-    <div className="relative overflow-hidden rounded-[4rem] bg-[#050505] border border-white/5 p-6 lg:p-16 shadow-[0_50px_100px_rgba(0,0,0,0.5)]">
+    <div className="relative overflow-hidden rounded-[3rem] lg:rounded-[4rem] bg-[#050505] border border-white/5 p-6 lg:p-16 shadow-[0_50px_100px_rgba(0,0,0,0.5)]">
       {/* Background FX */}
       <div className="absolute inset-0 opacity-20 pointer-events-none">
         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_#ff6b0010_0%,_transparent_70%)]" />
@@ -48,7 +50,7 @@ const AINeuralDiscovery = ({ title, type, data, description }) => {
       </div>
 
       <div className="relative z-10">
-        <header className="flex flex-col md:flex-row md:items-center justify-between mb-10 lg:mb-16 gap-6">
+        <header className="flex flex-col md:flex-row md:items-center justify-between mb-8 lg:mb-16 gap-6">
           <div className="flex items-center gap-4 lg:gap-6">
             <div className="p-4 lg:p-5 bg-[#ff6b00] rounded-3xl text-black shadow-[0_0_40px_rgba(255,107,0,0.3)] shrink-0">
               {type === 'emerging' ? <MdTrendingUp className="text-3xl lg:text-4xl" /> : <MdExplore className="text-3xl lg:text-4xl" />}
@@ -65,23 +67,94 @@ const AINeuralDiscovery = ({ title, type, data, description }) => {
           </div>
         </header>
 
-        <div className="relative min-h-[700px] lg:min-h-[600px] w-full flex flex-col lg:flex-row items-center overflow-hidden">
-           <AnimatePresence>
+        <div className="relative min-h-[500px] lg:min-h-[600px] w-full flex items-center justify-center overflow-hidden">
+           <AnimatePresence mode="wait">
             {analyzing ? (
               <motion.div 
                 key="loading"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="w-full h-full flex flex-col items-center justify-center gap-6 py-32"
+                className="w-full flex flex-col items-center justify-center gap-6 py-32"
               >
                 <MdPsychology className="text-7xl text-[#ff6b00] animate-pulse" />
                 <p className="text-xs font-black text-white uppercase tracking-[0.4em] text-center">Procesando ADN de la Escena...</p>
               </motion.div>
+            ) : isMobile ? (
+              /* MOBILE DNA LAYOUT */
+              <motion.div 
+                key="mobile-dna"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="relative w-full flex flex-col pt-4 pb-12"
+              >
+                {/* Central Spine */}
+                <div className="absolute top-10 bottom-10 left-1/2 w-0.5 bg-gradient-to-b from-[#ff6b00] via-[#ff6b00]/30 to-transparent -translate-x-1/2" />
+                
+                {/* Hub */}
+                <div className="relative z-10 flex justify-center mb-12">
+                  <div className="w-20 h-20 bg-[#ff6b00] rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(255,107,0,0.5)]">
+                    <MdHub className="text-4xl text-black" />
+                    <div className="absolute -inset-2 border border-[#ff6b00]/30 rounded-full animate-ping" />
+                  </div>
+                </div>
+
+                {/* Nodes */}
+                <div className="flex flex-col gap-8 relative z-10">
+                  {nodes.map((node, i) => {
+                    const isLeft = i % 2 === 0;
+                    return (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-50px" }}
+                        transition={{ delay: i * 0.1 }}
+                        key={node.id} 
+                        className={`flex w-full items-center relative ${isLeft ? 'flex-row-reverse' : 'flex-row'}`}
+                      >
+                         <div className="w-1/2" />
+                         
+                         {/* Connector Dot */}
+                         <div className="absolute left-1/2 w-4 h-4 bg-[#050505] border-2 border-[#ff6b00] rounded-full -translate-x-1/2 shadow-[0_0_10px_#ff6b00]" />
+
+                         {/* Horizontal connector line */}
+                         <div className={`absolute top-1/2 h-0.5 bg-[#ff6b00]/30 -translate-y-1/2 ${isLeft ? 'right-1/2 w-8' : 'left-1/2 w-8'}`} />
+
+                         {/* Card */}
+                         <div className={`w-1/2 flex ${isLeft ? 'justify-end pr-8' : 'justify-start pl-8'}`}>
+                           <div className="w-full max-w-[160px] bg-black/60 backdrop-blur-xl border border-white/10 rounded-3xl p-4 flex flex-col items-center text-center shadow-xl">
+                             <div className="relative mb-3">
+                               <img src={node.imagen} className="w-14 h-14 rounded-2xl object-cover border-2 border-[#ff6b00]" alt={node.nombre} />
+                               {type === 'emerging' && (
+                                 <div className="absolute -top-2 -right-2 w-5 h-5 bg-[#ff6b00] rounded-full flex items-center justify-center text-black">
+                                   <MdWhatshot className="text-[10px]" />
+                                 </div>
+                               )}
+                             </div>
+                             <h4 className="text-xs font-black text-white uppercase leading-tight mb-2 line-clamp-2">{node.nombre}</h4>
+                             <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden mb-4">
+                               <div className="h-full bg-[#ff6b00]" style={{ width: `${node.popularidad}%` }} />
+                             </div>
+                             <Link to={`/artista/${node.id}`} className="w-full py-2.5 bg-white text-black text-[9px] font-black uppercase tracking-widest rounded-xl hover:bg-[#ff6b00] transition-colors shadow-lg active:scale-95">
+                               Perfil
+                             </Link>
+                           </div>
+                         </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </motion.div>
             ) : (
-              <div className="relative w-full h-full flex flex-col lg:flex-row gap-8 lg:gap-0">
+              /* DESKTOP CIRCULAR LAYOUT */
+              <motion.div 
+                key="desktop-circle"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="relative w-full h-full flex flex-row gap-0"
+              >
                 {/* Visual Area */}
-                <div className="relative w-full lg:w-[60%] h-[350px] lg:h-full shrink-0">
+                <div className="relative w-[60%] h-full shrink-0">
                   <svg className="absolute inset-0 w-full h-full pointer-events-none">
                     <defs>
                       <filter id="glow">
@@ -109,9 +182,9 @@ const AINeuralDiscovery = ({ title, type, data, description }) => {
 
                   {/* Scene Core */}
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-                    <div className="relative w-20 h-20 lg:w-32 lg:h-32 bg-[#ff6b00] rounded-full flex items-center justify-center shadow-[0_0_60px_rgba(255,107,0,0.4)]">
-                      <MdHub className="text-4xl lg:text-5xl text-black" />
-                      <div className="absolute -inset-2 lg:-inset-4 border border-[#ff6b00]/20 rounded-full animate-ping" />
+                    <div className="relative w-32 h-32 bg-[#ff6b00] rounded-full flex items-center justify-center shadow-[0_0_60px_rgba(255,107,0,0.4)]">
+                      <MdHub className="text-5xl text-black" />
+                      <div className="absolute -inset-4 border border-[#ff6b00]/20 rounded-full animate-ping" />
                     </div>
                   </div>
 
@@ -135,10 +208,10 @@ const AINeuralDiscovery = ({ title, type, data, description }) => {
                             whileHover={{ scale: 1.2 }}
                             className={`relative p-1 rounded-2xl border-2 transition-all duration-500 ${activeNode?.id === node.id ? 'border-[#ff6b00] shadow-[0_0_30px_#ff6b00] grayscale-0' : 'border-white/10 grayscale hover:grayscale-0 bg-black/50 backdrop-blur-sm'}`}
                           >
-                            <img src={node.imagen} alt={node.nombre} className="w-12 h-12 lg:w-16 lg:h-16 rounded-xl object-cover" />
+                            <img src={node.imagen} alt={node.nombre} className="w-16 h-16 rounded-xl object-cover" />
                             {type === 'emerging' && (
-                              <div className="absolute -top-2 -right-2 w-5 h-5 lg:w-6 lg:h-6 bg-[#ff6b00] rounded-full flex items-center justify-center text-black shadow-lg">
-                                <MdWhatshot className="text-[10px] lg:text-xs" />
+                              <div className="absolute -top-2 -right-2 w-6 h-6 bg-[#ff6b00] rounded-full flex items-center justify-center text-black shadow-lg">
+                                <MdWhatshot className="text-xs" />
                               </div>
                             )}
                           </motion.div>
@@ -149,7 +222,7 @@ const AINeuralDiscovery = ({ title, type, data, description }) => {
                 </div>
 
                 {/* Info Area */}
-                <div className="relative w-full lg:w-[40%] h-auto lg:h-full overflow-y-auto lg:border-l border-white/5 p-6 lg:p-10">
+                <div className="relative w-[40%] h-full overflow-y-auto border-l border-white/5 p-10">
                   <AnimatePresence mode="wait">
                     {activeNode ? (
                       <motion.div
@@ -198,7 +271,7 @@ const AINeuralDiscovery = ({ title, type, data, description }) => {
                     )}
                   </AnimatePresence>
                 </div>
-              </div>
+              </motion.div>
             )}
            </AnimatePresence>
         </div>

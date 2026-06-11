@@ -1,26 +1,77 @@
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { MdHome, MdExplore, MdSearch, MdSportsEsports, MdGroups, MdFolder, MdPerson, MdClose, MdSecurity } from 'react-icons/md';
+import { MdHome, MdSearch, MdSportsEsports, MdGroups, MdFolder, MdPerson, MdClose, MdSecurity, MdMap, MdAlbum, MdArrowDropDown } from 'react-icons/md';
 import { useAuthStore } from '../store/authStore';
 import iconoLogo from '../assets/iconoLogo.png';
+import { ESCENAS_DATA } from '../data/escenasData';
+import { GENEROS_DATA } from '../data/generosData';
 
 export default function MobileMenu({ isOpen, onClose }) {
   const location = useLocation();
   const { user, isAuthenticated, logout } = useAuthStore();
+  const [expandedSection, setExpandedSection] = useState(null);
 
   if (!isOpen) return null;
 
-  const menuItems = [
+  const topItems = [
     { to: '/', label: 'Inicio', icon: MdHome },
     { to: '/buscar', label: 'Buscar', icon: MdSearch },
+  ];
+
+  const bottomItems = [
     { to: '/quavedle', label: 'Juegos', icon: MdSportsEsports },
     { to: '/comunidad', label: 'Comunidad', icon: MdGroups },
     { to: '/boveda', label: 'Mi Bóveda', icon: MdFolder },
     ...(user?.rol === 'ADMIN' ? [{ to: '/admin', label: 'Panel Admin', icon: MdSecurity }] : []),
   ];
 
+  const dropdownItems = [
+    { 
+      id: 'escenas', 
+      label: 'Escenas', 
+      icon: MdMap,
+      items: Object.entries(ESCENAS_DATA).map(([id, data]) => ({
+        to: `/escena/${id}`,
+        label: data.nombre,
+        icon: data.flag
+      }))
+    },
+    { 
+      id: 'generos', 
+      label: 'Géneros', 
+      icon: MdAlbum,
+      items: Object.entries(GENEROS_DATA).map(([id, data]) => ({
+        to: `/genero/${id}`,
+        label: data.nombre
+      }))
+    }
+  ];
+
   const isActive = (path) => {
     if (path === '/') return location.pathname === '/';
     return location.pathname.startsWith(path);
+  };
+
+  const toggleSection = (id) => {
+    setExpandedSection(expandedSection === id ? null : id);
+  };
+
+  const renderLinkItem = (item) => {
+    const Icon = item.icon;
+    const active = isActive(item.to);
+    return (
+      <Link
+        key={item.to}
+        to={item.to}
+        onClick={onClose}
+        className={`flex items-center gap-5 p-5 mb-3 rounded-2xl transition-all active:scale-95 ${
+          active ? 'bg-[#ff6b00] text-black shadow-[0_0_20px_rgba(255,107,0,0.2)]' : 'bg-[#0a0a0a] border border-white/5 text-white'
+        }`}
+      >
+        <Icon className="text-2xl" />
+        <span className="text-lg font-black uppercase tracking-tight">{item.label}</span>
+      </Link>
+    );
   };
 
   return (
@@ -41,23 +92,48 @@ export default function MobileMenu({ isOpen, onClose }) {
  
       {/* Menu Items - Scrollable */}
       <div className="flex-1 overflow-y-auto p-6 pb-32">
-        {menuItems.map((item) => {
-          const Icon = item.icon;
-          const active = isActive(item.to);
+        {topItems.map(renderLinkItem)}
+
+        {/* Dropdowns */}
+        {dropdownItems.map((dropdown) => {
+          const Icon = dropdown.icon;
+          const isExpanded = expandedSection === dropdown.id;
           return (
-            <Link
-              key={item.to}
-              to={item.to}
-              onClick={onClose}
-              className={`flex items-center gap-5 p-5 mb-3 rounded-2xl transition-all active:scale-95 ${
-                active ? 'bg-[#ff6b00] text-black shadow-[0_0_20px_rgba(255,107,0,0.2)]' : 'bg-[#0a0a0a] border border-white/5 text-white'
-              }`}
-            >
-              <Icon className="text-2xl" />
-              <span className="text-lg font-black uppercase tracking-tight">{item.label}</span>
-            </Link>
+            <div key={dropdown.id} className="mb-3">
+              <button
+                onClick={() => toggleSection(dropdown.id)}
+                className={`w-full flex items-center justify-between p-5 rounded-2xl transition-all active:scale-95 border border-white/5 ${
+                  isExpanded ? 'bg-white/10 text-white' : 'bg-[#0a0a0a] text-white'
+                }`}
+              >
+                <div className="flex items-center gap-5">
+                  <Icon className="text-2xl" />
+                  <span className="text-lg font-black uppercase tracking-tight">{dropdown.label}</span>
+                </div>
+                <MdArrowDropDown className={`text-2xl transition-transform duration-300 ${isExpanded ? 'rotate-180 text-[#ff6b00]' : ''}`} />
+              </button>
+              
+              {/* Contenido desplegable */}
+              {isExpanded && (
+                <div className="mt-2 ml-4 flex flex-col gap-2 border-l border-white/10 pl-4 py-2">
+                  {dropdown.items.map((item) => (
+                    <Link
+                      key={item.to}
+                      to={item.to}
+                      onClick={onClose}
+                      className="flex items-center gap-3 py-3 px-2 rounded-xl text-white/70 hover:text-white hover:bg-white/5 transition-all"
+                    >
+                      {item.icon && <span className="text-xl">{item.icon}</span>}
+                      <span className="text-sm font-black uppercase tracking-widest">{item.label}</span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
           );
         })}
+
+        {bottomItems.map(renderLinkItem)}
       </div>
  
       {/* Auth Section - Bottom Fixed with Safe Area */}
