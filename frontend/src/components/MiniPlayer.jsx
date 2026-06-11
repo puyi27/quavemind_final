@@ -115,7 +115,7 @@ export default function MiniPlayer() {
     if (!bar) return;
     const rect = bar.getBoundingClientRect();
     const pct = Math.min(100, Math.max(0, ((e.clientX - rect.left) / rect.width) * 100));
-    ctrl.seek(Math.floor((pct / 100) * duration));
+    ctrl.seek(Math.floor(((pct / 100) * duration) / 1000));
   }, [duration]);
 
   const [esFavorito, setEsFavorito] = useState(false);
