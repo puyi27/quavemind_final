@@ -7,9 +7,9 @@ import api from '../services/api';
  * y tiempos de carga innecesarios.
  */
 
-// Caché en memoria para evitar peticiones redundantes (TTL 30s)
+// Caché en memoria (Deshabilitado temporalmente para tener datos en tiempo real sin recargar)
 const cache = new Map();
-const CACHE_TTL = 30000; 
+const CACHE_TTL = 0; 
 
 const getFromCache = (key) => {
   const item = cache.get(key);
@@ -20,7 +20,9 @@ const getFromCache = (key) => {
 };
 
 const saveToCache = (key, data) => {
-  cache.set(key, { data, timestamp: Date.now() });
+  if (CACHE_TTL > 0) {
+    cache.set(key, { data, timestamp: Date.now() });
+  }
 };
 
 export const optimizedGet = async (endpoint, params = {}, fallback = { status: 'error', resultados: {} }) => {

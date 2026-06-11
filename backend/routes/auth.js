@@ -351,12 +351,13 @@ router.get('/search', async (req, res) => {
  */
 router.get('/leaderboard', async (req, res) => {
   try {
-    const cached = await getCachedData('ranking_comunidad');
+    const cached = await getCachedData('ranking_comunidad_v2');
     if (cached) return res.json({ status: 'ok', leaderboard: cached });
 
     const usuarios = await prisma.usuario.findMany({
       orderBy: { quavePoints: 'desc' },
       select: {
+        id: true,
         username: true,
         avatar: true,
         quavePoints: true
@@ -364,7 +365,7 @@ router.get('/leaderboard', async (req, res) => {
       take: 50
     });
 
-    await cacheData('ranking_comunidad', usuarios, 300);
+    await cacheData('ranking_comunidad_v2', usuarios, 5);
     res.json({ status: 'ok', leaderboard: usuarios });
   } catch (error) {
     res.json({ status: 'ok', leaderboard: [] });
