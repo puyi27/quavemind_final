@@ -171,7 +171,7 @@ export default function MiniPlayer() {
 
   if (!currentTrack) {
     return (
-      <div className="fixed bottom-[-1000px] left-[-1000px] w-0 h-0 opacity-0 pointer-events-none">
+      <div className="fixed bottom-[-1000px] left-[-1000px] w-0 h-0 opacity-0 pointer-events-none overflow-hidden">
         <div ref={containerRef} />
       </div>
     );
