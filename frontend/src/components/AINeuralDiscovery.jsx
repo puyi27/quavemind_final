@@ -22,7 +22,7 @@ const AINeuralDiscovery = ({ title, type, data, description }) => {
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 1024);
-      setRadius(window.innerWidth < 1024 ? 110 : 200);
+      setRadius(window.innerWidth < 1024 ? 110 : 170);
     };
     handleResize();
     window.addEventListener('resize', handleResize);
@@ -67,7 +67,7 @@ const AINeuralDiscovery = ({ title, type, data, description }) => {
           </div>
         </header>
 
-        <div className="relative min-h-[500px] lg:min-h-0 lg:h-[600px] w-full flex items-center justify-center overflow-hidden">
+        <div className="relative min-h-[500px] lg:min-h-[600px] w-full flex items-center justify-center overflow-hidden">
            <AnimatePresence mode="wait">
             {analyzing ? (
               <motion.div 
@@ -75,7 +75,7 @@ const AINeuralDiscovery = ({ title, type, data, description }) => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 w-full flex flex-col items-center justify-center gap-6"
+                className="w-full flex flex-col items-center justify-center gap-6 py-32"
               >
                 <MdPsychology className="text-7xl text-[#ff6b00] animate-pulse" />
                 <p className="text-xs font-black text-white uppercase tracking-[0.4em] text-center">Procesando ADN de la Escena...</p>
@@ -151,10 +151,10 @@ const AINeuralDiscovery = ({ title, type, data, description }) => {
                 key="desktop-circle"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="absolute inset-0 w-full h-full flex flex-row gap-0"
+                className="relative w-full h-full flex flex-row gap-0"
               >
                 {/* Visual Area */}
-                <div className="relative flex-1 h-full shrink-0">
+                <div className="relative w-[60%] h-full shrink-0">
                   <svg className="absolute inset-0 w-full h-full pointer-events-none">
                     <defs>
                       <filter id="glow">
@@ -222,7 +222,7 @@ const AINeuralDiscovery = ({ title, type, data, description }) => {
                 </div>
 
                 {/* Info Area */}
-                <div className="relative w-[320px] lg:w-[380px] shrink-0 h-full overflow-y-auto border-l border-white/5 p-10">
+                <div className="relative w-[40%] h-full overflow-y-auto border-l border-white/5 p-10">
                   <AnimatePresence mode="wait">
                     {activeNode ? (
                       <motion.div
