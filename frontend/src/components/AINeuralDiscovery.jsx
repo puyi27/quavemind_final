@@ -67,7 +67,7 @@ const AINeuralDiscovery = ({ title, type, data, description }) => {
           </div>
         </header>
 
-        <div className="relative min-h-[500px] lg:min-h-[600px] w-full flex items-stretch justify-center overflow-hidden">
+        <div className="relative min-h-[500px] lg:min-h-0 lg:h-[600px] w-full flex items-center justify-center overflow-hidden">
            <AnimatePresence mode="wait">
             {analyzing ? (
               <motion.div 
@@ -75,7 +75,7 @@ const AINeuralDiscovery = ({ title, type, data, description }) => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="w-full flex flex-col items-center justify-center gap-6 py-32"
+                className="absolute inset-0 w-full flex flex-col items-center justify-center gap-6"
               >
                 <MdPsychology className="text-7xl text-[#ff6b00] animate-pulse" />
                 <p className="text-xs font-black text-white uppercase tracking-[0.4em] text-center">Procesando ADN de la Escena...</p>
@@ -151,7 +151,7 @@ const AINeuralDiscovery = ({ title, type, data, description }) => {
                 key="desktop-circle"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="relative w-full h-full flex flex-row gap-0"
+                className="absolute inset-0 w-full h-full flex flex-row gap-0"
               >
                 {/* Visual Area */}
                 <div className="relative flex-1 h-full shrink-0">
