@@ -67,7 +67,7 @@ const AINeuralDiscovery = ({ title, type, data, description }) => {
           </div>
         </header>
 
-        <div className="relative min-h-[500px] lg:min-h-[600px] w-full flex items-center justify-center overflow-hidden">
+        <div className="relative min-h-[500px] lg:min-h-[600px] w-full flex items-stretch justify-center overflow-hidden">
            <AnimatePresence mode="wait">
             {analyzing ? (
               <motion.div 
