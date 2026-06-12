@@ -67,7 +67,7 @@ const AINeuralDiscovery = ({ title, type, data, description }) => {
           </div>
         </header>
 
-        <div className="relative min-h-[500px] lg:min-h-[600px] w-full flex items-center justify-center overflow-hidden">
+        <div className="relative min-h-[500px] lg:min-h-[600px] w-full flex items-center justify-center">
            <AnimatePresence mode="wait">
             {analyzing ? (
               <motion.div 
@@ -151,7 +151,7 @@ const AINeuralDiscovery = ({ title, type, data, description }) => {
                 key="desktop-circle"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="relative w-full h-full flex flex-row gap-0"
+                className="relative w-full h-[500px] lg:h-[600px] flex flex-row gap-0"
               >
                 {/* Visual Area */}
                 <div className="relative w-[60%] h-full shrink-0">
