@@ -22,13 +22,7 @@ const AINeuralDiscovery = ({ title, type, data, description }) => {
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 1024);
-      if (window.innerWidth < 1024) {
-        setRadius(110);
-      } else if (window.innerWidth < 1366) {
-        setRadius(150);
-      } else {
-        setRadius(200);
-      }
+      setRadius(window.innerWidth < 1024 ? 110 : 200);
     };
     handleResize();
     window.addEventListener('resize', handleResize);
@@ -160,8 +154,8 @@ const AINeuralDiscovery = ({ title, type, data, description }) => {
                 className="relative w-full h-full flex flex-row gap-0"
               >
                 {/* Visual Area */}
-                <div className="relative z-10 w-[60%] h-full shrink-0">
-                  <svg className="absolute inset-0 w-full h-full pointer-events-none overflow-visible">
+                <div className="relative flex-1 h-full shrink-0">
+                  <svg className="absolute inset-0 w-full h-full pointer-events-none">
                     <defs>
                       <filter id="glow">
                         <feGaussianBlur stdDeviation="3" result="blur" />
@@ -228,7 +222,7 @@ const AINeuralDiscovery = ({ title, type, data, description }) => {
                 </div>
 
                 {/* Info Area */}
-                <div className="relative z-0 w-[40%] h-full overflow-y-auto border-l border-white/5 p-10">
+                <div className="relative w-[320px] lg:w-[380px] shrink-0 h-full overflow-y-auto border-l border-white/5 p-10">
                   <AnimatePresence mode="wait">
                     {activeNode ? (
                       <motion.div
