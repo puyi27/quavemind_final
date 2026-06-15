@@ -34,7 +34,7 @@ const RankingQuave = ({ artistasInput = [] }) => {
                     };
                 }).sort((a, b) => {
                     const aVal = a.oyentesReales || a.seguidores || (a.popularidad * 10000);
-                    const bVal = b.oyentesReales || b.followers || (b.popularidad * 10000);
+                    const bVal = b.oyentesReales || b.seguidores || (b.popularidad * 10000);
                     return bVal - aVal;
                 });
                 
