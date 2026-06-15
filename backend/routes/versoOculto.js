@@ -6,7 +6,9 @@ const router = Router();
 // Obtener verso del día
 router.get('/daily', async (req, res) => {
   try {
-    const hoy = new Date();
+    const REROLL_OFFSET = 1; // Cambiar este valor para forzar un nuevo reroll en el futuro
+    const offsetMs = REROLL_OFFSET * 24 * 60 * 60 * 1000;
+    const hoy = new Date(Date.now() + offsetMs);
     hoy.setHours(0, 0, 0, 0);
 
     // Buscar si ya hay un verso asignado para hoy
@@ -78,7 +80,7 @@ router.get('/daily', async (req, res) => {
     // Marcar como usado hoy
     await prisma.pistaVersoOculto.update({
       where: { id: versoSeleccionado.id },
-      data: { usadaEnDiario: new Date() },
+      data: { usadaEnDiario: new Date(Date.now() + offsetMs) },
     });
 
     const { cancion, ...versoSinRespuesta } = versoSeleccionado;

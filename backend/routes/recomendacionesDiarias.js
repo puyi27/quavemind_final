@@ -9,9 +9,11 @@ const getHoy = () => {
   return `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
 };
 
+const REROLL_OFFSET = 1; // Cambiar este valor para forzar un nuevo reroll en el futuro
+
 const getSeed = () => {
   const hoy = new Date();
-  return hoy.getFullYear() * 10000 + (hoy.getMonth() + 1) * 100 + hoy.getDate();
+  return hoy.getFullYear() * 10000 + (hoy.getMonth() + 1) * 100 + hoy.getDate() + REROLL_OFFSET;
 };
 
 const selectWithSeed = (array, seed, offset = 0) => {
